@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kado Care</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #F5F7F5; font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+  /* Screens */
+  .screen { display: none; padding-bottom: 80px; }
+  .screen.active { display: block; }
+
+  /* Nav */
+  .nav { background: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EEF0EE; position: sticky; top: 0; z-index: 10; }
+  .nav-logo { font-family: 'Fraunces', serif; font-size: 18px; color: #1A2D22; }
+  .nav-logo span { color: #E8866A; }
+  .avatar { width: 32px; height: 32px; background: #E8F5F0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #2D8A6A; font-weight: 500; cursor: pointer; }
+
+  /* Hero */
+  .hero { background: white; padding: 20px 20px 16px; border-bottom: 1px solid #EEF0EE; }
+  .hero-greeting { font-size: 13px; color: #7A9A7A; margin-bottom: 4px; }
+  .hero-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 300; color: #1A2D22; }
+  .hero-sub { font-size: 12px; color: #7A9A7A; margin-top: 3px; }
+
+  /* ── RECORDS SCREEN ── */
+  .records-hero { background: white; padding: 20px 20px 16px; border-bottom: 1px solid #EEF0EE; }
+  .records-hero-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .upload-btn { background: #2D8A6A; color: white; border: none; padding: 9px 16px; border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .stats { display: flex; gap: 10px; padding-bottom: 4px; overflow-x: auto; }
+  .stat { border-radius: 12px; padding: 10px 14px; text-align: center; flex-shrink: 0; }
+  .stat-num { font-size: 20px; font-weight: 500; }
+  .stat-label { font-size: 9px; color: #7A9A7A; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .stat-1 { background: #EEF4FF; } .stat-1 .stat-num { color: #2D6BE4; }
+  .stat-2 { background: #FFF0F0; } .stat-2 .stat-num { color: #C0392B; }
+  .stat-3 { background: #FFFBE0; cursor: pointer; min-width: 110px; } .stat-3 .stat-num { color: #B8860B; }
+  .stat-fraction { display: flex; align-items: baseline; justify-content: center; gap: 1px; }
+  .stat-denom { font-size: 12px; color: #B8860B; opacity: 0.6; }
+  .explore-link { font-size: 8px; color: #2D6BE4; margin-top: 5px; text-decoration: underline; }
+  .section { padding: 16px 20px 0; }
+  .section-title { font-size: 11px; color: #7A9A7A; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: 500; }
+  .record { background: white; border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start; box-shadow: 0 1px 8px rgba(0,0,0,0.05); cursor: pointer; }
+  .record-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .record-body { flex: 1; }
+  .record-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .record-name { font-size: 14px; font-weight: 500; color: #1A2D22; }
+  .record-date { font-size: 10px; color: #7A9A7A; }
+  .record-meta { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .tag { padding: 3px 8px; border-radius: 100px; font-size: 9px; font-weight: 500; }
+  .tag-type { background: #EEF0FF; color: #5B5BD6; }
+  .tag-disease { background: #FFF4E8; color: #B86A1A; }
+  .record-arrow { color: #C0D0C0; font-size: 16px; margin-top: 2px; }
+  .icon-blood { background: #FFF0F0; } .icon-scan { background: #EEF0FF; }
+  .icon-prescription { background: #FFF8E0; } .icon-consultation { background: #F0F7F2; }
+  .icon-insurance { background: #F5F0FF; }
+
+  /* ── KADOS SCREEN ── */
+  .kado-count { padding: 16px 20px 8px; display: flex; align-items: center; justify-content: space-between; }
+  .kado-count-text { font-size: 12px; color: #7A9A7A; }
+  .kado-count-num { font-size: 12px; font-weight: 500; color: #1A2D22; }
+  .card-container { padding: 0 20px; margin-bottom: 16px; }
+  .kado-card { border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+  .panels-wrapper { display: flex; transition: transform 0.3s ease; }
+  .panel { min-width: 100%; padding: 22px 20px; }
+  .panel-info { background: white; }
+  .card-severity { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 100px; font-size: 10px; font-weight: 600; margin-bottom: 14px; }
+  .severity-urgent { background: #FFF0F0; color: #C0392B; }
+  .severity-watch { background: #FFFBE0; color: #B8860B; }
+  .severity-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot-urgent { background: #C0392B; } .dot-watch { background: #B8860B; }
+  .card-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: #1A2D22; margin-bottom: 16px; line-height: 1.2; }
+  .biomarkers { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .biomarker-row { display: flex; justify-content: space-between; align-items: center; background: #F5F7F5; border-radius: 10px; padding: 10px 14px; }
+  .biomarker-name { font-size: 12px; color: #1A2D22; font-weight: 500; }
+  .biomarker-value { font-size: 12px; font-weight: 500; }
+  .value-high { color: #C0392B; } .value-watch { color: #B8860B; }
+  .card-summary { font-size: 13px; color: #7A9A7A; line-height: 1.6; }
+  .panel-learn { background: #EEF4FF; }
+  .panel-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .label-blue { color: #2D6BE4; } .label-green { color: #2D8A6A; }
+  .learn-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 300; color: #1A2D22; margin-bottom: 16px; line-height: 1.3; }
+  .learn-options { display: flex; flex-direction: column; gap: 10px; }
+  .learn-option { background: white; border-radius: 14px; padding: 14px 16px; display: flex; gap: 14px; align-items: center; cursor: pointer; }
+  .learn-option-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .icon-video { background: #FFF0F0; } .icon-article { background: #EEF4FF; }
+  .learn-option-body { flex: 1; }
+  .learn-option-type { font-size: 9px; font-weight: 700; color: #7A9A7A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+  .learn-option-title { font-size: 13px; color: #1A2D22; font-weight: 500; line-height: 1.3; margin-bottom: 3px; }
+  .learn-option-meta { font-size: 10px; color: #7A9A7A; }
+  .learn-arrow { color: #C0D0C0; font-size: 18px; }
+  .panel-act { background: #E8F5F0; }
+  .act-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 300; color: #1A2D22; margin-bottom: 16px; line-height: 1.3; }
+  .act-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .act-square { background: white; border-radius: 14px; padding: 16px 14px; display: flex; flex-direction: column; gap: 6px; cursor: pointer; transition: transform 0.15s ease; min-height: 110px; }
+  .act-square:not(.empty):active { transform: scale(0.97); }
+  .act-square.empty { opacity: 0.3; cursor: default; }
+  .act-square-icon { font-size: 24px; }
+  .act-square-label { font-size: 11px; font-weight: 600; color: #1A2D22; }
+  .act-square-preview { font-size: 10px; color: #7A9A7A; line-height: 1.4; }
+  .act-square-suggest { margin-top: auto; background: #E8F5F0; border: none; padding: 5px 8px; border-radius: 6px; font-size: 9px; font-weight: 600; color: #2D8A6A; cursor: pointer; font-family: 'DM Sans', sans-serif; width: 100%; text-align: center; transition: all 0.2s ease; }
+  .act-square-suggest.requested { background: #F5F7F5; color: #7A9A7A; cursor: default; }
+  .panel-dots { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 12px 0 4px; background: white; }
+  .pdot { width: 6px; height: 6px; border-radius: 50%; background: #EEF0EE; transition: all 0.3s ease; cursor: pointer; }
+  .pdot.active { background: #1A2D22; width: 18px; border-radius: 3px; }
+  .swipe-hint { display: flex; justify-content: space-between; padding: 6px 20px 12px; }
+  .hint { font-size: 10px; color: #B0C0B0; }
+
+  /* ── COVERAGE SCREEN ── */
+  .overall { margin: 16px 20px; background: white; border-radius: 18px; padding: 20px; box-shadow: 0 1px 8px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 16px; }
+  .score-circle { width: 70px; height: 70px; border-radius: 50%; background: conic-gradient(#2D8A6A 0% 45%, #EEF0EE 45% 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .score-inner { width: 54px; height: 54px; background: white; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .score-num { font-size: 16px; font-weight: 500; color: #1A2D22; line-height: 1; }
+  .score-denom { font-size: 9px; color: #7A9A7A; }
+  .score-body { flex: 1; }
+  .score-title { font-size: 14px; font-weight: 500; color: #1A2D22; }
+  .score-sub { font-size: 11px; color: #7A9A7A; margin-top: 3px; line-height: 1.5; }
+  .cov-section { padding: 0 20px; margin-bottom: 12px; }
+  .level-card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 1px 8px rgba(0,0,0,0.05); }
+  .level-header { padding: 16px 18px 12px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .level-left { display: flex; flex-direction: column; gap: 4px; }
+  .level-badge { display: inline-block; font-size: 9px; font-weight: 700; padding: 4px 10px; border-radius: 100px; letter-spacing: 0.5px; text-transform: uppercase; width: fit-content; }
+  .level-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 300; color: #1A2D22; }
+  .level-sub { font-size: 11px; color: #7A9A7A; }
+  .level-count { text-align: right; }
+  .level-count-num { font-size: 22px; font-weight: 500; }
+  .level-count-label { font-size: 9px; color: #7A9A7A; text-transform: uppercase; letter-spacing: 0.5px; }
+  .progress-wrap { padding: 0 18px 14px; }
+  .progress-bar { height: 6px; background: #EEF0EE; border-radius: 100px; overflow: hidden; margin-bottom: 6px; }
+  .progress-fill { height: 100%; border-radius: 100px; }
+  .progress-labels { display: flex; justify-content: space-between; font-size: 10px; color: #7A9A7A; }
+  .missing-wrap { padding: 0 18px 16px; }
+  .missing-title { font-size: 10px; color: #7A9A7A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ctag { padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 400; }
+  .essential .level-badge { background: #EEF4FF; color: #2D6BE4; }
+  .essential .level-count-num { color: #2D6BE4; }
+  .essential .progress-fill { background: #2D6BE4; }
+  .essential .ctag { background: #EEF4FF; color: #2D6BE4; }
+  .advanced .level-badge { background: #FFF0F0; color: #C0392B; }
+  .advanced .level-count-num { color: #C0392B; }
+  .advanced .progress-fill { background: #C0392B; }
+  .advanced .ctag { background: #FFF0F0; color: #C0392B; }
+  .frontier .level-badge { background: #F5F0FF; color: #7B2FBE; }
+  .frontier .level-count-num { color: #7B2FBE; }
+  .frontier .progress-fill { background: #7B2FBE; }
+  .frontier-coming { padding: 16px 18px; font-size: 12px; color: #7A9A7A; font-style: italic; }
+
+  /* ── PROFILE SCREEN ── */
+  .profile-body { padding: 20px; }
+  .profile-card { background: white; border-radius: 18px; padding: 20px; box-shadow: 0 1px 8px rgba(0,0,0,0.05); margin-bottom: 12px; }
+  .profile-avatar-large { width: 64px; height: 64px; background: #E8F5F0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #2D8A6A; font-weight: 500; margin: 0 auto 12px; }
+  .profile-name { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: #1A2D22; text-align: center; }
+  .profile-sub { font-size: 12px; color: #7A9A7A; text-align: center; margin-top: 4px; }
+  .profile-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #F0F2F0; }
+  .profile-row:last-child { border-bottom: none; }
+  .profile-row-label { font-size: 13px; color: #1A2D22; }
+  .profile-row-value { font-size: 13px; color: #7A9A7A; }
+  .profile-section-title { font-size: 11px; color: #7A9A7A; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 500; }
+
+  /* ── MODAL ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: flex-end; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: white; border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; max-height: 70vh; overflow-y: auto; }
+  .modal-handle { width: 36px; height: 4px; background: #EEF0EE; border-radius: 2px; margin: 0 auto 20px; }
+  .modal-icon { font-size: 28px; margin-bottom: 10px; }
+  .modal-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: #1A2D22; margin-bottom: 12px; }
+  .modal-body { font-size: 13px; color: #7A9A7A; line-height: 1.8; white-space: pre-line; }
+  .modal-close { margin-top: 20px; width: 100%; background: #F5F7F5; border: none; padding: 14px; border-radius: 12px; font-size: 14px; color: #1A2D22; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* Add Report Sheet */
+  .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: flex-end; }
+  .sheet-overlay.open { display: flex; }
+  .sheet { background: white; border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; }
+  .sheet-handle { width: 36px; height: 4px; background: #EEF0EE; border-radius: 2px; margin: 0 auto 20px; }
+  .sheet-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 300; color: #1A2D22; margin-bottom: 6px; }
+  .sheet-sub { font-size: 12px; color: #7A9A7A; margin-bottom: 20px; }
+  .sheet-options { display: flex; flex-direction: column; gap: 10px; }
+  .sheet-option { display: flex; align-items: center; gap: 16px; background: #F5F7F5; border-radius: 16px; padding: 16px 18px; cursor: pointer; border: none; width: 100%; font-family: 'DM Sans', sans-serif; text-align: left; transition: background 0.15s ease; }
+  .sheet-option:active { background: #EEF0EE; }
+  .sheet-option-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .icon-camera { background: #EEF4FF; }
+  .icon-wa { background: #E8F5EE; }
+  .sheet-option-title { font-size: 14px; font-weight: 500; color: #1A2D22; }
+  .sheet-option-sub { font-size: 11px; color: #7A9A7A; margin-top: 2px; }
+  .sheet-cancel { margin-top: 10px; width: 100%; background: none; border: none; padding: 14px; font-size: 14px; color: #7A9A7A; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #EEF0EE; display: flex; justify-content: space-around; padding: 10px 0 20px; z-index: 10; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 9px; color: #7A9A7A; cursor: pointer; padding: 0 24px; }
+  .nav-item.active { color: #2D8A6A; }
+  .nav-icon { font-size: 22px; }
+
+  /* back button */
+  .back-btn { background: none; border: none; font-size: 18px; cursor: pointer; color: #1A2D22; padding: 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ RECORDS SCREEN ═══════════════ -->
+<div class="screen active" id="screen-records">
+  <div class="nav">
+    <div class="nav-logo">kado<span>.</span>care</div>
+    <div class="avatar" onclick="showScreen('profile')">H</div>
+  </div>
+  <div class="records-hero">
+    <div class="records-hero-top">
+      <div>
+        <div class="hero-greeting">Good evening, Himanshu 👋</div>
+        <div class="hero-title">My Records</div>
+        <div class="hero-sub">Last updated today, 4:30 PM</div>
+      </div>
+      <button class="upload-btn" onclick="openSheet()">+ Add Report</button>
+    </div>
+    <div class="stats">
+      <div class="stat stat-1"><div class="stat-num">12</div><div class="stat-label">Total Records</div></div>
+      <div class="stat stat-2"><div class="stat-num">3</div><div class="stat-label">Active Issues</div></div>
+      <div class="stat stat-3" onclick="showScreen('coverage')">
+        <div class="stat-fraction"><span class="stat-num">24</span><span class="stat-denom">/34</span></div>
+        <div class="stat-label">Essential Biomarkers</div>
+        <div class="explore-link">Advanced and more ›</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">April 2026</div>
+    <div class="record">
+      <div class="record-icon icon-blood">🩸</div>
+      <div class="record-body">
+        <div class="record-top"><div class="record-name">Complete Blood Count</div><div class="record-date">28 Apr</div></div>
+        <div class="record-meta"><span class="tag tag-type">Blood Test</span><span class="tag tag-disease">Diabetes</span><span class="tag tag-disease">Thyroid</span></div>
+      </div>
+      <div class="record-arrow">›</div>
+    </div>
+    <div class="record">
+      <div class="record-icon icon-scan">🫁</div>
+      <div class="record-body">
+        <div class="record-top"><div class="record-name">Chest X-Ray</div><div class="record-date">22 Apr</div></div>
+        <div class="record-meta"><span class="tag tag-type">Scan</span><span class="tag tag-disease">General</span></div>
+      </div>
+      <div class="record-arrow">›</div>
+    </div>
+    <div class="record">
+      <div class="record-icon icon-prescription">💊</div>
+      <div class="record-body">
+        <div class="record-top"><div class="record-name">Metformin Prescription</div><div class="record-date">15 Apr</div></div>
+        <div class="record-meta"><span class="tag tag-type">Prescription</span><span class="tag tag-disease">Diabetes</span></div>
+      </div>
+      <div class="record-arrow">›</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">March 2026</div>
+    <div class="record">
+      <div class="record-icon icon-consultation">🩺</div>
+      <div class="record-body">
+        <div class="record-top"><div class="record-name">Dermatologist Visit</div><div class="record-date">18 Mar</div></div>
+        <div class="record-meta"><span class="tag tag-type">Consultation</span><span class="tag tag-disease">Acne</span></div>
+      </div>
+      <div class="record-arrow">›</div>
+    </div>
+    <div class="record">
+      <div class="record-icon icon-insurance">📋</div>
+      <div class="record-body">
+        <div class="record-top"><div class="record-name">Health Insurance Policy</div><div class="record-date">5 Mar</div></div>
+        <div class="record-meta"><span class="tag tag-type">Insurance</span></div>
+      </div>
+      <div class="record-arrow">›</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ KADOS SCREEN ═══════════════ -->
+<div class="screen" id="screen-kados">
+  <div class="nav">
+    <div class="nav-logo">kado<span>.</span>care</div>
+    <div class="avatar" onclick="showScreen('profile')">H</div>
+  </div>
+  <div class="hero">
+    <div class="hero-greeting">Good evening, Himanshu 👋</div>
+    <div class="hero-title">Your Kados</div>
+    <div class="hero-sub">Action items from your latest reports</div>
+  </div>
+  <div class="kado-count"><div class="kado-count-text">3 active Kados</div><div class="kado-count-num">Updated today</div></div>
+
+  <!-- Kado 1 -->
+  <div class="card-container">
+    <div class="kado-card">
+      <div class="panels-wrapper" id="c1">
+        <div class="panel panel-info">
+          <div class="card-severity severity-urgent"><div class="severity-dot dot-urgent"></div>Needs attention</div>
+          <div class="card-title">Manage your blood sugar</div>
+          <div class="biomarkers">
+            <div class="biomarker-row"><div class="biomarker-name">HbA1c</div><div class="biomarker-value value-high">7.2% — High</div></div>
+            <div class="biomarker-row"><div class="biomarker-name">Fasting Glucose</div><div class="biomarker-value value-watch">118 mg/dL — Borderline</div></div>
+          </div>
+          <div class="card-summary">Your blood sugar levels are above the normal range. Very manageable with the right steps.</div>
+        </div>
+        <div class="panel panel-learn">
+          <div class="panel-label label-blue">📖 Learn</div>
+          <div class="learn-title">Understanding blood sugar and what it means</div>
+          <div class="learn-options">
+            <div class="learn-option"><div class="learn-option-icon icon-video">🎬</div><div class="learn-option-body"><div class="learn-option-type">Video · 4 min</div><div class="learn-option-title">What is HbA1c and why does it matter?</div><div class="learn-option-meta">Mayo Clinic</div></div><div class="learn-arrow">›</div></div>
+            <div class="learn-option"><div class="learn-option-icon icon-article">📄</div><div class="learn-option-body"><div class="learn-option-type">Article · 3 min read</div><div class="learn-option-title">HbA1c as a diagnostic tool for diabetes</div><div class="learn-option-meta">NCBI</div></div><div class="learn-arrow">›</div></div>
+          </div>
+        </div>
+        <div class="panel panel-act">
+          <div class="panel-label label-green">✅ Act</div>
+          <div class="act-title">What you can do</div>
+          <div class="act-grid">
+            <div class="act-square" onclick="openModal('lifestyle1')"><div class="act-square-icon">🏃</div><div class="act-square-label">Lifestyle</div><div class="act-square-preview">Reduce sugar, walk 30 mins daily</div></div>
+            <div class="act-square" onclick="openModal('doctor1')"><div class="act-square-icon">🩺</div><div class="act-square-label">Doctor</div><div class="act-square-preview">Consult a diabetologist</div><button class="act-square-suggest" id="suggest-doctor1" onclick="event.stopPropagation();requestSuggestion('doctor1')">Get suggestions</button></div>
+            <div class="act-square" onclick="openModal('retest1')"><div class="act-square-icon">🔁</div><div class="act-square-label">Repeat Test</div><div class="act-square-preview">Retest HbA1c in 3 months</div><button class="act-square-suggest" id="suggest-retest1" onclick="event.stopPropagation();requestSuggestion('retest1')">Get suggestions</button></div>
+            <div class="act-square empty"><div class="act-square-icon">💊</div><div class="act-square-label">Medicines</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-dots"><div class="pdot active" onclick="goToPanel('c1',0)"></div><div class="pdot" onclick="goToPanel('c1',1)"></div><div class="pdot" onclick="goToPanel('c1',2)"></div></div>
+    </div>
+    <div class="swipe-hint"><div class="hint">← Learn</div><div class="hint">Act →</div></div>
+  </div>
+
+  <!-- Kado 2 -->
+  <div class="card-container">
+    <div class="kado-card">
+      <div class="panels-wrapper" id="c2">
+        <div class="panel panel-info">
+          <div class="card-severity severity-watch"><div class="severity-dot dot-watch"></div>Keep an eye on this</div>
+          <div class="card-title">Boost your Vitamin D</div>
+          <div class="biomarkers">
+            <div class="biomarker-row"><div class="biomarker-name">Vitamin D (25-OH)</div><div class="biomarker-value value-watch">18 ng/mL — Low</div></div>
+          </div>
+          <div class="card-summary">Your Vitamin D is below optimal range. Very common in India and easy to address.</div>
+        </div>
+        <div class="panel panel-learn">
+          <div class="panel-label label-blue">📖 Learn</div>
+          <div class="learn-title">Why Vitamin D matters more than you think</div>
+          <div class="learn-options">
+            <div class="learn-option"><div class="learn-option-icon icon-video">🎬</div><div class="learn-option-body"><div class="learn-option-type">Video · 5 min</div><div class="learn-option-title">Vitamin D deficiency — signs and solutions</div><div class="learn-option-meta">NHS</div></div><div class="learn-arrow">›</div></div>
+            <div class="learn-option"><div class="learn-option-icon icon-article">📄</div><div class="learn-option-body"><div class="learn-option-type">Article · 4 min read</div><div class="learn-option-title">Vitamin D — Benefits and recommended levels</div><div class="learn-option-meta">Mayo Clinic</div></div><div class="learn-arrow">›</div></div>
+          </div>
+        </div>
+        <div class="panel panel-act">
+          <div class="panel-label label-green">✅ Act</div>
+          <div class="act-title">What you can do</div>
+          <div class="act-grid">
+            <div class="act-square" onclick="openModal('lifestyle2')"><div class="act-square-icon">🏃</div><div class="act-square-label">Lifestyle</div><div class="act-square-preview">20 mins morning sunlight daily</div></div>
+            <div class="act-square empty"><div class="act-square-icon">🩺</div><div class="act-square-label">Doctor</div></div>
+            <div class="act-square" onclick="openModal('retest2')"><div class="act-square-icon">🔁</div><div class="act-square-label">Repeat Test</div><div class="act-square-preview">Retest in 3 months</div><button class="act-square-suggest" id="suggest-retest2" onclick="event.stopPropagation();requestSuggestion('retest2')">Get suggestions</button></div>
+            <div class="act-square" onclick="openModal('medicine2')"><div class="act-square-icon">💊</div><div class="act-square-label">Medicines</div><div class="act-square-preview">Vitamin D3 supplement</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-dots"><div class="pdot active" onclick="goToPanel('c2',0)"></div><div class="pdot" onclick="goToPanel('c2',1)"></div><div class="pdot" onclick="goToPanel('c2',2)"></div></div>
+    </div>
+    <div class="swipe-hint"><div class="hint">← Learn</div><div class="hint">Act →</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ COVERAGE SCREEN ═══════════════ -->
+<div class="screen" id="screen-coverage">
+  <div class="nav">
+    <div class="nav-logo">kado<span>.</span>care</div>
+    <div class="avatar" onclick="showScreen('profile')">H</div>
+  </div>
+  <div class="hero">
+    <div class="hero-greeting">Good evening, Himanshu 👋</div>
+    <div class="hero-title">Health Coverage</div>
+    <div class="hero-sub">See how complete your health picture is</div>
+  </div>
+
+  <div class="overall">
+    <div class="score-circle"><div class="score-inner"><div class="score-num">28</div><div class="score-denom">of 62</div></div></div>
+    <div class="score-body"><div class="score-title">Overall Coverage</div><div class="score-sub">You have tracked 28 out of 62 items. Keep adding reports to improve your score.</div></div>
+  </div>
+
+  <div class="cov-section">
+    <div class="level-card essential">
+      <div class="level-header">
+        <div class="level-left"><div class="level-badge">Level 1</div><div class="level-title">Essential</div><div class="level-sub">Routine checkup markers everyone should track</div></div>
+        <div class="level-count"><div class="level-count-num">24/34</div><div class="level-count-label">tracked</div></div>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:71%"></div></div><div class="progress-labels"><span>71% complete</span><span>10 remaining</span></div></div>
+      <div class="missing-wrap"><div class="missing-title">Missing</div><div class="tags"><span class="ctag">Uric Acid</span><span class="ctag">TIBC</span><span class="ctag">Pus Cells</span><span class="ctag">HBsAg</span><span class="ctag">Anti-HCV</span><span class="ctag">Waist Circumference</span><span class="ctag">ESR</span><span class="ctag">Calcium</span><span class="ctag">BUN</span><span class="ctag">ALP</span></div></div>
+    </div>
+  </div>
+
+  <div class="cov-section">
+    <div class="level-card advanced">
+      <div class="level-header">
+        <div class="level-left"><div class="level-badge">Level 2</div><div class="level-title">Advanced</div><div class="level-sub">High evidence markers. Rarely tested.</div></div>
+        <div class="level-count"><div class="level-count-num">4/27</div><div class="level-count-label">tracked</div></div>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:14%"></div></div><div class="progress-labels"><span>14% complete</span><span>23 remaining</span></div></div>
+      <div class="missing-wrap"><div class="missing-title">Missing</div><div class="tags"><span class="ctag">Cortisol</span><span class="ctag">DHEA-S</span><span class="ctag">Homocysteine</span><span class="ctag">VO2 Max</span><span class="ctag">Grip Strength</span><span class="ctag">Body Fat %</span><span class="ctag">Bone Mineral Density</span><span class="ctag">Apo B</span><span class="ctag">Lipoprotein(a)</span><span class="ctag">+ 14 more</span></div></div>
+    </div>
+  </div>
+
+  <div class="cov-section">
+    <div class="level-card frontier">
+      <div class="level-header">
+        <div class="level-left"><div class="level-badge">Level 3</div><div class="level-title">Frontier</div><div class="level-sub">Cutting edge. Genetic testing and beyond.</div></div>
+        <div class="level-count"><div class="level-count-num">0/?</div><div class="level-count-label">tracked</div></div>
+      </div>
+      <div class="frontier-coming">Coming soon. Genetic markers, microbiome analysis, epigenetic age and more.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PROFILE SCREEN ═══════════════ -->
+<div class="screen" id="screen-profile">
+  <div class="nav">
+    <div class="nav-logo">kado<span>.</span>care</div>
+    <button class="back-btn" onclick="showScreen('records')">✕</button>
+  </div>
+  <div class="profile-body">
+    <div class="profile-card">
+      <div class="profile-avatar-large">H</div>
+      <div class="profile-name">Himanshu Gupta</div>
+      <div class="profile-sub">Member since May 2026</div>
+    </div>
+    <div class="profile-section-title">Details</div>
+    <div class="profile-card">
+      <div class="profile-row"><div class="profile-row-label">Phone</div><div class="profile-row-value">+91 96541 60898</div></div>
+      <div class="profile-row"><div class="profile-row-label">Age</div><div class="profile-row-value">Not set</div></div>
+      <div class="profile-row"><div class="profile-row-label">Gender</div><div class="profile-row-value">Not set</div></div>
+      <div class="profile-row"><div class="profile-row-label">Blood Group</div><div class="profile-row-value">Not set</div></div>
+    </div>
+    <div class="profile-section-title">Account</div>
+    <div class="profile-card">
+      <div class="profile-row"><div class="profile-row-label">Privacy Policy</div><div class="profile-row-value">›</div></div>
+      <div class="profile-row"><div class="profile-row-label">Terms of Service</div><div class="profile-row-value">›</div></div>
+      <div class="profile-row"><div class="profile-row-label">Contact Support</div><div class="profile-row-value">›</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ ADD REPORT SHEET ═══════════════ -->
+<div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Add a report</div>
+    <div class="sheet-sub">How would you like to share your report?</div>
+    <div class="sheet-options">
+      <button class="sheet-option" onclick="openCamera()">
+        <div class="sheet-option-icon icon-camera">📷</div>
+        <div>
+          <div class="sheet-option-title">Take a photo</div>
+          <div class="sheet-option-sub">Use your camera to capture a report</div>
+        </div>
+      </button>
+      <button class="sheet-option" onclick="openWhatsApp()">
+        <div class="sheet-option-icon icon-wa">💬</div>
+        <div>
+          <div class="sheet-option-title">Send on WhatsApp</div>
+          <div class="sheet-option-sub">Forward your report to us on WhatsApp</div>
+        </div>
+      </button>
+    </div>
+    <button class="sheet-cancel" onclick="closeSheet()">Cancel</button>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL ═══════════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-icon" id="modal-icon"></div>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <button class="modal-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<input type="file" accept="image/*" capture="environment" style="display:none"/>
+
+<!-- ═══════════════ BOTTOM NAV ═══════════════ -->
+<div class="bottom-nav">
+  <div class="nav-item active" id="tab-records" onclick="showScreen('records')"><div class="nav-icon">🗂️</div>Records</div>
+  <div class="nav-item" id="tab-kados" onclick="showScreen('kados')"><div class="nav-icon">🃏</div>Kados</div>
+</div>
+
+<script>
+  const cardState = {};
+  const requested = {};
+  const modals = {
+    lifestyle1: { icon: '🏃', title: 'Lifestyle changes', body: '1. Reduce refined carbs and sugar. Avoid white rice, bread and sugary drinks.\n\n2. Walk 30 minutes every day. Physical activity improves insulin sensitivity.\n\n3. Sleep 7-8 hours. Poor sleep worsens blood sugar control.\n\n4. Manage stress. Cortisol raises blood sugar levels.' },
+    doctor1: { icon: '🩺', title: 'See a doctor', body: 'Consult a diabetologist or endocrinologist if your HbA1c remains above 7% after 3 months of lifestyle changes.\n\nBring your last 2-3 blood test reports to the appointment.' },
+    retest1: { icon: '🔁', title: 'Repeat testing', body: 'Retest your HbA1c and Fasting Glucose in 3 months to see if your levels are improving.\n\nAlso consider testing Insulin (fasting) to check for insulin resistance.' },
+    lifestyle2: { icon: '🏃', title: 'Lifestyle changes', body: '1. Get 20 minutes of morning sunlight daily between 8am and 10am.\n\n2. Include Vitamin D rich foods such as fatty fish, egg yolks and fortified milk.\n\n3. Exercise outdoors when possible.' },
+    retest2: { icon: '🔁', title: 'Repeat testing', body: 'Retest Vitamin D (25-OH) in 3 months after starting supplementation.\n\nTarget level: 40-60 ng/mL for optimal health.' },
+    medicine2: { icon: '💊', title: 'Supplements', body: 'Vitamin D3 with K2 is commonly recommended.\n\nTypical protocol: 60,000 IU weekly for 8 weeks, then 1000-2000 IU daily for maintenance.\n\nAlways consult your doctor before starting any supplement.' },
+  };
+
+  function openSheet() { document.getElementById('sheet-overlay').classList.add('open'); }
+  function closeSheet() { document.getElementById('sheet-overlay').classList.remove('open'); }
+  function openCamera() { closeSheet(); document.querySelector('input[type=file]').click(); }
+  function openWhatsApp() { closeSheet(); window.open('https://wa.me/919654160898?text=Hi%2C%20I%20want%20to%20add%20a%20new%20report', '_blank'); }
+
+  function showScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(`screen-${name}`).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+    if (name === 'records') document.getElementById('tab-records').classList.add('active');
+    if (name === 'kados') document.getElementById('tab-kados').classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function goToPanel(cardId, panelIndex) {
+    cardState[cardId] = panelIndex;
+    const wrapper = document.getElementById(cardId);
+    wrapper.style.transform = `translateX(-${panelIndex * 100}%)`;
+    const dots = wrapper.parentElement.querySelectorAll('.pdot');
+    dots.forEach((d, i) => d.classList.toggle('active', i === panelIndex));
+  }
+
+  ['c1', 'c2'].forEach(cardId => {
+    cardState[cardId] = 0;
+    const wrapper = document.getElementById(cardId);
+    let startX = 0;
+    wrapper.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    wrapper.addEventListener('touchend', e => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) {
+        const newPanel = Math.max(0, Math.min(2, cardState[cardId] + (diff > 0 ? 1 : -1)));
+        goToPanel(cardId, newPanel);
+      }
+    });
+  });
+
+  function openModal(id) {
+    const m = modals[id];
+    if (!m) return;
+    document.getElementById('modal-icon').textContent = m.icon;
+    document.getElementById('modal-title').textContent = m.title;
+    document.getElementById('modal-body').textContent = m.body;
+    document.getElementById('modal-overlay').classList.add('open');
+  }
+
+  function requestSuggestion(id) {
+    const btn = document.getElementById(`suggest-${id}`);
+    if (!btn || requested[id]) return;
+    requested[id] = true;
+    btn.textContent = '✓ Requested';
+    btn.classList.add('requested');
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+</script>
+</body>
+</html>
