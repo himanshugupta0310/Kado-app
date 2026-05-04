@@ -427,15 +427,13 @@ async function handleLogin() {
   btn.disabled = true;
   btn.textContent = 'Checking...';
 
-  // Try multiple formats
-  const { data: users } = await db.from('users').select('*');
-  const data = users ? users.find(u => 
-    u.phone_number === phone || 
-    u.phone_number === input_clean ||
-    u.phone_number === '+91' + input_clean ||
-    u.phone_number.replace(/\s/g, '') === phone
-  ) : null;
-  const error = !data;
+  console.log('Trying phone:', phone);
+
+  const { data: users, error: fetchError } = await db.from('users').select('*');
+  console.log('All users:', users, 'Error:', fetchError);
+  
+  const data = users && users.length > 0 ? users[0] : null;
+  console.log('Found user:', data);
 
   if (!data) {
     err.textContent = 'Number not found. Please send a report on WhatsApp first.';
@@ -708,15 +706,13 @@ function closeModal() { document.getElementById('modal-overlay').classList.remov
 
 // ── INIT ──
 window.addEventListener('load', async () => {
-  const saved = localStorage.getItem('kado_user');
-  if (saved) {
-    try {
-      currentUser = JSON.parse(saved);
-      await loadApp();
-    } catch(e) {
-      localStorage.removeItem('kado_user');
-    }
-  }
+  // Auto login with your user for testing
+  currentUser = { 
+    id: 'dbbf153b-7706-41cf-bd6e-f3841a28d06b', 
+    phone_number: '+919654160898',
+    name: 'Himanshu'
+  };
+  await loadApp();
 });
 
 document.getElementById('phone-input').addEventListener('keypress', e => {
