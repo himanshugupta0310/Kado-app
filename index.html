@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Kado Care</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #F5F7F5; font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
@@ -396,10 +396,13 @@
 </div>
 
 <script>
-const SUPABASE_URL = 'https://ygovtjqzztschecrqufq.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlnb3Z0anF6enRzY2hlY3JxdWZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDEzODcsImV4cCI6MjA5MzI3NzM4N30._mfykfM1EDgwVMGgUEL-dnkcYUj9wNHZtNCTRPTpsSg';
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+const API = 'https://api.kado.care';
+
+async function apiFetch(path) {
+  const res = await fetch(API + path);
+  if (!res.ok) throw new Error('API error: ' + res.status);
+  return res.json();
+}
 
 let currentUser = null;
 let cardStates = {};
@@ -415,17 +418,30 @@ function getGreeting() {
 
 // ── AUTH ──
 async function handleLogin() {
+  const input = document.getElementById('phone-input').value.trim().replace(/\s/g, '');
   const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  err.style.display = 'none';
+
+  if (input.length < 10) { err.textContent = 'Please enter a valid 10-digit number.'; err.style.display = 'block'; return; }
+
+  const phone = '+91' + input;
   btn.disabled = true;
-  btn.textContent = 'Loading...';
-  
-  currentUser = { 
-    id: 'dbbf153b-7706-41cf-bd6e-f3841a28d06b', 
-    phone_number: '+919654160898',
-    name: 'Himanshu'
-  };
-  localStorage.setItem('kado_user', JSON.stringify(currentUser));
-  await loadApp();
+  btn.textContent = 'Checking...';
+
+  try {
+    const data = await apiFetch(`/user?phone=${encodeURIComponent(phone)}`);
+    currentUser = data;
+    localStorage.setItem('kado_user', JSON.stringify(data));
+    btn.disabled = false;
+    btn.textContent = 'View my records';
+    await loadApp();
+  } catch (e) {
+    err.textContent = 'Number not found. Please send a report on WhatsApp first.';
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'View my records';
+  }
 }
 
 function logout() {
@@ -457,9 +473,9 @@ function updateAvatars() {
 
 // ── RECORDS ──
 async function loadRecords() {
-  const { data: reports } = await db.from('reports').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
-  const { data: biomarkers } = await db.from('biomarkers').select('*').eq('user_id', currentUser.id);
-  const { data: kados } = await db.from('kado_cards').select('*').eq('user_id', currentUser.id);
+  const reports = await apiFetch(`/records?user_id=${currentUser.id}`);
+  const biomarkers = await apiFetch(`/biomarkers?user_id=${currentUser.id}`);
+  const kados = await apiFetch(`/kados?user_id=${currentUser.id}`);
 
   const totalReports = reports ? reports.length : 0;
   const activeIssues = kados ? kados.length : 0;
@@ -505,7 +521,7 @@ async function loadRecords() {
 
 // ── KADOS ──
 async function loadKados() {
-  const { data: kados } = await db.from('kado_cards').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  const kados = await apiFetch(`/kados?user_id=${currentUser.id}`);
 
   const container = document.getElementById('kados-list');
   if (!kados || kados.length === 0) {
@@ -588,8 +604,8 @@ async function loadKados() {
 
 // ── COVERAGE ──
 async function loadCoverage() {
-  const { data: biomarkers } = await db.from('biomarkers').select('*').eq('user_id', currentUser.id);
-  const { data: library } = await db.from('biomarker_library').select('name, level');
+  const biomarkers = await apiFetch(`/biomarkers?user_id=${currentUser.id}`);
+  const library = await apiFetch(`/library`);
 
   const essLib = library ? library.filter(b => b.level === 'essential').map(b => b.name.toLowerCase()) : [];
   const advLib = library ? library.filter(b => b.level === 'advanced').map(b => b.name.toLowerCase()) : [];
