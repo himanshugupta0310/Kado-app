@@ -430,7 +430,7 @@ async function handleLogin() {
   btn.textContent = 'Checking...';
 
   try {
-    const data = await apiFetch(`/user?phone=${encodeURIComponent(phone)}`);
+    const data = await apiFetch(`/user?phone=${phone.replace('+', '%2B')}`);
     currentUser = data;
     localStorage.setItem('kado_user', JSON.stringify(data));
     btn.disabled = false;
