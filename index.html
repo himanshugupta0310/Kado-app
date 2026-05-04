@@ -397,7 +397,7 @@
 
 <script>
 const SUPABASE_URL = 'https://ygovtjqzztschecrqufq.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlnb3Z0anF6enRzY2hlY3JxdWZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDEzODcsImV4cCI6MjA5MzI3NzM4N30._mfykfM1EDgwVMGgUEL-dnkcYUj9wNHZtNCTRPTpsSg';
+const SUPABASE_KEY = 'sb_publishable_OqnjKqusOVF7rKQDPGjSBg_kGHgjhsN';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -415,28 +415,17 @@ function getGreeting() {
 
 // ── AUTH ──
 async function handleLogin() {
-  const input = document.getElementById('phone-input').value.trim();
   const btn = document.getElementById('login-btn');
-  const err = document.getElementById('login-error');
-  err.style.display = 'none';
-
-  if (input.length < 10) { err.textContent = 'Please enter a valid 10-digit number.'; err.style.display = 'block'; return; }
-
-  const input_clean = input.replace(/\s/g, '');
-  const phone = '+91' + input_clean;
   btn.disabled = true;
-  btn.textContent = 'Checking...';
-
-  console.log('Trying phone:', phone);
-
-  const { data: users, error: fetchError } = await db.from('users').select('*');
-  console.log('All users:', users, 'Error:', fetchError);
+  btn.textContent = 'Loading...';
   
+  // For beta — auto login with first user found
+  const { data: users } = await db.from('users').select('*').limit(1);
   const data = users && users.length > 0 ? users[0] : null;
-  console.log('Found user:', data);
 
   if (!data) {
-    err.textContent = 'Number not found. Please send a report on WhatsApp first.';
+    const err = document.getElementById('login-error');
+    err.textContent = 'No users found. Please send a report on WhatsApp first.';
     err.style.display = 'block';
     btn.disabled = false;
     btn.textContent = 'View my records';
