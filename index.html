@@ -423,7 +423,11 @@ async function handleLogin() {
   const err = document.getElementById('login-error');
   err.style.display = 'none';
 
-  if (input.length < 10) { err.textContent = 'Please enter a valid 10-digit number.'; err.style.display = 'block'; return; }
+  if (input.length < 10) { 
+    err.textContent = 'Please enter a valid 10-digit number.'; 
+    err.style.display = 'block'; 
+    return; 
+  }
 
   const phone = '+91' + input;
   btn.disabled = true;
@@ -436,9 +440,12 @@ async function handleLogin() {
     if (!data || !data.id) throw new Error('empty');
     currentUser = data;
     localStorage.setItem('kado_user', JSON.stringify(data));
-    btn.disabled = false;
-    btn.textContent = 'View my records';
-    await loadApp();
+    document.getElementById('bottom-nav').style.display = 'flex';
+    updateAvatars();
+    await Promise.all([loadRecords(), loadKados(), loadCoverage()]);
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-records').classList.add('active');
+    window.scrollTo(0, 0);
   } catch (e) {
     err.textContent = 'Number not found. Please send a report on WhatsApp first.';
     err.style.display = 'block';
