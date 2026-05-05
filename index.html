@@ -703,13 +703,11 @@ function closeModal() { document.getElementById('modal-overlay').classList.remov
 
 // ── INIT ──
 window.addEventListener('load', async () => {
-  // Auto login with your user for testing
-  currentUser = { 
-    id: 'dbbf153b-7706-41cf-bd6e-f3841a28d06b', 
-    phone_number: '+919654160898',
-    name: 'Himanshu'
-  };
-  await loadApp();
+  const saved = localStorage.getItem('kado_user');
+  if (saved) {
+    currentUser = JSON.parse(saved);
+    await loadApp();
+  }
 });
 
 document.getElementById('phone-input').addEventListener('keypress', e => {
