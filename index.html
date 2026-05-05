@@ -687,12 +687,13 @@ function requestSug(id) {
 }
 
 function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(`screen-${name}`).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
-  if (name === 'records') document.getElementById('tab-records').classList.add('active');
-  if (name === 'kados') document.getElementById('tab-kados').classList.add('active');
-  window.scrollTo(0, 0);
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  const el = document.getElementById(`screen-${name}`);
+  el.classList.add('active');
+  el.style.display = name === 'login' ? 'flex' : 'block';
 }
 
 function openSheet() { document.getElementById('sheet-overlay').classList.add('open'); }
