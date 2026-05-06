@@ -711,6 +711,33 @@ function closeModal() { document.getElementById('modal-overlay').classList.remov
 
 // ── INIT ──
 window.addEventListener('load', async () => {
+  // Check URL for phone number (magic link)
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlPhone = urlParams.get('phone');
+
+  if (urlPhone) {
+    const btn = document.getElementById('login-btn');
+    btn.textContent = 'Loading...';
+    btn.disabled = true;
+    try {
+      const res = await fetch(`${API}/user?phone=${encodeURIComponent(urlPhone)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.id) {
+          currentUser = data;
+          localStorage.setItem('kado_user', JSON.stringify(data));
+          await loadApp();
+          return;
+        }
+      }
+    } catch (e) {
+      console.log('Magic link login failed:', e);
+    }
+    btn.textContent = 'View my records';
+    btn.disabled = false;
+  }
+
+  // Check localStorage
   const saved = localStorage.getItem('kado_user');
   if (saved) {
     currentUser = JSON.parse(saved);
