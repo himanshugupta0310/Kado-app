@@ -504,10 +504,11 @@ async function loadRecords() {
     return;
   }
 
-  // Group by month
+ // Group by month
   const grouped = {};
   reports.forEach(r => {
-    const date = new Date(r.created_at);
+    const dateStr = r.report_date ? r.report_date + 'T12:00:00' : r.created_at;
+    const date = new Date(dateStr);
     const key = date.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
     if (!grouped[key]) grouped[key] = [];
     grouped[key].push(r);
@@ -519,7 +520,8 @@ async function loadRecords() {
     reps.forEach(r => {
       const icon = getReportIcon(r.report_type);
       const iconBg = getIconBg(r.report_type);
-      const date = new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      const dateStr = r.report_date ? r.report_date + 'T12:00:00' : r.created_at;
+const date = new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
       const tags = (r.disease_tags || []).slice(0, 2).map(t => `<span class="tag tag-disease">${t}</span>`).join('');
       const typetag = `<span class="tag tag-type">${r.report_type || 'Report'}</span>`;
       html += `<div class="record" onclick="window.open('${r.file_url}', '_blank')" style="cursor:pointer;"><div class="record-icon ${iconBg}">${icon}</div><div class="record-body"><div class="record-top"><div class="record-name">${r.report_type ? capitalize(r.report_type) : 'Health Report'}</div><div class="record-date">${date}</div></div><div class="record-meta">${typetag}${tags}</div></div><div class="record-arrow">›</div></div>`;
