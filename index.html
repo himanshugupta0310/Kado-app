@@ -310,6 +310,10 @@
         <div class="progress-bar"><div class="progress-fill" id="ess-bar" style="width:0%"></div></div>
         <div class="progress-labels"><span id="ess-pct">0% complete</span><span id="ess-rem">30 remaining</span></div>
       </div>
+     <div class="missing-wrap">
+  <div class="missing-title">Not yet tested</div>
+  <div class="tags" id="ess-missing"></div>
+</div>
     </div>
   </div>
   <div class="cov-section">
@@ -618,19 +622,15 @@ async function loadKados() {
 async function loadCoverage() {
   const biomarkers = await apiFetch(`/biomarkers?user_id=${currentUser.id}`);
   const library = await apiFetch(`/library`);
-
   const essLib = library ? library.filter(b => b.level === 'essential').map(b => b.name.toLowerCase()) : [];
   const advLib = library ? library.filter(b => b.level === 'advanced').map(b => b.name.toLowerCase()) : [];
-
   const trackedNames = biomarkers ? [...new Set(biomarkers.map(b => b.name.toLowerCase()))] : [];
   const essTracked = trackedNames.filter(n => essLib.includes(n)).length;
   const advTracked = trackedNames.filter(n => advLib.includes(n)).length;
   const totalTracked = essTracked + advTracked;
-
   const essPct = Math.round((essTracked / 30) * 100);
   const advPct = Math.round((advTracked / 27) * 100);
   const totalPct = Math.round((totalTracked / 57) * 100);
-
   document.getElementById('cov-tracked').textContent = totalTracked;
   document.getElementById('cov-sub').textContent = `You have tracked ${totalTracked} out of 57 biomarkers. Keep adding reports to improve your score.`;
   document.getElementById('ess-count').textContent = `${essTracked}/30`;
@@ -641,9 +641,26 @@ async function loadCoverage() {
   document.getElementById('ess-rem').textContent = `${30 - essTracked} remaining`;
   document.getElementById('adv-pct').textContent = `${advPct}% complete`;
   document.getElementById('adv-rem').textContent = `${27 - advTracked} remaining`;
-
   const circle = document.getElementById('coverage-circle');
   circle.style.background = `conic-gradient(#2D8A6A 0% ${totalPct}%, #EEF0EE ${totalPct}% 100%)`;
+
+  // Show missing essential biomarkers
+  const essMissing = essLib.filter(n => !trackedNames.includes(n));
+  const advMissing = advLib.filter(n => !trackedNames.includes(n));
+
+  const essMissingEl = document.getElementById('ess-missing');
+  const advMissingEl = document.getElementById('adv-missing');
+
+  if (essMissingEl) {
+    essMissingEl.innerHTML = essMissing.length > 0
+      ? essMissing.map(n => `<span class="ctag">${n}</span>`).join('')
+      : '<span style="font-size:12px;color:#7A9A7A;">All essential biomarkers tracked!</span>';
+  }
+  if (advMissingEl) {
+    advMissingEl.innerHTML = advMissing.length > 0
+      ? advMissing.map(n => `<span class="ctag">${n}</span>`).join('')
+      : '<span style="font-size:12px;color:#7A9A7A;">All advanced biomarkers tracked!</span>';
+  }
 }
 
 // ── HELPERS ──
