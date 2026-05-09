@@ -624,6 +624,7 @@ async function loadKados() {
 
 // ── COVERAGE ──
 async function loadCoverage() {
+ if (currentUser.name) { const age = currentUser.age ? ` · ${currentUser.age}` : ''; const gender = currentUser.gender ? `, ${currentUser.gender === 'male' ? 'M' : 'F'}` : ''; document.getElementById('coverage-title').textContent = `${currentUser.name}'s biomarker picture${age}${gender}`; }
   const biomarkers = await apiFetch(`/biomarkers?user_id=${currentUser.id}`);
   const library = await apiFetch(`/library`);
   const essLib = library ? library.filter(b => b.level === 'essential').map(b => b.name.toLowerCase()) : [];
