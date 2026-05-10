@@ -523,7 +523,11 @@ async function loadRecords() {
   });
 
   let html = '';
-  Object.entries(grouped).forEach(([month, reps]) => {
+  Object.entries(grouped).sort((a, b) => {
+  const dateA = new Date(a[1][0].report_date || a[1][0].created_at);
+  const dateB = new Date(b[1][0].report_date || b[1][0].created_at);
+  return dateB - dateA;
+}).forEach(([month, reps]) => {
     html += `<div class="section"><div class="section-title">${month}</div>`;
     reps.forEach(r => {
       const icon = getReportIcon(r.report_type);
