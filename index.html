@@ -759,7 +759,45 @@ function openSheet() { document.getElementById('sheet-overlay').classList.add('o
 function closeSheet() { document.getElementById('sheet-overlay').classList.remove('open'); }
 function openCamera() { closeSheet(); document.getElementById('camera-input').click(); }
 function openWhatsApp() { closeSheet(); window.open('https://wa.me/918867062200?text=Hi%2C%20I%20want%20to%20add%20a%20new%20report', '_blank'); }
-
+async function openGmail() {
+  closeSheet();
+  const gmailTitle = document.getElementById('gmail-sheet-title');
+  if (currentUser.gmail_token) {
+    // Already connected - scan for reports
+    if (gmailTitle) gmailTitle.textContent = 'Scanning Gmail...';
+    try {
+      const res = await apiFetch(`/gmail/scan?user_id=${currentUser.id}`);
+      if (!res.reports || res.reports.length === 0) {
+        alert('No medical reports found in Gmail.');
+        if (gmailTitle) gmailTitle.textContent = 'Scan Gmail';
+        return;
+      }
+      const list = res.reports.map((r, i) => `${i+1}. ${r.filename}`).join('\n');
+      const ok = confirm(`Found ${res.reports.length} report(s):\n\n${list}\n\nProcess all?`);
+      if (ok) {
+        for (const r of res.reports) {
+          await fetch(`${API}/gmail/process`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: currentUser.id, message_id: r.message_id, attachment_id: r.attachment_id, filename: r.filename, mime_type: r.mime_type })
+          });
+        }
+        alert('Done! Refreshing records...');
+        await loadRecords();
+        await loadKados();
+        showScreen('records');
+      }
+    } catch (e) {
+      alert('Error: ' + e.message);
+    }
+    if (gmailTitle) gmailTitle.textContent = 'Scan Gmail';
+  } else {
+    // Not connected - open OAuth
+    const res = await fetch(`${API}/gmail/auth?phone=${encodeURIComponent(currentUser.phone_number)}`);
+    const data = await res.json();
+    window.open(data.url, '_blank');
+  }
+}
 function openModal(type, icon, title, body) {
   document.getElementById('modal-icon').textContent = icon;
   document.getElementById('modal-title').textContent = title;
