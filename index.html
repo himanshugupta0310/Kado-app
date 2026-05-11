@@ -89,17 +89,19 @@
   .panels-wrapper { display: flex; transition: transform 0.3s ease; }
   .panel { min-width: 100%; padding: 22px 20px; }
   .panel-info { background: white; }
-  .card-severity { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 100px; font-size: 10px; font-weight: 600; margin-bottom: 10px; }
+  .card-severity { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 100px; font-size: 10px; font-weight: 600; }
   .severity-urgent { background: #FFF0F0; color: #C0392B; }
   .severity-watch { background: #FFFBE0; color: #B8860B; }
   .severity-dot { width: 6px; height: 6px; border-radius: 50%; }
   .dot-urgent { background: #C0392B; } .dot-watch { background: #B8860B; }
-  .card-status { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 700; margin-bottom: 14px; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .card-status { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 700; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
   .status-high { background: #EEF4FF; color: #2D6BE4; border: 1.5px solid #2D6BE4; }
-  .status-low { background: #EEF4FF; color: #2D6BE4; border: 1.5px solid #2D6BE4; }
-  .status-diagnosed { background: #F5F0FF; color: #7B2FBE; border: 1.5px solid #7B2FBE; }
-  .card-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: #1A2D22; margin-bottom: 12px; line-height: 1.2; }
+  .status-low { background: #F0FFF4; color: #2D8A6A; border: 1.5px solid #2D8A6A; }
+  .card-value-box { background: #F5F7F5; border-radius: 12px; padding: 10px 14px; font-size: 14px; font-weight: 500; color: #1A2D22; margin: 12px 0; display: block; }
+  .card-range { font-size: 12px; color: #7A9A7A; font-weight: 400; }
+  .card-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: #1A2D22; margin: 12px 0 8px; line-height: 1.2; }
   .card-info { font-size: 13px; color: #7A9A7A; line-height: 1.6; }
+  .swipe-explore { font-size: 11px; color: #2D8A6A; margin-top: 16px; text-align: center; letter-spacing: 0.3px; }
   .panel-learn { background: #EEF4FF; }
   .panel-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
   .label-blue { color: #2D6BE4; } .label-green { color: #2D8A6A; }
@@ -124,16 +126,11 @@
   .act-square-preview { font-size: 10px; color: #7A9A7A; line-height: 1.4; }
   .act-square-suggest { margin-top: auto; background: #E8F5F0; border: none; padding: 5px 8px; border-radius: 6px; font-size: 9px; font-weight: 600; color: #2D8A6A; cursor: pointer; font-family: 'DM Sans', sans-serif; width: 100%; text-align: center; transition: all 0.2s ease; }
   .act-square-suggest.requested { background: #F5F7F5; color: #7A9A7A; cursor: default; }
-  .panel-dots { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 12px 0 4px; background: white; }
+  .panel-dots { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 12px 0 4px; background: white; }
   .pdot { width: 8px; height: 8px; border-radius: 50%; background: #EEF0EE; transition: all 0.3s ease; cursor: pointer; }
   .pdot.active { background: #1A2D22; width: 24px; border-radius: 4px; }
-  .card-value { font-size: 22px; font-weight: 600; color: #1A2D22; margin-bottom: 4px; }
-  .card-range { font-size: 12px; color: #7A9A7A; font-weight: 400; margin-left: 8px; }
-  .swipe-explore { font-size: 11px; color: #2D8A6A; margin-top: 16px; text-align: center; }
-  .card-arrows { display: flex; justify-content: space-between; padding: 0 12px 12px; background: white; }
+  .card-arrows { display: flex; justify-content: space-between; padding: 4px 12px 12px; background: white; }
   .card-arrow-btn { background: #F5F7F5; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 20px; color: #1A2D22; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .swipe-hint { display: flex; justify-content: space-between; padding: 6px 20px 12px; }
-  .hint { font-size: 10px; color: #B0C0B0; }
 
   /* ── COVERAGE ── */
   .overall { margin: 16px 20px; background: white; border-radius: 18px; padding: 20px; box-shadow: 0 1px 8px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 16px; }
@@ -294,7 +291,7 @@
   <div class="hero">
     <div class="hero-greeting">Health Coverage</div>
     <div class="hero-title" id="coverage-title">Your biomarker picture</div>
-    <div class="hero-sub">See how complete your health data is</div>
+    <div class="hero-sub">See how complete your health profile is</div>
   </div>
   <div class="overall">
     <div class="score-circle" id="coverage-circle">
@@ -315,10 +312,10 @@
         <div class="progress-bar"><div class="progress-fill" id="ess-bar" style="width:0%"></div></div>
         <div class="progress-labels"><span id="ess-pct">0% complete</span><span id="ess-rem">30 remaining</span></div>
       </div>
-     <div class="missing-wrap">
-  <div class="missing-title">Not yet tested</div>
-  <div class="tags" id="ess-missing"></div>
-</div>
+      <div class="missing-wrap">
+        <div class="missing-title">Not yet tested</div>
+        <div class="tags" id="ess-missing"></div>
+      </div>
     </div>
   </div>
   <div class="cov-section">
@@ -421,7 +418,6 @@ let currentUser = null;
 let cardStates = {};
 let requested = {};
 
-// ── GREETING ──
 function getGreeting() {
   const h = new Date().getHours();
   if (h < 12) return 'Good morning';
@@ -429,23 +425,15 @@ function getGreeting() {
   return 'Good evening';
 }
 
-// ── AUTH ──
 async function handleLogin() {
   const input = document.getElementById('phone-input').value.trim().replace(/\s/g, '');
   const btn = document.getElementById('login-btn');
   const err = document.getElementById('login-error');
   err.style.display = 'none';
-
-  if (input.length < 10) { 
-    err.textContent = 'Please enter a valid 10-digit number.'; 
-    err.style.display = 'block'; 
-    return; 
-  }
-
+  if (input.length < 10) { err.textContent = 'Please enter a valid 10-digit number.'; err.style.display = 'block'; return; }
   const phone = '+91' + input;
   btn.disabled = true;
   btn.textContent = 'Checking...';
-
   try {
     const res = await fetch(`${API}/user?phone=${encodeURIComponent(phone)}`);
     if (!res.ok) throw new Error('not found');
@@ -474,7 +462,6 @@ function logout() {
   showScreen('login');
 }
 
-// ── LOAD APP ──
 async function loadApp() {
   document.getElementById('bottom-nav').style.display = 'flex';
   updateAvatars();
@@ -494,30 +481,23 @@ function updateAvatars() {
   document.getElementById('kados-greeting').textContent = greeting + ' 👋';
 }
 
-// ── RECORDS ──
 async function loadRecords() {
   const reports = await apiFetch(`/records?user_id=${currentUser.id}`);
   const biomarkers = await apiFetch(`/biomarkers?user_id=${currentUser.id}`);
   const kados = await apiFetch(`/kados?user_id=${currentUser.id}`);
-
   const totalReports = reports ? reports.length : 0;
   const activeIssues = kados ? kados.length : 0;
-  const essentialTracked = biomarkers ? [...new Set(biomarkers.filter(b => b.status !== 'normal').map(b => b.name))].length : 0;
-
+  const essentialTracked = biomarkers ? [...new Set(biomarkers.map(b => b.name))].length : 0;
   document.getElementById('stat-total').textContent = totalReports;
   document.getElementById('stat-issues').textContent = activeIssues;
   document.getElementById('stat-essential').textContent = essentialTracked;
-
   const lastUpdate = reports && reports.length > 0 ? new Date(reports[0].created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'No reports yet';
   document.getElementById('records-sub').textContent = `Last updated ${lastUpdate}`;
-
   const container = document.getElementById('records-list');
   if (!reports || reports.length === 0) {
     container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🗂️</div><div class="empty-state-title">No records yet</div><div class="empty-state-sub">Send a health report on WhatsApp to get started</div></div>`;
     return;
   }
-
- // Group by month
   const grouped = {};
   reports.forEach(r => {
     const dateStr = r.report_date ? r.report_date + 'T12:00:00' : r.created_at;
@@ -526,19 +506,18 @@ async function loadRecords() {
     if (!grouped[key]) grouped[key] = [];
     grouped[key].push(r);
   });
-
   let html = '';
   Object.entries(grouped).sort((a, b) => {
-  const dateA = new Date(a[1][0].report_date || a[1][0].created_at);
-  const dateB = new Date(b[1][0].report_date || b[1][0].created_at);
-  return dateB - dateA;
-}).forEach(([month, reps]) => {
+    const dateA = new Date(a[1][0].report_date || a[1][0].created_at);
+    const dateB = new Date(b[1][0].report_date || b[1][0].created_at);
+    return dateB - dateA;
+  }).forEach(([month, reps]) => {
     html += `<div class="section"><div class="section-title">${month}</div>`;
     reps.forEach(r => {
       const icon = getReportIcon(r.report_type);
       const iconBg = getIconBg(r.report_type);
       const dateStr = r.report_date ? r.report_date + 'T12:00:00' : r.created_at;
-const date = new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      const date = new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
       const tags = (r.disease_tags || []).slice(0, 2).map(t => `<span class="tag tag-disease">${t}</span>`).join('');
       const typetag = `<span class="tag tag-type">${r.report_type || 'Report'}</span>`;
       html += `<div class="record" onclick="window.open('${r.file_url}', '_blank')" style="cursor:pointer;"><div class="record-icon ${iconBg}">${icon}</div><div class="record-body"><div class="record-top"><div class="record-name">${r.report_type ? capitalize(r.report_type) : 'Health Report'}</div><div class="record-date">${date}</div></div><div class="record-meta">${typetag}${tags}</div></div><div class="record-arrow">›</div></div>`;
@@ -548,49 +527,46 @@ const date = new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', mon
   container.innerHTML = html;
 }
 
-// ── KADOS ──
 async function loadKados() {
   const kados = await apiFetch(`/kados?user_id=${currentUser.id}`);
-
   const container = document.getElementById('kados-list');
   if (!kados || kados.length === 0) {
     container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🃏</div><div class="empty-state-title">No Kados yet</div><div class="empty-state-sub">Send a health report on WhatsApp and we will generate your Kado cards</div></div>`;
     return;
   }
-
   let html = `<div class="kado-count"><div class="kado-count-text">${kados.length} Kado${kados.length > 1 ? 's' : ''}</div><div class="kado-count-num">Updated recently</div></div>`;
-
   kados.forEach((kado, i) => {
     const cardId = `kado_${i}`;
     cardStates[cardId] = 0;
     const sevClass = kado.severity === 'urgent' ? 'severity-urgent' : 'severity-watch';
     const sevDot = kado.severity === 'urgent' ? 'dot-urgent' : 'dot-watch';
     const sevLabel = kado.severity === 'urgent' ? 'Urgent' : 'Watch';
-    const statusClass = kado.status === 'low' ? 'status-low' : kado.status === 'diagnosed' ? 'status-diagnosed' : 'status-high';
-    const statusLabel = kado.status === 'low' ? '↓ Low' : kado.status === 'diagnosed' ? '⬤ Diagnosed' : '↑ High';
-
+    const statusClass = kado.status === 'low' ? 'status-low' : 'status-high';
+    const statusLabel = kado.status === 'low' ? '↓ Low' : '↑ High';
     const lifestyle = kado.act_lifestyle || null;
     const doctor = kado.act_doctor || null;
     const retest = kado.act_retest || null;
     const medicine = kado.act_medicine || null;
-
+    const bioName = kado.biomarker_name || kado.title || 'Health Alert';
+    const valueBox = kado.biomarker_value
+      ? `<div class="card-value-box">${bioName} · ${kado.biomarker_value} <span class="card-range">(Range: ${kado.reference_range || ''})</span></div>`
+      : `<div class="card-title">${bioName}</div>`;
     html += `
     <div class="card-container">
       <div class="kado-card">
         <div class="panels-wrapper" id="${cardId}">
           <div class="panel panel-info">
-            <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
               <div class="card-severity ${sevClass}"><div class="severity-dot ${sevDot}"></div>${sevLabel}</div>
               <div class="card-status ${statusClass}">${statusLabel}</div>
             </div>
-            <div class="card-title">${kado.biomarker_name || kado.title || 'Health Alert'}</div>
-            ${kado.biomarker_value ? `<div class="card-value">${kado.biomarker_value} ${kado.biomarker_unit || ''} <span class="card-range">Range: ${kado.reference_range || ''}</span></div>` : ''}
+            ${valueBox}
             <div class="card-info">${kado.info_text || ''}</div>
             ${i === 0 ? `<div class="swipe-explore">Swipe to explore →</div>` : ''}
           </div>
           <div class="panel panel-learn">
             <div class="panel-label label-blue">📖 Learn</div>
-            <div class="learn-title">Understanding ${kado.biomarker_name || kado.title || 'this condition'}</div>
+            <div class="learn-title">Understanding ${bioName}</div>
             <div class="learn-options">
               <div class="learn-option"><div class="learn-option-icon icon-video">🎬</div><div class="learn-option-body"><div class="learn-option-type">Video · 3-5 min</div><div class="learn-option-title">Coming soon</div><div class="learn-option-meta">Curated from trusted sources</div></div><div class="learn-arrow">›</div></div>
               <div class="learn-option"><div class="learn-option-icon icon-article">📄</div><div class="learn-option-body"><div class="learn-option-type">Article · 3-5 min read</div><div class="learn-option-title">Coming soon</div><div class="learn-option-meta">Curated from trusted sources</div></div><div class="learn-arrow">›</div></div>
@@ -620,8 +596,6 @@ async function loadKados() {
     </div>`;
   });
   container.innerHTML = html;
-
-  // Add touch swipe
   kados.forEach((_, i) => {
     const cardId = `kado_${i}`;
     const wrapper = document.getElementById(cardId);
@@ -638,40 +612,48 @@ async function loadKados() {
   });
 }
 
-// ── COVERAGE ──
 async function loadCoverage() {
- if (currentUser.name) { const age = currentUser.age ? ` · ${currentUser.age}` : ''; const gender = currentUser.gender ? `, ${currentUser.gender.toLowerCase() === 'male' ? 'M' : 'F'}` : ''; document.getElementById('coverage-title').textContent = `${currentUser.name}'s biomarker picture${age}${gender}`; }
+  if (currentUser.name) {
+    const age = currentUser.age ? ` · ${currentUser.age}` : '';
+    const gender = currentUser.gender ? `, ${currentUser.gender.toLowerCase() === 'male' ? 'M' : 'F'}` : '';
+    document.getElementById('coverage-title').textContent = `${currentUser.name}'s biomarker picture${age}${gender}`;
+  }
   const biomarkers = await apiFetch(`/biomarkers?user_id=${currentUser.id}`);
   const library = await apiFetch(`/library`);
   const essLib = library ? library.filter(b => b.level === 'essential').map(b => b.name.toLowerCase()) : [];
   const advLib = library ? library.filter(b => b.level === 'advanced').map(b => b.name.toLowerCase()) : [];
   const trackedNames = biomarkers ? [...new Set(biomarkers.map(b => b.name.toLowerCase()))] : [];
   const essTracked = trackedNames.filter(n => essLib.includes(n)).length;
+  const gender = currentUser.gender ? currentUser.gender.toLowerCase() : null;
+  const maleOnly = ['psa', 'testosterone'];
+  const femaleOnly = ['ca-125', 'lh', 'fsh', 'amh'];
+  const advTotal = gender === 'male' ? 25 : gender === 'female' ? 27 : 29;
   const advTracked = trackedNames.filter(n => advLib.includes(n)).length;
   const totalTracked = essTracked + advTracked;
   const essPct = Math.round((essTracked / 30) * 100);
-  const advPct = Math.round((advTracked / 27) * 100);
+  const advPct = Math.round((advTracked / advTotal) * 100);
   const totalPct = Math.round((totalTracked / 57) * 100);
   document.getElementById('cov-tracked').textContent = totalTracked;
   document.getElementById('cov-sub').textContent = `You have tracked ${totalTracked} out of 57 biomarkers. Keep adding reports to improve your score.`;
   document.getElementById('ess-count').textContent = `${essTracked}/30`;
-  document.getElementById('adv-count').textContent = `${advTracked}/27`;
+  document.getElementById('adv-count').textContent = `${advTracked}/${advTotal}`;
   document.getElementById('ess-bar').style.width = essPct + '%';
   document.getElementById('adv-bar').style.width = advPct + '%';
   document.getElementById('ess-pct').textContent = `${essPct}% complete`;
   document.getElementById('ess-rem').textContent = `${30 - essTracked} remaining`;
   document.getElementById('adv-pct').textContent = `${advPct}% complete`;
-  document.getElementById('adv-rem').textContent = `${27 - advTracked} remaining`;
+  document.getElementById('adv-rem').textContent = `${advTotal - advTracked} remaining`;
   const circle = document.getElementById('coverage-circle');
   circle.style.background = `conic-gradient(#2D8A6A 0% ${totalPct}%, #EEF0EE ${totalPct}% 100%)`;
-
-  // Show missing essential biomarkers
   const essMissing = essLib.filter(n => !trackedNames.includes(n));
-  const advMissing = advLib.filter(n => !trackedNames.includes(n));
-
+  const advMissing = advLib.filter(n => {
+    if (trackedNames.includes(n)) return false;
+    if (gender === 'male' && femaleOnly.includes(n)) return false;
+    if (gender === 'female' && maleOnly.includes(n)) return false;
+    return true;
+  });
   const essMissingEl = document.getElementById('ess-missing');
   const advMissingEl = document.getElementById('adv-missing');
-
   if (essMissingEl) {
     essMissingEl.innerHTML = essMissing.length > 0
       ? essMissing.map(n => `<span class="ctag">${n}</span>`).join('')
@@ -684,7 +666,6 @@ async function loadCoverage() {
   }
 }
 
-// ── HELPERS ──
 function getReportIcon(type) {
   if (!type) return '📋';
   const t = type.toLowerCase();
@@ -692,7 +673,6 @@ function getReportIcon(type) {
   if (t.includes('scan') || t.includes('xray') || t.includes('x-ray') || t.includes('mri')) return '🫁';
   if (t.includes('prescription')) return '💊';
   if (t.includes('consultation')) return '🩺';
-  if (t.includes('insurance')) return '📋';
   return '📄';
 }
 
@@ -727,10 +707,7 @@ function requestSug(id) {
 }
 
 function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => {
-    s.classList.remove('active');
-    s.style.display = 'none';
-  });
+  document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
   const el = document.getElementById(`screen-${name}`);
   el.classList.add('active');
   el.style.display = name === 'login' ? 'flex' : 'block';
@@ -749,12 +726,9 @@ function openModal(type, icon, title, body) {
 }
 function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
 
-// ── INIT ──
 window.addEventListener('load', async () => {
-  // Check URL for phone number (magic link)
   const urlParams = new URLSearchParams(window.location.search);
   const urlPhone = urlParams.get('phone');
-
   if (urlPhone) {
     const btn = document.getElementById('login-btn');
     btn.textContent = 'Loading...';
@@ -770,14 +744,10 @@ window.addEventListener('load', async () => {
           return;
         }
       }
-    } catch (e) {
-      console.log('Magic link login failed:', e);
-    }
+    } catch (e) { console.log('Magic link login failed:', e); }
     btn.textContent = 'View my records';
     btn.disabled = false;
   }
-
-  // Check localStorage
   const saved = localStorage.getItem('kado_user');
   if (saved) {
     currentUser = JSON.parse(saved);
