@@ -574,13 +574,18 @@ async function loadKados() {
       <div class="kado-card">
         <div class="panels-wrapper" id="${cardId}">
           <div class="panel panel-info">
-            <div class="card-severity ${sevClass}"><div class="severity-dot ${sevDot}"></div>${sevLabel}</div><div class="card-status ${statusClass}">${statusLabel}</div>
-            <div class="card-title">${kado.title || 'Health Alert'}</div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+              <div class="card-severity ${sevClass}"><div class="severity-dot ${sevDot}"></div>${sevLabel}</div>
+              <div class="card-status ${statusClass}">${statusLabel}</div>
+            </div>
+            <div class="card-title">${kado.biomarker_name || kado.title || 'Health Alert'}</div>
+            ${kado.biomarker_value ? `<div class="card-value">${kado.biomarker_value} ${kado.biomarker_unit || ''} <span class="card-range">Range: ${kado.reference_range || ''}</span></div>` : ''}
             <div class="card-info">${kado.info_text || ''}</div>
+            ${i === 0 ? `<div class="swipe-explore">Swipe to explore →</div>` : ''}
           </div>
           <div class="panel panel-learn">
             <div class="panel-label label-blue">📖 Learn</div>
-            <div class="learn-title">Understanding ${kado.title || 'this condition'}</div>
+            <div class="learn-title">Understanding ${kado.biomarker_name || kado.title || 'this condition'}</div>
             <div class="learn-options">
               <div class="learn-option"><div class="learn-option-icon icon-video">🎬</div><div class="learn-option-body"><div class="learn-option-type">Video · 3-5 min</div><div class="learn-option-title">Coming soon</div><div class="learn-option-meta">Curated from trusted sources</div></div><div class="learn-arrow">›</div></div>
               <div class="learn-option"><div class="learn-option-icon icon-article">📄</div><div class="learn-option-body"><div class="learn-option-type">Article · 3-5 min read</div><div class="learn-option-title">Coming soon</div><div class="learn-option-meta">Curated from trusted sources</div></div><div class="learn-arrow">›</div></div>
@@ -602,11 +607,13 @@ async function loadKados() {
           <div class="pdot" onclick="goToPanel('${cardId}',1)"></div>
           <div class="pdot" onclick="goToPanel('${cardId}',2)"></div>
         </div>
+        <div class="card-arrows">
+          <button class="card-arrow-btn" onclick="goToPanel('${cardId}', Math.max(0, (cardStates['${cardId}']||0)-1))">‹</button>
+          <button class="card-arrow-btn" onclick="goToPanel('${cardId}', Math.min(2, (cardStates['${cardId}']||0)+1))">›</button>
+        </div>
       </div>
-      <div class="swipe-hint"><div class="hint">← Learn</div><div class="hint">Act →</div></div>
     </div>`;
   });
-
   container.innerHTML = html;
 
   // Add touch swipe
