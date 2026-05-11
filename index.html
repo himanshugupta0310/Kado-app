@@ -90,13 +90,13 @@
   .panel { min-width: 100%; padding: 22px 20px; }
   .panel-info { background: white; }
   .card-severity { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 100px; font-size: 10px; font-weight: 600; }
-  .severity-urgent { background: #FFF0F0; color: #C0392B; border: 1.5px solid #C0392B; }
-  .severity-watch { background: #FFFBE0; color: #B8860B; border: 1.5px solid #B8860B; }
+  .severity-urgent { background: #FFF0F0; color: #C0392B; }
+  .severity-watch { background: #FFFBE0; color: #B8860B; }
   .severity-dot { width: 6px; height: 6px; border-radius: 50%; }
   .dot-urgent { background: #C0392B; } .dot-watch { background: #B8860B; }
   .card-status { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 700; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
   .status-high { background: #EEF4FF; color: #2D6BE4; border: 1.5px solid #2D6BE4; }
-  .status-low { background: #EEF4FF; color: #2D6BE4; border: 1.5px solid #2D6BE4; }
+  .status-low { background: #F0FFF4; color: #2D8A6A; border: 1.5px solid #2D8A6A; }
   .card-value-box { background: #E8F5F0; border: 1.5px solid #2D8A6A; border-radius: 12px; padding: 10px 14px; font-size: 14px; font-weight: 500; color: #1A2D22; margin: 12px 0; display: block; }
   .card-range { font-size: 12px; color: #7A9A7A; font-weight: 400; }
   .card-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: #1A2D22; margin: 12px 0 8px; line-height: 1.2; }
@@ -249,16 +249,16 @@
   <div class="hero">
     <div class="records-top">
       <div>
-        <div class="hero-greeting" id="kados-greeting">Good day 👋</div>
-          <div class="hero-title">Your Kados</div>
-            <div class="hero-sub">Action items from your reports</div>
+        <div class="hero-greeting" id="records-greeting">Good day 👋</div>
+        <div class="hero-title">My Records</div>
+        <div class="hero-sub" id="records-sub">Loading...</div>
       </div>
       <button class="upload-btn" onclick="openSheet()">+ Add Report</button>
     </div>
   </div>
   <div class="stats">
     <div class="stat stat-1"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total Records</div></div>
-    <div class="stat stat-2" onclick="showScreen('kados')" style="cursor:pointer;"><div class="stat-num" id="stat-issues">0</div><div class="stat-label">Active Issues</div></div>
+    <div class="stat stat-2"><div class="stat-num" id="stat-issues">0</div><div class="stat-label">Active Issues</div></div>
     <div class="stat stat-3" onclick="showScreen('coverage')">
       <div class="stat-fraction"><span class="stat-num" id="stat-essential">0</span><span class="stat-denom">/30</span></div>
       <div class="stat-label">Essential Biomarkers</div>
@@ -275,8 +275,9 @@
     <div class="avatar" onclick="showScreen('profile')">?</div>
   </div>
   <div class="hero">
-    <div class="hero-title">Your Active Issues</div>
-     <div class="hero-sub">Kado means "card" in Japanese. One card for every health issue that needs your attention.</div>
+    <div class="hero-greeting" id="kados-greeting">Good day 👋</div>
+    <div class="hero-title">Your Kados</div>
+    <div class="hero-sub">Action items from your reports</div>
   </div>
   <div id="kados-list"></div>
 </div>
@@ -476,8 +477,8 @@ function updateAvatars() {
   document.getElementById('profile-name').textContent = currentUser.name || 'Kado User';
   document.getElementById('profile-phone').textContent = currentUser.phone_number || '';
   const greeting = getGreeting();
-  
- 
+  document.getElementById('records-greeting').textContent = greeting + ' 👋';
+  document.getElementById('kados-greeting').textContent = greeting + ' 👋';
 }
 
 async function loadRecords() {
