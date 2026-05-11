@@ -821,6 +821,11 @@ window.addEventListener('load', async () => {
           currentUser = data;
           localStorage.setItem('kado_user', JSON.stringify(data));
           await loadApp();
+         if (urlParams.get('gmail') === 'connected') {
+    const fresh = await fetch(`${API}/user?phone=${encodeURIComponent(urlPhone || currentUser?.phone_number)}`);
+    if (fresh.ok) { currentUser = await fresh.json(); localStorage.setItem('kado_user', JSON.stringify(currentUser)); }
+    document.getElementById('gmail-sheet-title').textContent = 'Scan Gmail';
+  }
           return;
         }
       }
