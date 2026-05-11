@@ -163,11 +163,11 @@
   .essential .level-badge { background: #EEF4FF; color: #2D6BE4; }
   .essential .level-count-num { color: #2D6BE4; }
   .essential .progress-fill { background: #2D6BE4; }
-  .essential .ctag { background: #F5F7F5; color: #9AAAA0; }
+  .essential .ctag { background: #EEF4FF; color: #2D6BE4; }
   .advanced .level-badge { background: #FFF0F0; color: #C0392B; }
   .advanced .level-count-num { color: #C0392B; }
   .advanced .progress-fill { background: #C0392B; }
-  .advanced .ctag { background: #F5F7F5; color: #9AAAA0; }
+  .advanced .ctag { background: #FFF0F0; color: #C0392B; }
   .frontier .level-badge { background: #F5F0FF; color: #7B2FBE; }
   .frontier .level-count-num { color: #7B2FBE; }
   .frontier-coming { padding: 16px 18px; font-size: 12px; color: #7A9A7A; font-style: italic; }
@@ -409,25 +409,8 @@
 
 <!-- ═══════════ BOTTOM NAV ═══════════ -->
 <div class="bottom-nav" id="bottom-nav" style="display:none;">
-  <div class="nav-item active" id="tab-records" onclick="showScreen('records')">
-    <svg width="28" height="28" viewBox="0 0 80 80" style="margin-bottom:2px;">
-      <rect x="12" y="12" width="58" height="58" rx="8" fill="#E8866A" opacity="0.5"/>
-      <rect x="6" y="6" width="58" height="58" rx="8" fill="#E8866A" opacity="0.7"/>
-      <rect x="0" y="0" width="58" height="58" rx="8" fill="#E8866A"/>
-      <rect x="10" y="14" width="38" height="6" rx="3" fill="white" opacity="0.9"/>
-      <rect x="10" y="26" width="28" height="6" rx="3" fill="white" opacity="0.7"/>
-      <rect x="10" y="38" width="32" height="6" rx="3" fill="white" opacity="0.7"/>
-    </svg>
-    Records
-  </div>
-  <div class="nav-item" id="tab-kados" onclick="showScreen('kados')">
-    <svg width="28" height="28" viewBox="0 0 80 80" style="margin-bottom:2px;">
-      <rect x="0" y="0" width="80" height="80" rx="12" fill="#2D8A6A"/>
-      <rect x="6" y="6" width="68" height="68" rx="8" fill="white" opacity="0.15"/>
-      <text x="40" y="56" text-anchor="middle" font-size="40" font-weight="700" fill="white" font-family="sans-serif">K</text>
-    </svg>
-    Kados
-  </div>
+  <div class="nav-item active" id="tab-records" onclick="showScreen('records')"><div class="nav-icon">🗂️</div>Records</div>
+  <div class="nav-item" id="tab-kados" onclick="showScreen('kados')"><div class="nav-icon">🃏</div>Kados</div>
 </div>
 
 <script>
@@ -669,6 +652,8 @@ async function loadCoverage() {
   document.getElementById('adv-rem').textContent = `${advTotal - advTracked} remaining`;
   const circle = document.getElementById('coverage-circle');
   circle.style.background = `conic-gradient(#2D8A6A 0% ${totalPct}%, #EEF0EE ${totalPct}% 100%)`;
+  const essTrackedNames = essLib.filter(n => trackedNames.includes(n));
+  const advTrackedNames = advLib.filter(n => trackedNames.includes(n));
   const essMissing = essLib.filter(n => !trackedNames.includes(n));
   const advMissing = advLib.filter(n => {
     if (trackedNames.includes(n)) return false;
@@ -676,6 +661,18 @@ async function loadCoverage() {
     if (gender === 'female' && maleOnly.includes(n)) return false;
     return true;
   });
+  const essTrackedEl = document.getElementById('ess-tracked');
+  const advTrackedEl = document.getElementById('adv-tracked');
+  if (essTrackedEl) {
+    essTrackedEl.innerHTML = essTrackedNames.length > 0
+      ? essTrackedNames.map(n => `<span class="ctag ctag-tracked">${n}</span>`).join('')
+      : '<span style="font-size:12px;color:#7A9A7A;">No essential biomarkers tracked yet</span>';
+  }
+  if (advTrackedEl) {
+    advTrackedEl.innerHTML = advTrackedNames.length > 0
+      ? advTrackedNames.map(n => `<span class="ctag ctag-tracked">${n}</span>`).join('')
+      : '<span style="font-size:12px;color:#7A9A7A;">No advanced biomarkers tracked yet</span>';
+  }
   const essMissingEl = document.getElementById('ess-missing');
   const advMissingEl = document.getElementById('adv-missing');
   if (essMissingEl) {
