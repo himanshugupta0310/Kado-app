@@ -97,7 +97,7 @@
   .card-status { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 700; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
   .status-high { background: #EEF4FF; color: #2D6BE4; border: 1.5px solid #2D6BE4; }
   .status-low { background: #F0FFF4; color: #2D8A6A; border: 1.5px solid #2D8A6A; }
-  .card-value-box { background: #F5F7F5; border-radius: 12px; padding: 10px 14px; font-size: 14px; font-weight: 500; color: #1A2D22; margin: 12px 0; display: block; }
+  .card-value-box { background: #E8F5F0; border: 1.5px solid #2D8A6A; border-radius: 12px; padding: 10px 14px; font-size: 14px; font-weight: 500; color: #1A2D22; margin: 12px 0; display: block; }
   .card-range { font-size: 12px; color: #7A9A7A; font-weight: 400; }
   .card-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: #1A2D22; margin: 12px 0 8px; line-height: 1.2; }
   .card-info { font-size: 13px; color: #7A9A7A; line-height: 1.6; }
@@ -549,7 +549,7 @@ async function loadKados() {
     const medicine = kado.act_medicine || null;
     const bioName = kado.biomarker_name || kado.title || 'Health Alert';
     const valueBox = kado.biomarker_value
-      ? `<div class="card-value-box">${bioName} · ${kado.biomarker_value} <span class="card-range">(Range: ${kado.reference_range || ''})</span></div>`
+      ? `<div class="card-value-box">${bioName} — ${kado.biomarker_value} &nbsp;&nbsp;<span class="card-range">(Range: ${kado.reference_range || ''})</span></div>`
       : `<div class="card-title">${bioName}</div>`;
     html += `
     <div class="card-container">
