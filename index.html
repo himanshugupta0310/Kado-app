@@ -400,8 +400,25 @@
 
 <!-- ═══════════ BOTTOM NAV ═══════════ -->
 <div class="bottom-nav" id="bottom-nav" style="display:none;">
-  <div class="nav-item active" id="tab-records" onclick="showScreen('records')"><div class="nav-icon">🗂️</div>Records</div>
-  <div class="nav-item" id="tab-kados" onclick="showScreen('kados')"><div class="nav-icon">🃏</div>Kados</div>
+  <div class="nav-item active" id="tab-records" onclick="showScreen('records')">
+    <svg width="28" height="28" viewBox="0 0 80 80" style="margin-bottom:2px;">
+      <rect x="12" y="12" width="58" height="58" rx="8" fill="#E8866A" opacity="0.5"/>
+      <rect x="6" y="6" width="58" height="58" rx="8" fill="#E8866A" opacity="0.7"/>
+      <rect x="0" y="0" width="58" height="58" rx="8" fill="#E8866A"/>
+      <rect x="10" y="14" width="38" height="6" rx="3" fill="white" opacity="0.9"/>
+      <rect x="10" y="26" width="28" height="6" rx="3" fill="white" opacity="0.7"/>
+      <rect x="10" y="38" width="32" height="6" rx="3" fill="white" opacity="0.7"/>
+    </svg>
+    Records
+  </div>
+  <div class="nav-item" id="tab-kados" onclick="showScreen('kados')">
+    <svg width="28" height="28" viewBox="0 0 80 80" style="margin-bottom:2px;">
+      <rect x="0" y="0" width="80" height="80" rx="12" fill="#2D8A6A"/>
+      <rect x="6" y="6" width="68" height="68" rx="8" fill="white" opacity="0.15"/>
+      <text x="40" y="56" text-anchor="middle" font-size="40" font-weight="700" fill="white" font-family="sans-serif">K</text>
+    </svg>
+    Kados
+  </div>
 </div>
 
 <script>
