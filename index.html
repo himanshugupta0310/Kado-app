@@ -546,6 +546,16 @@ function logout() {
 
 async function loadApp() {
   document.getElementById('bottom-nav').style.display = 'flex';
+  // Fetch patient profile to get name
+  try {
+    const patients = await apiFetch(`/patients?user_id=${currentUser.id}`);
+    if (patients && patients.length > 0) {
+      const self = patients.find(p => p.role === 'self') || patients[0];
+      if (self.name) currentUser.name = self.name;
+      if (self.gender) currentUser.gender = self.gender;
+      if (self.age) currentUser.age = self.age;
+    }
+  } catch(e) { console.log('Could not load patient:', e); }
   updateAvatars();
   await Promise.all([loadRecords(), loadKados(), loadCoverage()]);
   showScreen('records');
