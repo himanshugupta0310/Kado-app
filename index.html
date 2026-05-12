@@ -390,7 +390,7 @@
         <div class="sheet-option-icon icon-wa-bg">💬</div>
         <div><div class="sheet-option-title">Send on WhatsApp</div><div class="sheet-option-sub">Forward your report to us on WhatsApp</div></div>
       </button>
-      <button class="sheet-option" onclick="openGmail()">
+      <button class="sheet-option" onclick="event.stopPropagation(); openGmail()">
         <div class="sheet-option-icon" style="background:#FFF0F0;">📧</div>
         <div><div class="sheet-option-title" id="gmail-sheet-title">Connect Gmail</div><div class="sheet-option-sub">Import reports from your inbox</div></div>
       </button>
