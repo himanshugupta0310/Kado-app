@@ -795,7 +795,7 @@ async function openGmail() {
     // Not connected - open OAuth
     const res = await fetch(`${API}/gmail/auth?phone=${encodeURIComponent(currentUser.phone_number)}`);
     const data = await res.json();
-    window.open(data.url, '_blank');
+    window.location.href = data.url;
   }
 }
 function openModal(type, icon, title, body) {
