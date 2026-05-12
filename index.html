@@ -220,6 +220,37 @@
   .spinner { width: 32px; height: 32px; border: 3px solid #EEF0EE; border-top-color: #2D8A6A; border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-text { font-size: 13px; color: #7A9A7A; }
+
+  /* ── GMAIL SELECTION SHEET ── */
+  #gmail-sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 110; display: none; align-items: flex-end; }
+  #gmail-sheet-overlay.open { display: flex; }
+  .gmail-sheet { background: white; border-radius: 24px 24px 0 0; width: 100%; max-height: 85vh; display: flex; flex-direction: column; }
+  .gmail-sheet-header { padding: 20px 20px 0; flex-shrink: 0; }
+  .gmail-sheet-handle { width: 36px; height: 4px; background: #EEF0EE; border-radius: 2px; margin: 0 auto 20px; }
+  .gmail-sheet-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+  .gmail-sheet-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 300; color: #1A2D22; }
+  .gmail-select-all { background: none; border: none; font-size: 12px; color: #2D8A6A; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 4px 0; }
+  .gmail-sheet-sub { font-size: 12px; color: #7A9A7A; margin-bottom: 16px; }
+  .gmail-report-list { flex: 1; overflow-y: auto; padding: 0 20px; }
+  .gmail-report-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #F0F2F0; cursor: pointer; }
+  .gmail-report-item:last-child { border-bottom: none; }
+  .gmail-report-item.selected .gmail-checkbox { background: #2D8A6A; border-color: #2D8A6A; }
+  .gmail-report-item.selected .gmail-checkbox::after { display: block; }
+  .gmail-checkbox { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid #C0D0C0; flex-shrink: 0; position: relative; transition: all 0.15s ease; background: white; }
+  .gmail-checkbox::after { content: ''; display: none; position: absolute; left: 6px; top: 3px; width: 6px; height: 10px; border: 2px solid white; border-top: none; border-left: none; transform: rotate(45deg); }
+  .gmail-report-icon { width: 40px; height: 40px; border-radius: 10px; background: #FFF0F0; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .gmail-report-body { flex: 1; min-width: 0; }
+  .gmail-report-name { font-size: 13px; font-weight: 500; color: #1A2D22; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gmail-report-from { font-size: 11px; color: #7A9A7A; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gmail-report-date { font-size: 10px; color: #9BA89B; flex-shrink: 0; }
+  .gmail-sheet-footer { padding: 16px 20px 36px; flex-shrink: 0; border-top: 1px solid #EEF0EE; background: white; }
+  .gmail-process-btn { width: 100%; background: #2D8A6A; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
+  .gmail-process-btn:disabled { background: #A0C4B8; cursor: default; }
+  .gmail-process-btn:not(:disabled):hover { background: #236B54; }
+  .gmail-cancel-btn { width: 100%; background: none; border: none; padding: 12px; font-size: 13px; color: #7A9A7A; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 4px; }
+  .gmail-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; gap: 12px; }
+  .gmail-loading-text { font-size: 13px; color: #7A9A7A; text-align: center; }
+  .gmail-progress { font-size: 11px; color: #2D8A6A; font-weight: 500; margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -392,13 +423,32 @@
       </button>
       <button class="sheet-option" onclick="event.stopPropagation(); openGmail()">
         <div class="sheet-option-icon" style="background:#FFF0F0;">📧</div>
-        <div><div class="sheet-option-title" id="gmail-sheet-title">Connect Gmail</div><div class="sheet-option-sub">Import reports from your inbox</div></div>
+        <div><div class="sheet-option-title" id="gmail-sheet-title">Connect Gmail</div><div class="sheet-option-sub" id="gmail-sheet-sub">Import reports from your inbox</div></div>
       </button>
     </div>
     <button class="sheet-cancel" onclick="closeSheet()">Cancel</button>
   </div>
 </div>
 <input type="file" accept="image/*" capture="environment" style="display:none" id="camera-input"/>
+
+<!-- ═══════════ GMAIL SELECTION SHEET ═══════════ -->
+<div id="gmail-sheet-overlay" onclick="closeGmailSheet()">
+  <div class="gmail-sheet" onclick="event.stopPropagation()">
+    <div class="gmail-sheet-header">
+      <div class="gmail-sheet-handle"></div>
+      <div class="gmail-sheet-top">
+        <div class="gmail-sheet-title" id="gmail-select-title">Found in Gmail</div>
+        <button class="gmail-select-all" id="gmail-select-all-btn" onclick="toggleSelectAll()">Select all</button>
+      </div>
+      <div class="gmail-sheet-sub" id="gmail-select-sub">Select reports to import</div>
+    </div>
+    <div class="gmail-report-list" id="gmail-report-list"></div>
+    <div class="gmail-sheet-footer">
+      <button class="gmail-process-btn" id="gmail-process-btn" onclick="processSelectedReports()" disabled>Import selected</button>
+      <button class="gmail-cancel-btn" onclick="closeGmailSheet()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════ MODAL ═══════════ -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
@@ -446,6 +496,9 @@ async function apiFetch(path) {
 let currentUser = null;
 let cardStates = {};
 let requested = {};
+let gmailReports = [];
+let selectedReports = new Set();
+let allSelected = false;
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -507,6 +560,11 @@ function updateAvatars() {
   document.getElementById('profile-phone').textContent = currentUser.phone_number || '';
   const greeting = getGreeting();
   document.getElementById('records-greeting').textContent = greeting + ' 👋';
+  // Update Gmail button label
+  if (currentUser.gmail_token) {
+    document.getElementById('gmail-sheet-title').textContent = 'Scan Gmail';
+    document.getElementById('gmail-sheet-sub').textContent = 'Find reports in your inbox';
+  }
 }
 
 async function loadRecords() {
@@ -759,45 +817,197 @@ function openSheet() { document.getElementById('sheet-overlay').classList.add('o
 function closeSheet() { document.getElementById('sheet-overlay').classList.remove('open'); }
 function openCamera() { closeSheet(); document.getElementById('camera-input').click(); }
 function openWhatsApp() { closeSheet(); window.open('https://wa.me/918867062200?text=Hi%2C%20I%20want%20to%20add%20a%20new%20report', '_blank'); }
+
+// ── GMAIL FLOW ──
 async function openGmail() {
   closeSheet();
-  const gmailTitle = document.getElementById('gmail-sheet-title');
   if (currentUser.gmail_token) {
-    // Already connected - scan for reports
-    if (gmailTitle) gmailTitle.textContent = 'Scanning Gmail...';
+    // Show loading state in sheet
+    showGmailLoading();
     try {
       const res = await apiFetch(`/gmail/scan?user_id=${currentUser.id}`);
       if (!res.reports || res.reports.length === 0) {
-        alert('No medical reports found in Gmail.');
-        if (gmailTitle) gmailTitle.textContent = 'Scan Gmail';
+        hideGmailLoading();
+        showGmailEmpty();
         return;
       }
-      const list = res.reports.map((r, i) => `${i+1}. ${r.filename}`).join('\n');
-      const ok = confirm(`Found ${res.reports.length} report(s):\n\n${list}\n\nProcess all?`);
-      if (ok) {
-        for (const r of res.reports) {
-          await fetch(`${API}/gmail/process`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: currentUser.id, message_id: r.message_id, attachment_id: r.attachment_id, filename: r.filename, mime_type: r.mime_type })
-          });
-        }
-        alert('Done! Refreshing records...');
-        await loadRecords();
-        await loadKados();
-        showScreen('records');
-      }
+      gmailReports = res.reports;
+      selectedReports = new Set();
+      allSelected = false;
+      renderGmailSheet();
     } catch (e) {
-      alert('Error: ' + e.message);
+      hideGmailLoading();
+      alert('Could not scan Gmail: ' + e.message);
     }
-    if (gmailTitle) gmailTitle.textContent = 'Scan Gmail';
   } else {
-    // Not connected - open OAuth
     const res = await fetch(`${API}/gmail/auth?phone=${encodeURIComponent(currentUser.phone_number)}`);
     const data = await res.json();
     window.location.href = data.url;
   }
 }
+
+function showGmailLoading() {
+  const overlay = document.getElementById('gmail-sheet-overlay');
+  const list = document.getElementById('gmail-report-list');
+  const footer = overlay.querySelector('.gmail-sheet-footer');
+  const header = overlay.querySelector('.gmail-sheet-header');
+  overlay.classList.add('open');
+  header.style.display = 'none';
+  footer.style.display = 'none';
+  list.innerHTML = `<div class="gmail-loading"><div class="spinner"></div><div class="gmail-loading-text">Scanning your inbox for medical reports...</div></div>`;
+}
+
+function hideGmailLoading() {
+  const overlay = document.getElementById('gmail-sheet-overlay');
+  const header = overlay.querySelector('.gmail-sheet-header');
+  const footer = overlay.querySelector('.gmail-sheet-footer');
+  header.style.display = '';
+  footer.style.display = '';
+}
+
+function showGmailEmpty() {
+  const overlay = document.getElementById('gmail-sheet-overlay');
+  const list = document.getElementById('gmail-report-list');
+  const footer = overlay.querySelector('.gmail-sheet-footer');
+  footer.style.display = 'none';
+  document.getElementById('gmail-select-title').textContent = 'No reports found';
+  document.getElementById('gmail-select-sub').textContent = 'We didn\'t find any medical PDFs in your inbox.';
+  document.getElementById('gmail-select-all-btn').style.display = 'none';
+  list.innerHTML = `<div class="gmail-loading"><div style="font-size:40px;margin-bottom:12px;">📭</div><div class="gmail-loading-text">Try forwarding reports to your Gmail first.</div></div>`;
+}
+
+function renderGmailSheet() {
+  hideGmailLoading();
+  const overlay = document.getElementById('gmail-sheet-overlay');
+  overlay.classList.add('open');
+
+  document.getElementById('gmail-select-title').textContent = `${gmailReports.length} reports found`;
+  document.getElementById('gmail-select-sub').textContent = 'Select the ones you want to import';
+  document.getElementById('gmail-select-all-btn').style.display = '';
+  document.getElementById('gmail-select-all-btn').textContent = 'Select all';
+
+  const list = document.getElementById('gmail-report-list');
+  list.innerHTML = gmailReports.map((r, i) => {
+    const ext = (r.filename || '').split('.').pop().toLowerCase();
+    const icon = ext === 'pdf' ? '📄' : '🖼️';
+    const fromShort = (r.from || '').replace(/<.*>/, '').trim().split('@')[0];
+    const dateStr = r.date ? new Date(r.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+    return `
+      <div class="gmail-report-item" id="gmail-item-${i}" onclick="toggleReport(${i})">
+        <div class="gmail-checkbox" id="gmail-cb-${i}"></div>
+        <div class="gmail-report-icon">${icon}</div>
+        <div class="gmail-report-body">
+          <div class="gmail-report-name">${r.filename || 'Report'}</div>
+          <div class="gmail-report-from">${fromShort || r.from || ''}</div>
+        </div>
+        <div class="gmail-report-date">${dateStr}</div>
+      </div>`;
+  }).join('');
+
+  updateProcessBtn();
+}
+
+function toggleReport(i) {
+  if (selectedReports.has(i)) {
+    selectedReports.delete(i);
+    document.getElementById(`gmail-item-${i}`).classList.remove('selected');
+  } else {
+    selectedReports.add(i);
+    document.getElementById(`gmail-item-${i}`).classList.add('selected');
+  }
+  allSelected = selectedReports.size === gmailReports.length;
+  document.getElementById('gmail-select-all-btn').textContent = allSelected ? 'Deselect all' : 'Select all';
+  updateProcessBtn();
+}
+
+function toggleSelectAll() {
+  allSelected = !allSelected;
+  selectedReports = new Set();
+  gmailReports.forEach((_, i) => {
+    const item = document.getElementById(`gmail-item-${i}`);
+    if (allSelected) {
+      selectedReports.add(i);
+      item.classList.add('selected');
+    } else {
+      item.classList.remove('selected');
+    }
+  });
+  document.getElementById('gmail-select-all-btn').textContent = allSelected ? 'Deselect all' : 'Select all';
+  updateProcessBtn();
+}
+
+function updateProcessBtn() {
+  const btn = document.getElementById('gmail-process-btn');
+  const n = selectedReports.size;
+  btn.disabled = n === 0;
+  btn.textContent = n === 0 ? 'Import selected' : `Import ${n} report${n > 1 ? 's' : ''}`;
+}
+
+function closeGmailSheet() {
+  document.getElementById('gmail-sheet-overlay').classList.remove('open');
+  // Reset footer/header visibility for next open
+  const overlay = document.getElementById('gmail-sheet-overlay');
+  overlay.querySelector('.gmail-sheet-header').style.display = '';
+  overlay.querySelector('.gmail-sheet-footer').style.display = '';
+}
+
+async function processSelectedReports() {
+  if (selectedReports.size === 0) return;
+  const toProcess = [...selectedReports].map(i => gmailReports[i]);
+  const btn = document.getElementById('gmail-process-btn');
+  const list = document.getElementById('gmail-report-list');
+  const header = document.getElementById('gmail-sheet-overlay').querySelector('.gmail-sheet-header');
+
+  // Show progress UI
+  header.style.display = 'none';
+  btn.disabled = true;
+  document.getElementById('gmail-sheet-overlay').querySelector('.gmail-sheet-footer').style.display = 'none';
+
+  list.innerHTML = `<div class="gmail-loading">
+    <div class="spinner"></div>
+    <div class="gmail-loading-text">Processing your reports...</div>
+    <div class="gmail-progress" id="gmail-prog">0 of ${toProcess.length}</div>
+  </div>`;
+
+  let done = 0;
+  let skipped = 0;
+  for (const r of toProcess) {
+    try {
+      const res = await fetch(`${API}/gmail/process`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: currentUser.id, message_id: r.message_id, attachment_id: r.attachment_id, filename: r.filename, mime_type: r.mime_type })
+      });
+      const data = await res.json();
+      if (data.duplicate) skipped++;
+    } catch (e) {
+      console.error('Process error:', e.message);
+    }
+    done++;
+    const prog = document.getElementById('gmail-prog');
+    if (prog) prog.textContent = `${done} of ${toProcess.length}`;
+  }
+
+  // Done — show summary
+  const newCount = done - skipped;
+  list.innerHTML = `<div class="gmail-loading">
+    <div style="font-size:40px;margin-bottom:12px;">✅</div>
+    <div class="gmail-loading-text">${newCount} new report${newCount !== 1 ? 's' : ''} imported${skipped > 0 ? `, ${skipped} already existed` : ''}.</div>
+  </div>`;
+
+  document.getElementById('gmail-sheet-overlay').querySelector('.gmail-sheet-footer').style.display = '';
+  btn.disabled = false;
+  btn.textContent = 'Done';
+  btn.onclick = async () => {
+    closeGmailSheet();
+    await loadRecords();
+    await loadKados();
+    showScreen('records');
+    // Reset button for future use
+    btn.onclick = processSelectedReports;
+  };
+}
+
 function openModal(type, icon, title, body) {
   document.getElementById('modal-icon').textContent = icon;
   document.getElementById('modal-title').textContent = title;
@@ -821,11 +1031,12 @@ window.addEventListener('load', async () => {
           currentUser = data;
           localStorage.setItem('kado_user', JSON.stringify(data));
           await loadApp();
-         if (urlParams.get('gmail') === 'connected') {
-    const fresh = await fetch(`${API}/user?phone=${encodeURIComponent(urlPhone || currentUser?.phone_number)}`);
-    if (fresh.ok) { currentUser = await fresh.json(); localStorage.setItem('kado_user', JSON.stringify(currentUser)); }
-    document.getElementById('gmail-sheet-title').textContent = 'Scan Gmail';
-  }
+          if (urlParams.get('gmail') === 'connected') {
+            const fresh = await fetch(`${API}/user?phone=${encodeURIComponent(urlPhone)}`);
+            if (fresh.ok) { currentUser = await fresh.json(); localStorage.setItem('kado_user', JSON.stringify(currentUser)); }
+            document.getElementById('gmail-sheet-title').textContent = 'Scan Gmail';
+            document.getElementById('gmail-sheet-sub').textContent = 'Find reports in your inbox';
+          }
           return;
         }
       }
