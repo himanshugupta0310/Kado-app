@@ -282,7 +282,7 @@
     <div class="records-top">
       <div>
         <div class="hero-greeting" id="records-greeting">Good day 👋</div>
-        <div class="hero-title">My Records</div>
+        <div class="hero-title" id="records-title">My Records</div>
         <div class="hero-sub" id="records-sub">Loading...</div>
       </div>
       <button class="upload-btn" onclick="openSheet()">+ Add Report</button>
@@ -307,7 +307,7 @@
     <div class="avatar" onclick="showScreen('profile')">?</div>
   </div>
   <div class="hero">
-    <div class="hero-title">Your Active Issues</div>
+    <div class="hero-title" id="kados-title">Your Active Issues</div>
     <div class="hero-sub">Kado means "card" in Japanese. One card for every health issue that needs your attention.</div>
   </div>
   <div id="kados-list"></div>
@@ -321,7 +321,7 @@
   </div>
   <div class="hero">
     <div class="hero-greeting">Health Coverage</div>
-    <div class="hero-title" id="coverage-title">Your biomarker picture</div>
+    <div class="hero-title" id="coverage-title">Your biomarkers</div>
     <div class="hero-sub">See how complete your health profile is</div>
   </div>
   <div class="overall">
@@ -565,6 +565,12 @@ function updateAvatars() {
     document.getElementById('gmail-sheet-title').textContent = 'Scan Gmail';
     document.getElementById('gmail-sheet-sub').textContent = 'Find reports in your inbox';
   }
+  // ── CHANGE 1 & 2: Update screen titles with patient name ──
+  const patientName = currentUser.name || null;
+  if (patientName) {
+    document.getElementById('records-title').textContent = `${patientName}'s Records`;
+    document.getElementById('kados-title').textContent = `${patientName}'s Active Issues`;
+  }
 }
 
 async function loadRecords() {
@@ -700,9 +706,15 @@ async function loadKados() {
 
 async function loadCoverage() {
   if (currentUser.name) {
-    const age = currentUser.age ? ` · ${currentUser.age}` : '';
-    const gender = currentUser.gender ? `, ${currentUser.gender.toLowerCase() === 'male' ? 'M' : 'F'}` : '';
-    document.getElementById('coverage-title').textContent = `${currentUser.name}'s biomarker picture${age}${gender}`;
+    // ── CHANGE 3: Remove "picture", hide age/gender for doctor use case ──
+    const isDoctor = currentUser.user_type === 'doctor';
+    if (isDoctor) {
+      document.getElementById('coverage-title').textContent = `${currentUser.name}'s biomarkers`;
+    } else {
+      const age = currentUser.age ? ` · ${currentUser.age}` : '';
+      const gender = currentUser.gender ? `, ${currentUser.gender.toLowerCase() === 'male' ? 'M' : 'F'}` : '';
+      document.getElementById('coverage-title').textContent = `${currentUser.name}'s biomarkers${age}${gender}`;
+    }
   }
   const biomarkers = await apiFetch(`/biomarkers?user_id=${currentUser.id}`);
   const library = await apiFetch(`/library`);
@@ -822,7 +834,6 @@ function openWhatsApp() { closeSheet(); window.open('https://wa.me/918867062200?
 async function openGmail() {
   closeSheet();
   if (currentUser.gmail_token) {
-    // Show loading state in sheet
     showGmailLoading();
     try {
       const res = await apiFetch(`/gmail/scan?user_id=${currentUser.id}`);
@@ -880,12 +891,10 @@ function renderGmailSheet() {
   hideGmailLoading();
   const overlay = document.getElementById('gmail-sheet-overlay');
   overlay.classList.add('open');
-
   document.getElementById('gmail-select-title').textContent = `${gmailReports.length} reports found`;
   document.getElementById('gmail-select-sub').textContent = 'Select the ones you want to import';
   document.getElementById('gmail-select-all-btn').style.display = '';
   document.getElementById('gmail-select-all-btn').textContent = 'Select all';
-
   const list = document.getElementById('gmail-report-list');
   list.innerHTML = gmailReports.map((r, i) => {
     const ext = (r.filename || '').split('.').pop().toLowerCase();
@@ -903,7 +912,6 @@ function renderGmailSheet() {
         <div class="gmail-report-date">${dateStr}</div>
       </div>`;
   }).join('');
-
   updateProcessBtn();
 }
 
@@ -945,7 +953,6 @@ function updateProcessBtn() {
 
 function closeGmailSheet() {
   document.getElementById('gmail-sheet-overlay').classList.remove('open');
-  // Reset footer/header visibility for next open
   const overlay = document.getElementById('gmail-sheet-overlay');
   overlay.querySelector('.gmail-sheet-header').style.display = '';
   overlay.querySelector('.gmail-sheet-footer').style.display = '';
@@ -957,18 +964,14 @@ async function processSelectedReports() {
   const btn = document.getElementById('gmail-process-btn');
   const list = document.getElementById('gmail-report-list');
   const header = document.getElementById('gmail-sheet-overlay').querySelector('.gmail-sheet-header');
-
-  // Show progress UI
   header.style.display = 'none';
   btn.disabled = true;
   document.getElementById('gmail-sheet-overlay').querySelector('.gmail-sheet-footer').style.display = 'none';
-
   list.innerHTML = `<div class="gmail-loading">
     <div class="spinner"></div>
     <div class="gmail-loading-text">Processing your reports...</div>
     <div class="gmail-progress" id="gmail-prog">0 of ${toProcess.length}</div>
   </div>`;
-
   let done = 0;
   let skipped = 0;
   for (const r of toProcess) {
@@ -987,14 +990,11 @@ async function processSelectedReports() {
     const prog = document.getElementById('gmail-prog');
     if (prog) prog.textContent = `${done} of ${toProcess.length}`;
   }
-
-  // Done — show summary
   const newCount = done - skipped;
   list.innerHTML = `<div class="gmail-loading">
     <div style="font-size:40px;margin-bottom:12px;">✅</div>
     <div class="gmail-loading-text">${newCount} new report${newCount !== 1 ? 's' : ''} imported${skipped > 0 ? `, ${skipped} already existed` : ''}.</div>
   </div>`;
-
   document.getElementById('gmail-sheet-overlay').querySelector('.gmail-sheet-footer').style.display = '';
   btn.disabled = false;
   btn.textContent = 'Done';
@@ -1003,7 +1003,6 @@ async function processSelectedReports() {
     await loadRecords();
     await loadKados();
     showScreen('records');
-    // Reset button for future use
     btn.onclick = processSelectedReports;
   };
 }
