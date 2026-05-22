@@ -667,6 +667,7 @@ function updateAvatars() {
 let selectedInviteRole = 'caregiver';
 
 async function loadCareTeam() {
+  console.log('loadCareTeam called, selectedPatient:', selectedPatient, 'currentUser:', currentUser);
   if (!selectedPatient) return;
   const container = document.getElementById('care-team-list');
   const addBtn = document.getElementById('add-person-btn');
