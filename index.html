@@ -663,7 +663,111 @@ function updateAvatars() {
 }
 
 // ── PROFILE SWITCHER ──
-async function openSwitcher() {
+// ── CARE TEAM ──
+let selectedInviteRole = 'caregiver';
+
+async function loadCareTeam() {
+  if (!selectedPatient) return;
+  const container = document.getElementById('care-team-list');
+  const addBtn = document.getElementById('add-person-btn');
+  const roleBadge = document.getElementById('profile-role-badge');
+  try {
+    const caregivers = await apiFetch(`/patients/${selectedPatient.id}/caregivers`);
+    const myRole = (caregivers.find(c => c.id === currentUser.id) || {}).role || selectedPatient.role;
+    const isOwner = myRole === 'owner';
+    if (roleBadge) roleBadge.textContent = isOwner ? 'Owner' : 'Caregiver';
+    if (addBtn) addBtn.style.display = isOwner ? 'block' : 'none';
+    if (!caregivers || caregivers.length === 0) {
+      container.innerHTML = '<div style="font-size:13px;color:#7A9A7A;padding:8px 0;">No one else on this profile yet.</div>';
+      return;
+    }
+    container.innerHTML = caregivers.map(c => {
+      const initial = (c.name || c.phone_number || '?').charAt(0).toUpperCase();
+      const isMe = c.id === currentUser.id;
+      const roleLabel = c.role === 'owner' ? 'Owner' : c.role === 'caregiver_doctor' ? 'Doctor' : 'Caregiver';
+      const roleBg = c.role === 'owner' ? '#E8F5F0' : c.role === 'caregiver_doctor' ? '#FFF4E8' : '#EEF4FF';
+      const roleColor = c.role === 'owner' ? '#2D8A6A' : c.role === 'caregiver_doctor' ? '#B86A1A' : '#2D6BE4';
+      const avatarBg = c.role === 'owner' ? '#E8F5F0' : '#EEF4FF';
+      const avatarColor = c.role === 'owner' ? '#2D8A6A' : '#2D6BE4';
+      const removeBtn = isOwner && !isMe && c.role !== 'owner'
+        ? `<button onclick="removeCaregiver('${c.id}')" style="background:none;border:none;font-size:11px;color:#C0392B;cursor:pointer;font-family:'DM Sans',sans-serif;margin-left:6px;flex-shrink:0;">Remove</button>`
+        : '';
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F0F2F0;">
+        <div style="width:36px;height:36px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;font-size:13px;color:${avatarColor};font-weight:500;flex-shrink:0;">${initial}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;color:#1A2D22;">${isMe ? 'You' : (c.name || c.phone_number || '—')}</div>
+          <div style="font-size:11px;color:#7A9A7A;margin-top:1px;">${isMe ? '' : (c.phone_number || '')}</div>
+        </div>
+        <div style="font-size:9px;font-weight:600;padding:2px 8px;border-radius:100px;background:${roleBg};color:${roleColor};text-transform:uppercase;letter-spacing:0.4px;flex-shrink:0;">${roleLabel}</div>
+        ${removeBtn}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = '<div style="font-size:13px;color:#7A9A7A;">Could not load care team.</div>';
+  }
+}
+
+async function removeCaregiver(userId) {
+  if (!confirm('Remove this person from the care team?')) return;
+  try {
+    await fetch(`${API}/patients/${selectedPatient.id}/caregivers/${userId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ removed_by: currentUser.id })
+    });
+    await loadCareTeam();
+  } catch(e) { alert('Could not remove caregiver.'); }
+}
+
+function openInviteSheet() {
+  selectedInviteRole = 'caregiver';
+  document.getElementById('invite-phone').value = '';
+  ['caregiver','caregiver_doctor','owner'].forEach(r => {
+    document.getElementById('invite-opt-' + r).style.borderColor = r === 'caregiver' ? '#2D8A6A' : 'transparent';
+    document.getElementById('invite-opt-' + r).style.background = r === 'caregiver' ? '#E8F5F0' : '#F5F7F5';
+  });
+  const patientName = selectedPatient?.name || 'this profile';
+  document.getElementById('invite-sheet-sub').textContent = patientName + "'s profile";
+  document.getElementById('invite-overlay').classList.add('open');
+}
+
+function closeInviteSheet() {
+  document.getElementById('invite-overlay').classList.remove('open');
+}
+
+function selectInviteRole(role) {
+  selectedInviteRole = role;
+  ['caregiver','caregiver_doctor','owner'].forEach(r => {
+    document.getElementById('invite-opt-' + r).style.borderColor = r === role ? '#2D8A6A' : 'transparent';
+    document.getElementById('invite-opt-' + r).style.background = r === role ? '#E8F5F0' : '#F5F7F5';
+  });
+}
+
+async function sendInvite() {
+  const input = document.getElementById('invite-phone').value.trim().replace(/\s/g, '');
+  const btn = document.getElementById('invite-send-btn');
+  if (input.length < 10) { document.getElementById('invite-phone').focus(); return; }
+  const phone = '+91' + input;
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  try {
+    const res = await fetch(`${API}/patients/${selectedPatient.id}/invite`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone_number: phone, role: selectedInviteRole, invited_by_user_id: currentUser.id })
+    });
+    const data = await res.json();
+    if (data.success) {
+      closeInviteSheet();
+      await loadCareTeam();
+    } else {
+      alert(data.error || 'Could not send invite.');
+    }
+  } catch(e) { alert('Could not send invite.'); }
+  btn.disabled = false;
+  btn.textContent = 'Send invite on WhatsApp';
+}
+ async function openSwitcher() {
   try {
     allPatients = await apiFetch(`/patients?user_id=${currentUser.id}`);
   } catch(e) { allPatients = []; }
