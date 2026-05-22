@@ -412,6 +412,33 @@
   </div>
 </div>
 
+ <!-- ═══════════ INVITE SHEET ═══════════ -->
+<div class="sheet-overlay" id="invite-overlay" onclick="closeInviteSheet()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Add to care team</div>
+    <div class="sheet-sub" id="invite-sheet-sub">Choose a role</div>
+    <button class="sheet-option" id="invite-opt-caregiver" onclick="selectInviteRole('caregiver')" style="border:1.5px solid transparent;">
+      <div class="sheet-option-icon" style="background:#EEF4FF;">👨‍👩‍👧</div>
+      <div><div class="sheet-option-title">Caregiver</div><div class="sheet-option-sub">Can upload and view records</div></div>
+    </button>
+    <button class="sheet-option" id="invite-opt-caregiver_doctor" onclick="selectInviteRole('caregiver_doctor')" style="border:1.5px solid transparent;">
+      <div class="sheet-option-icon" style="background:#FFF4E8;">🩺</div>
+      <div><div class="sheet-option-title">Doctor</div><div class="sheet-option-sub">Same as caregiver, tagged differently</div></div>
+    </button>
+    <button class="sheet-option" id="invite-opt-owner" onclick="selectInviteRole('owner')" style="border:1.5px solid transparent;">
+      <div class="sheet-option-icon" style="background:#E8F5F0;">🔑</div>
+      <div><div class="sheet-option-title">Owner</div><div class="sheet-option-sub">Full control · max 2 total</div></div>
+    </button>
+    <div class="input-group" style="margin-top:16px;">
+      <span class="input-prefix">+91</span>
+      <input type="tel" id="invite-phone" placeholder="WhatsApp number" maxlength="10" inputmode="numeric"/>
+    </div>
+    <button class="login-btn" id="invite-send-btn" onclick="sendInvite()">Send invite on WhatsApp</button>
+    <button class="sheet-cancel" onclick="closeInviteSheet()">Cancel</button>
+  </div>
+</div>
+ 
 <!-- ═══════════ PROFILE SWITCHER SHEET ═══════════ -->
 <div class="sheet-overlay" id="switcher-overlay" onclick="closeSwitcher()">
   <div class="sheet" onclick="event.stopPropagation()">
