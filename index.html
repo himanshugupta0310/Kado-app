@@ -635,9 +635,7 @@ async function openSwitcher() {
     allPatients = await apiFetch(`/patients?user_id=${currentUser.id}`);
   } catch(e) { allPatients = []; }
 
-  if (allPatients.length === 1 && selectedPatient) {
-    return;
-  }
+  // always show switcher so user can access profile and create new profiles
 
   const list = document.getElementById('switcher-list');
   list.innerHTML = allPatients.map((p, i) => {
