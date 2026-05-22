@@ -1137,6 +1137,7 @@ function showScreen(name) {
   const el = document.getElementById(`screen-${name}`);
   el.classList.add('active');
   el.style.display = name === 'login' ? 'flex' : 'block';
+  if (name === 'profile') loadCareTeam();
 }
 
 function openSheet() { document.getElementById('sheet-overlay').classList.add('open'); }
