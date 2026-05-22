@@ -18,7 +18,7 @@
   .nav { background: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EEF0EE; position: sticky; top: 0; z-index: 10; }
   .nav-logo { font-family: 'Fraunces', serif; font-size: 18px; color: #1A2D22; }
   .nav-logo span { color: #E8866A; }
-  .avatar { width: 32px; height: 32px; background: #E8F5F0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #2D8A6A; font-weight: 500; cursor: pointer; }
+  .avatar { width: 32px; height: 32px; background: #E8F5F0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #2D8A6A; font-weight: 500; cursor: pointer; border: 1.5px solid #2D8A6A; }
 
   /* ── LOGIN SCREEN ── */
   #screen-login { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; background: #FDF6EE; min-height: 100vh; }
@@ -187,7 +187,7 @@
   /* ── SHEET ── */
   .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: flex-end; }
   .sheet-overlay.open { display: flex; }
-  .sheet { background: white; border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; }
+  .sheet { background: white; border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; max-height: 85vh; overflow-y: auto; }
   .sheet-handle { width: 36px; height: 4px; background: #EEF0EE; border-radius: 2px; margin: 0 auto 20px; }
   .sheet-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 300; color: #1A2D22; margin-bottom: 6px; }
   .sheet-sub { font-size: 12px; color: #7A9A7A; margin-bottom: 20px; }
@@ -276,7 +276,7 @@
 <div class="screen" id="screen-records">
   <div class="nav">
     <div class="nav-logo">kado<span>.</span>care</div>
-    <div class="avatar" id="avatar-records" onclick="showScreen('profile')">?</div>
+    <div class="avatar" id="avatar-records" onclick="openSwitcher()">?</div>
   </div>
   <div class="hero">
     <div class="records-top">
@@ -304,7 +304,7 @@
 <div class="screen" id="screen-kados">
   <div class="nav">
     <div class="nav-logo">kado<span>.</span>care</div>
-    <div class="avatar" onclick="showScreen('profile')">?</div>
+    <div class="avatar" onclick="openSwitcher()">?</div>
   </div>
   <div class="hero">
     <div class="hero-title" id="kados-title">Your Active Issues</div>
@@ -317,7 +317,7 @@
 <div class="screen" id="screen-coverage">
   <div class="nav">
     <div class="nav-logo">kado<span>.</span>care</div>
-    <div class="avatar" onclick="showScreen('profile')">?</div>
+    <div class="avatar" onclick="openSwitcher()">?</div>
   </div>
   <div class="hero">
     <div class="hero-greeting">Health Coverage</div>
@@ -403,6 +403,44 @@
     <div class="profile-card">
       <button class="logout-btn" onclick="logout()">Log out</button>
     </div>
+  </div>
+</div>
+
+<!-- ═══════════ PROFILE SWITCHER SHEET ═══════════ -->
+<div class="sheet-overlay" id="switcher-overlay" onclick="closeSwitcher()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Switch profile</div>
+    <div class="sheet-sub">Tap a profile to view their records</div>
+    <div id="switcher-list"></div>
+    <button class="sheet-option" style="margin-top:4px;" onclick="showCreateProfile()">
+      <div class="sheet-option-icon" style="background:#F5F7F5;font-size:20px;">＋</div>
+      <div><div class="sheet-option-title">Create new profile</div><div class="sheet-option-sub">Add a family member or friend</div></div>
+    </button>
+    <button class="sheet-cancel" onclick="closeSwitcher()">Cancel</button>
+  </div>
+</div>
+
+<!-- ═══════════ CREATE PROFILE SHEET ═══════════ -->
+<div class="sheet-overlay" id="create-profile-overlay" onclick="closeCreateProfile()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <button style="background:none;border:none;font-size:13px;color:#2D8A6A;cursor:pointer;padding:0 0 14px;font-family:'DM Sans',sans-serif;display:block;" onclick="closeCreateProfile();openSwitcher()">‹ Back</button>
+    <div class="sheet-title">New profile</div>
+    <div class="sheet-sub">You'll be the owner of this profile</div>
+    <div class="input-group">
+      <input type="text" id="new-patient-name" placeholder="Name" style="width:100%;"/>
+    </div>
+    <div class="input-group">
+      <input type="number" id="new-patient-age" placeholder="Age" style="width:100%;"/>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button id="gender-male" onclick="selectGender('male')" style="flex:1;padding:11px;border-radius:12px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:13px;color:#7A9A7A;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;">Male</button>
+      <button id="gender-female" onclick="selectGender('female')" style="flex:1;padding:11px;border-radius:12px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:13px;color:#7A9A7A;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;">Female</button>
+      <button id="gender-other" onclick="selectGender('other')" style="flex:1;padding:11px;border-radius:12px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:13px;color:#7A9A7A;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;">Other</button>
+    </div>
+    <button class="login-btn" id="create-profile-btn" onclick="submitCreateProfile()">Create profile</button>
+    <button class="sheet-cancel" onclick="closeCreateProfile()">Cancel</button>
   </div>
 </div>
 
@@ -499,6 +537,9 @@ let requested = {};
 let gmailReports = [];
 let selectedReports = new Set();
 let allSelected = false;
+let allPatients = [];
+let selectedPatient = null;
+let newPatientGender = null;
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -523,12 +564,7 @@ async function handleLogin() {
     if (!data || !data.id) throw new Error('empty');
     currentUser = data;
     localStorage.setItem('kado_user', JSON.stringify(data));
-    document.getElementById('bottom-nav').style.display = 'flex';
-    updateAvatars();
-    await Promise.all([loadRecords(), loadKados(), loadCoverage()]);
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('screen-records').classList.add('active');
-    window.scrollTo(0, 0);
+    await loadApp();
   } catch (e) {
     err.textContent = 'Number not found. Please send a report on WhatsApp first.';
     err.style.display = 'block';
@@ -539,6 +575,8 @@ async function handleLogin() {
 
 function logout() {
   currentUser = null;
+  selectedPatient = null;
+  allPatients = [];
   localStorage.removeItem('kado_user');
   document.getElementById('bottom-nav').style.display = 'none';
   showScreen('login');
@@ -546,47 +584,168 @@ function logout() {
 
 async function loadApp() {
   document.getElementById('bottom-nav').style.display = 'flex';
-  // Fetch patient profile to get name
   try {
-    const patients = await apiFetch(`/patients?user_id=${currentUser.id}`);
-    if (patients && patients.length > 0) {
-      const self = patients.find(p => p.role === 'self') || patients[0];
-      if (self.name) currentUser.name = self.name;
-      if (self.gender) currentUser.gender = self.gender;
-      if (self.age) currentUser.age = self.age;
+    allPatients = await apiFetch(`/patients?user_id=${currentUser.id}`);
+    if (allPatients && allPatients.length > 0) {
+      const savedPatientId = currentUser._patientId;
+      const match = savedPatientId && allPatients.find(p => p.id === savedPatientId);
+      selectedPatient = match || allPatients.find(p => p.role === 'owner') || allPatients[0];
+      currentUser._patientId = selectedPatient.id;
+      currentUser._patientName = selectedPatient.name;
+      if (selectedPatient.name) currentUser.name = selectedPatient.name;
+      if (selectedPatient.gender) currentUser.gender = selectedPatient.gender;
+      if (selectedPatient.age) currentUser.age = selectedPatient.age;
     }
-  } catch(e) { console.log('Could not load patient:', e); }
+  } catch(e) { console.log('Could not load patients:', e); }
   updateAvatars();
   await Promise.all([loadRecords(), loadKados(), loadCoverage()]);
   showScreen('records');
+  if (allPatients && allPatients.length > 1) {
+    openSwitcher();
+  }
 }
 
 function updateAvatars() {
-  const phone = currentUser.phone_number || '';
-  const initial = phone.slice(-2, -1) || 'K';
+  const name = selectedPatient?.name || currentUser.name || '';
+  const initial = name ? name.charAt(0).toUpperCase() : (currentUser.phone_number || '').slice(-2, -1) || 'K';
   document.getElementById('avatar-records').textContent = initial;
   document.getElementById('profile-avatar').textContent = initial;
   document.getElementById('profile-name').textContent = currentUser.name || 'Kado User';
   document.getElementById('profile-phone').textContent = currentUser.phone_number || '';
   const greeting = getGreeting();
   document.getElementById('records-greeting').textContent = greeting + ' 👋';
-  // Update Gmail button label
   if (currentUser.gmail_token) {
     document.getElementById('gmail-sheet-title').textContent = 'Scan Gmail';
     document.getElementById('gmail-sheet-sub').textContent = 'Find reports in your inbox';
   }
-  // ── CHANGE 1 & 2: Update screen titles with patient name ──
-  const patientName = currentUser.name || null;
+  const patientName = selectedPatient?.name || currentUser.name || null;
   if (patientName) {
     document.getElementById('records-title').textContent = `${patientName}'s Records`;
     document.getElementById('kados-title').textContent = `${patientName}'s Active Issues`;
   }
 }
 
+// ── PROFILE SWITCHER ──
+async function openSwitcher() {
+  try {
+    allPatients = await apiFetch(`/patients?user_id=${currentUser.id}`);
+  } catch(e) { allPatients = []; }
+
+  if (allPatients.length === 1 && selectedPatient) {
+    return;
+  }
+
+  const list = document.getElementById('switcher-list');
+  list.innerHTML = allPatients.map((p, i) => {
+    const initial = (p.name || '?').charAt(0).toUpperCase();
+    const meta = [p.age, p.gender ? (p.gender.toLowerCase() === 'male' ? 'M' : 'F') : null].filter(Boolean).join(' · ');
+    const isActive = selectedPatient && p.id === selectedPatient.id;
+    const isOwner = p.role === 'owner';
+    const roleLabel = isOwner ? 'Owner' : 'Caregiver';
+    const roleBg = isOwner ? '#E8F5F0' : '#EEF4FF';
+    const roleColor = isOwner ? '#2D8A6A' : '#2D6BE4';
+    const avatarBg = isOwner ? '#E8F5F0' : '#EEF4FF';
+    const avatarColor = isOwner ? '#2D8A6A' : '#2D6BE4';
+    const activeBorder = isActive ? '#2D8A6A' : 'transparent';
+    const activeBg = isActive ? '#E8F5F0' : '#F5F7F5';
+    return `<button onclick="switchPatient(${i})" style="width:100%;display:flex;align-items:center;gap:14px;background:${activeBg};border:1.5px solid ${activeBorder};border-radius:16px;padding:14px 16px;margin-bottom:8px;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:left;">
+      <div style="width:40px;height:40px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;font-size:15px;color:${avatarColor};font-weight:500;flex-shrink:0;">${initial}</div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:500;color:#1A2D22;">${p.name || 'Unknown'}</div>
+        <div style="font-size:11px;color:#7A9A7A;margin-top:2px;">${meta || '—'}</div>
+      </div>
+      <div style="font-size:9px;font-weight:600;padding:3px 10px;border-radius:100px;background:${roleBg};color:${roleColor};text-transform:uppercase;letter-spacing:0.4px;flex-shrink:0;">${roleLabel}</div>
+    </button>`;
+  }).join('');
+
+  document.getElementById('switcher-overlay').classList.add('open');
+}
+
+function closeSwitcher() {
+  document.getElementById('switcher-overlay').classList.remove('open');
+}
+
+async function switchPatient(i) {
+  selectedPatient = allPatients[i];
+  closeSwitcher();
+  currentUser._patientId = selectedPatient.id;
+  currentUser._patientName = selectedPatient.name;
+  if (selectedPatient.name) currentUser.name = selectedPatient.name;
+  if (selectedPatient.gender) currentUser.gender = selectedPatient.gender;
+  if (selectedPatient.age) currentUser.age = selectedPatient.age;
+  localStorage.setItem('kado_user', JSON.stringify(currentUser));
+  updateAvatars();
+  await Promise.all([loadRecords(), loadKados(), loadCoverage()]);
+  showScreen('records');
+}
+
+function showCreateProfile() {
+  closeSwitcher();
+  newPatientGender = null;
+  document.getElementById('new-patient-name').value = '';
+  document.getElementById('new-patient-age').value = '';
+  ['male','female','other'].forEach(g => {
+    const btn = document.getElementById('gender-' + g);
+    btn.style.background = '#F5F7F5';
+    btn.style.borderColor = '#EEF0EE';
+    btn.style.color = '#7A9A7A';
+  });
+  document.getElementById('create-profile-overlay').classList.add('open');
+}
+
+function closeCreateProfile() {
+  document.getElementById('create-profile-overlay').classList.remove('open');
+}
+
+function selectGender(g) {
+  newPatientGender = g;
+  ['male','female','other'].forEach(id => {
+    const btn = document.getElementById('gender-' + id);
+    const active = id === g;
+    btn.style.background = active ? '#E8F5F0' : '#F5F7F5';
+    btn.style.borderColor = active ? '#2D8A6A' : '#EEF0EE';
+    btn.style.color = active ? '#2D8A6A' : '#7A9A7A';
+  });
+}
+
+async function submitCreateProfile() {
+  const name = document.getElementById('new-patient-name').value.trim();
+  const age = document.getElementById('new-patient-age').value.trim();
+  const btn = document.getElementById('create-profile-btn');
+  if (!name) { document.getElementById('new-patient-name').focus(); return; }
+  btn.disabled = true;
+  btn.textContent = 'Creating...';
+  try {
+    const res = await fetch(`${API}/patients`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: currentUser.id, name, age: age ? parseInt(age) : null, gender: newPatientGender })
+    });
+    const newPatient = await res.json();
+    closeCreateProfile();
+    selectedPatient = { ...newPatient, role: 'owner' };
+    currentUser._patientId = newPatient.id;
+    currentUser._patientName = newPatient.name;
+    if (newPatient.name) currentUser.name = newPatient.name;
+    if (newPatient.gender) currentUser.gender = newPatient.gender;
+    if (newPatient.age) currentUser.age = newPatient.age;
+    localStorage.setItem('kado_user', JSON.stringify(currentUser));
+    updateAvatars();
+    await Promise.all([loadRecords(), loadKados(), loadCoverage()]);
+    showScreen('records');
+  } catch(e) {
+    console.error('Create profile error:', e);
+  }
+  btn.disabled = false;
+  btn.textContent = 'Create profile';
+}
+
 async function loadRecords() {
-  const reports = await apiFetch(`/records?user_id=${currentUser.id}`);
-  const biomarkers = await apiFetch(`/biomarkers?user_id=${currentUser.id}`);
-  const kados = await apiFetch(`/kados?user_id=${currentUser.id}`);
+  const pid = currentUser._patientId || null;
+  const pidParam = pid ? `patient_id=${pid}` : `user_id=${currentUser.id}`;
+  const reports = await apiFetch(`/records?${pidParam}`);
+  const biomarkers = await apiFetch(`/biomarkers?${pidParam}`);
+  const kados = await apiFetch(`/kados?${pidParam}`);
   const totalReports = reports ? reports.length : 0;
   const activeIssues = kados ? kados.length : 0;
   const essentialTracked = biomarkers ? [...new Set(biomarkers.map(b => b.name))].length : 0;
@@ -630,7 +789,9 @@ async function loadRecords() {
 }
 
 async function loadKados() {
-  const kados = await apiFetch(`/kados?user_id=${currentUser.id}`);
+  const pid = currentUser._patientId || null;
+  const pidParam = pid ? `patient_id=${pid}` : `user_id=${currentUser.id}`;
+  const kados = await apiFetch(`/kados?${pidParam}`);
   const container = document.getElementById('kados-list');
   if (!kados || kados.length === 0) {
     container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🃏</div><div class="empty-state-title">No Kados yet</div><div class="empty-state-sub">Send a health report on WhatsApp and we will generate your Kado cards</div></div>`;
@@ -715,24 +876,28 @@ async function loadKados() {
 }
 
 async function loadCoverage() {
-  if (currentUser.name) {
-    // ── CHANGE 3: Remove "picture", hide age/gender for doctor use case ──
+  const patientName = selectedPatient?.name || currentUser.name;
+  if (patientName) {
     const isDoctor = currentUser.user_type === 'doctor';
     if (isDoctor) {
-      document.getElementById('coverage-title').textContent = `${currentUser.name}'s biomarkers`;
+      document.getElementById('coverage-title').textContent = `${patientName}'s biomarkers`;
     } else {
-      const age = currentUser.age ? ` · ${currentUser.age}` : '';
-      const gender = currentUser.gender ? `, ${currentUser.gender.toLowerCase() === 'male' ? 'M' : 'F'}` : '';
-      document.getElementById('coverage-title').textContent = `${currentUser.name}'s biomarkers${age}${gender}`;
+      const age = (selectedPatient?.age || currentUser.age) ? ` · ${selectedPatient?.age || currentUser.age}` : '';
+      const g = (selectedPatient?.gender || currentUser.gender);
+      const gender = g ? `, ${g.toLowerCase() === 'male' ? 'M' : 'F'}` : '';
+      document.getElementById('coverage-title').textContent = `${patientName}'s biomarkers${age}${gender}`;
     }
   }
-  const biomarkers = await apiFetch(`/biomarkers?user_id=${currentUser.id}`);
+  const pid = currentUser._patientId || null;
+  const pidParam = pid ? `patient_id=${pid}` : `user_id=${currentUser.id}`;
+  const biomarkers = await apiFetch(`/biomarkers?${pidParam}`);
   const library = await apiFetch(`/library`);
   const essLib = library ? library.filter(b => b.level === 'essential').map(b => b.name.toLowerCase()) : [];
   const advLib = library ? library.filter(b => b.level === 'advanced').map(b => b.name.toLowerCase()) : [];
   const trackedNames = biomarkers ? [...new Set(biomarkers.map(b => b.name.toLowerCase()))] : [];
   const essTracked = trackedNames.filter(n => essLib.includes(n)).length;
-  const gender = currentUser.gender ? currentUser.gender.toLowerCase() : null;
+  const g = (selectedPatient?.gender || currentUser.gender);
+  const gender = g ? g.toLowerCase() : null;
   const maleOnly = ['psa', 'testosterone'];
   const femaleOnly = ['ca-125', 'lh', 'fsh', 'amh'];
   const advTotal = gender === 'male' ? 25 : gender === 'female' ? 27 : 29;
@@ -1028,6 +1193,13 @@ function closeModal() { document.getElementById('modal-overlay').classList.remov
 window.addEventListener('load', async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const urlPhone = urlParams.get('phone');
+  const urlInvite = urlParams.get('invite');
+
+  if (urlInvite) {
+    // Invite accept flow — handled after login
+    localStorage.setItem('kado_pending_invite', urlInvite);
+  }
+
   if (urlPhone) {
     const btn = document.getElementById('login-btn');
     btn.textContent = 'Loading...';
@@ -1046,6 +1218,7 @@ window.addEventListener('load', async () => {
             document.getElementById('gmail-sheet-title').textContent = 'Scan Gmail';
             document.getElementById('gmail-sheet-sub').textContent = 'Find reports in your inbox';
           }
+          await handlePendingInvite();
           return;
         }
       }
@@ -1053,12 +1226,40 @@ window.addEventListener('load', async () => {
     btn.textContent = 'View my records';
     btn.disabled = false;
   }
+
   const saved = localStorage.getItem('kado_user');
   if (saved) {
     currentUser = JSON.parse(saved);
     await loadApp();
+    await handlePendingInvite();
   }
 });
+
+async function handlePendingInvite() {
+  const token = localStorage.getItem('kado_pending_invite');
+  if (!token || !currentUser) return;
+  localStorage.removeItem('kado_pending_invite');
+  try {
+    const res = await fetch(`${API}/invites/accept`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, user_id: currentUser.id })
+    });
+    const data = await res.json();
+    if (data.success) {
+      allPatients = await apiFetch(`/patients?user_id=${currentUser.id}`);
+      const newPatient = allPatients.find(p => p.id === data.patient_id);
+      if (newPatient) {
+        selectedPatient = newPatient;
+        currentUser._patientId = newPatient.id;
+        currentUser._patientName = newPatient.name;
+        localStorage.setItem('kado_user', JSON.stringify(currentUser));
+        updateAvatars();
+        await Promise.all([loadRecords(), loadKados(), loadCoverage()]);
+      }
+    }
+  } catch(e) { console.log('Invite accept error:', e); }
+}
 
 document.getElementById('phone-input').addEventListener('keypress', e => {
   if (e.key === 'Enter') handleLogin();
