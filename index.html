@@ -774,17 +774,24 @@ function selectInviteRole(role) {
 }
 
 async function sendInvite() {
-  const input = document.getElementById('invite-phone').value.trim().replace(/\s/g, '');
   const btn = document.getElementById('invite-send-btn');
-  if (input.length < 10) { document.getElementById('invite-phone').focus(); return; }
-  const phone = '+91' + input;
+  let body = { role: selectedInviteRole, invited_by_user_id: currentUser.id };
+  if (selectedInviteMethod === 'whatsapp') {
+    const input = document.getElementById('invite-phone').value.trim().replace(/\s/g, '');
+    if (input.length < 10) { document.getElementById('invite-phone').focus(); return; }
+    body.phone_number = '+91' + input;
+  } else {
+    const email = document.getElementById('invite-email').value.trim();
+    if (!email || !email.includes('@')) { document.getElementById('invite-email').focus(); return; }
+    body.email = email;
+  }
   btn.disabled = true;
   btn.textContent = 'Sending...';
   try {
     const res = await fetch(`${API}/patients/${selectedPatient.id}/invite`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone_number: phone, role: selectedInviteRole, invited_by_user_id: currentUser.id })
+      body: JSON.stringify(body)
     });
     const data = await res.json();
     if (data.success) {
