@@ -186,14 +186,11 @@
 <!-- ═══════════ PATIENTS LIST SCREEN ═══════════ -->
 <div class="screen" id="screen-patients">
   <div class="nav">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div class="mode-toggle">
-        <button class="mode-btn active" id="mode-pro" onclick="setMode('professional')">Professional</button>
-        <button class="mode-btn inactive" id="mode-personal" onclick="setMode('personal')">Personal</button>
-      </div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="mode-pro" onclick="setMode('professional')">Professional</button>
+      <button class="mode-btn inactive" id="mode-personal" onclick="setMode('personal')">Personal</button>
     </div>
-    <div class="nav-logo" style="position:absolute;left:50%;transform:translateX(-50%);">kado<span>.</span>care</div>
-    <div class="avatar" id="avatar-main">D</div>
+    <div class="avatar" id="avatar-main" onclick="showScreen('doctor-profile')">D</div>
   </div>
   <div class="hero">
     <div class="hero-greeting" id="patients-greeting">Good morning 👋</div>
