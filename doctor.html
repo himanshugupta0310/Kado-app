@@ -270,10 +270,17 @@
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
     <div class="sheet-title">Invite a patient</div>
-    <div class="sheet-sub">They'll receive a WhatsApp message to start sharing their records with you</div>
-    <div class="input-group">
+    <div class="sheet-sub">They'll receive a message to start sharing their records with you</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button id="doc-invite-method-wa" onclick="selectDocInviteMethod('whatsapp')" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid #2D6BE4;background:#EEF4FF;font-size:12px;color:#2D6BE4;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">💬 WhatsApp</button>
+      <button id="doc-invite-method-email" onclick="selectDocInviteMethod('email')" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:12px;color:#7A9A7A;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">📧 Email</button>
+    </div>
+    <div id="doc-invite-wa-input" class="input-group">
       <span class="input-prefix">+91</span>
       <input type="tel" id="patient-invite-phone" placeholder="Patient's WhatsApp number" maxlength="10" inputmode="numeric"/>
+    </div>
+    <div id="doc-invite-email-input" class="input-group" style="display:none;">
+      <input type="email" id="patient-invite-email" placeholder="Patient's email address" style="width:100%;"/>
     </div>
     <button class="primary-btn" id="invite-patient-btn" onclick="sendPatientInvite()">Send invite on WhatsApp</button>
     <button class="sheet-cancel" onclick="closeInvitePatientSheet()">Cancel</button>
