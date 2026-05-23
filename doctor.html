@@ -635,16 +635,24 @@ function closeInvitePatientSheet() {
 }
 
 async function sendPatientInvite() {
-  const input = document.getElementById('patient-invite-phone').value.trim().replace(/\s/g, '');
   const btn = document.getElementById('invite-patient-btn');
-  if (input.length < 10) { document.getElementById('patient-invite-phone').focus(); return; }
+  let body = { doctor_user_id: currentDoctor.id };
+  if (docInviteMethod === 'whatsapp') {
+    const input = document.getElementById('patient-invite-phone').value.trim().replace(/\s/g, '');
+    if (input.length < 10) { document.getElementById('patient-invite-phone').focus(); return; }
+    body.phone_number = '+91' + input;
+  } else {
+    const email = document.getElementById('patient-invite-email').value.trim();
+    if (!email || !email.includes('@')) { document.getElementById('patient-invite-email').focus(); return; }
+    body.email = email;
+  }
   btn.disabled = true;
   btn.textContent = 'Sending...';
   try {
     const res = await fetch(`${API}/doctor/invite-patient`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ doctor_user_id: currentDoctor.id, phone_number: '+91' + input })
+      body: JSON.stringify(body)
     });
     const data = await res.json();
     if (data.success) {
