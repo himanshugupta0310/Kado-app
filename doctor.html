@@ -444,15 +444,28 @@ async function loadPatients() {
       container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-title">No patients yet</div><div class="empty-state-sub">Tap "+ Invite patient" to invite your first patient</div></div>`;
       return;
     }
+    // Fetch report counts for all patients in parallel
+    const reportCounts = await Promise.all(patients.map(async p => {
+      try {
+        const reports = await apiFetch(`/records?patient_id=${p.id}`);
+        return reports ? reports.length : 0;
+      } catch { return 0; }
+    }));
+
     container.innerHTML = `<div class="patient-list">${patients.map((p, i) => {
       const initial = (p.name || '?').charAt(0).toUpperCase();
       const meta = [p.age ? `${p.age} yrs` : null, p.gender ? capitalize(p.gender) : null].filter(Boolean).join(' · ');
+      const count = reportCounts[i];
+      const badge = count > 0
+        ? `<div style="background:#EEF4FF;color:#2D6BE4;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;flex-shrink:0;">${count} report${count !== 1 ? 's' : ''}</div>`
+        : `<div style="background:#E8F5F0;color:#2D8A6A;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;flex-shrink:0;">No reports</div>`;
       return `<div class="patient-card" onclick="openPatient(${i})" data-idx="${i}">
         <div class="patient-avatar">${initial}</div>
         <div class="patient-info">
           <div class="patient-name">${p.name || 'Unknown'}</div>
           <div class="patient-meta">${meta || '—'}</div>
         </div>
+        ${badge}
         <div class="patient-arrow">›</div>
       </div>`;
     }).join('')}</div>`;
