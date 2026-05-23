@@ -659,7 +659,44 @@ async function sendPatientInvite() {
 }
 
 // ── MODE TOGGLE ──
-function setMode(mode) {
+// ── DOCTOR PROFILE ──
+function showDoctorProfile() {
+  document.getElementById('profile-avatar-lg').textContent = (currentDoctor.name || 'D').charAt(0).toUpperCase();
+  document.getElementById('profile-name-lg').textContent = currentDoctor.name || 'Doctor';
+  document.getElementById('profile-spec-lg').textContent = currentDoctor.specialization || '';
+  document.getElementById('profile-phone-lg').textContent = currentDoctor.phone_number || '';
+  showScreen('doctor-profile');
+}
+
+function logoutDoctor() {
+  currentDoctor = null;
+  localStorage.removeItem('kado_doctor');
+  showScreen('login');
+}
+
+// ── DOC INVITE METHOD TOGGLE ──
+let docInviteMethod = 'whatsapp';
+function selectDocInviteMethod(method) {
+  docInviteMethod = method;
+  const waBtn = document.getElementById('doc-invite-method-wa');
+  const emailBtn = document.getElementById('doc-invite-method-email');
+  const waInput = document.getElementById('doc-invite-wa-input');
+  const emailInput = document.getElementById('doc-invite-email-input');
+  const sendBtn = document.getElementById('invite-patient-btn');
+  if (method === 'whatsapp') {
+    waBtn.style.borderColor = '#2D6BE4'; waBtn.style.background = '#EEF4FF'; waBtn.style.color = '#2D6BE4';
+    emailBtn.style.borderColor = '#EEF0EE'; emailBtn.style.background = '#F5F7F5'; emailBtn.style.color = '#7A9A7A';
+    waInput.style.display = 'flex'; emailInput.style.display = 'none';
+    sendBtn.textContent = 'Send invite on WhatsApp';
+  } else {
+    emailBtn.style.borderColor = '#2D6BE4'; emailBtn.style.background = '#EEF4FF'; emailBtn.style.color = '#2D6BE4';
+    waBtn.style.borderColor = '#EEF0EE'; waBtn.style.background = '#F5F7F5'; waBtn.style.color = '#7A9A7A';
+    emailInput.style.display = 'flex'; waInput.style.display = 'none';
+    sendBtn.textContent = 'Send invite by email';
+  }
+}
+ 
+ function setMode(mode) {
   if (mode === 'professional') {
     showScreen('patients');
     document.getElementById('invite-fab').style.display = 'block';
