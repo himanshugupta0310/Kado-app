@@ -730,7 +730,10 @@ async function removeCaregiver(userId) {
 
 function openInviteSheet() {
   selectedInviteRole = 'caregiver';
+  selectedInviteMethod = 'whatsapp';
   document.getElementById('invite-phone').value = '';
+  document.getElementById('invite-email').value = '';
+  selectInviteMethod('whatsapp');
   ['caregiver','caregiver_doctor','owner'].forEach(r => {
     document.getElementById('invite-opt-' + r).style.borderColor = r === 'caregiver' ? '#2D8A6A' : 'transparent';
     document.getElementById('invite-opt-' + r).style.background = r === 'caregiver' ? '#E8F5F0' : '#F5F7F5';
