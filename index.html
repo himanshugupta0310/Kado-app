@@ -636,9 +636,6 @@ async function loadApp() {
       selectedPatient = match || allPatients.find(p => p.role === 'owner') || allPatients[0];
       currentUser._patientId = selectedPatient.id;
       currentUser._patientName = selectedPatient.name;
-      if (selectedPatient.name) currentUser.name = selectedPatient.name;
-      if (selectedPatient.gender) currentUser.gender = selectedPatient.gender;
-      if (selectedPatient.age) currentUser.age = selectedPatient.age;
     }
   } catch(e) { console.log('Could not load patients:', e); }
   updateAvatars();
