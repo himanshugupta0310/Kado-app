@@ -644,6 +644,7 @@ async function loadApp() {
   if (allPatients && allPatients.length > 1) {
     openSwitcher();
   }
+  await handlePendingInvite();
 }
 
 function updateAvatars() {
