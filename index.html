@@ -1372,6 +1372,7 @@ window.addEventListener('load', async () => {
 
   if (urlInvite) {
     localStorage.setItem('kado_pending_invite', urlInvite);
+    window._pendingInviteToken = urlInvite;
   }
   if (urlPhone) {
     const btn = document.getElementById('login-btn');
