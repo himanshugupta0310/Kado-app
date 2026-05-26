@@ -679,41 +679,77 @@ async function loadCareTeam() {
   const addBtn = document.getElementById('add-person-btn');
   const roleBadge = document.getElementById('profile-role-badge');
   try {
-    const caregivers = await apiFetch(`/patients/${selectedPatient.id}/caregivers`);
+    const [caregivers, pendingInvites] = await Promise.all([
+      apiFetch(`/patients/${selectedPatient.id}/caregivers`),
+      apiFetch(`/patients/${selectedPatient.id}/invites/pending`)
+    ]);
     const myRole = (caregivers.find(c => c.id === currentUser.id) || {}).role || selectedPatient.role;
     const isOwner = myRole === 'owner';
     if (roleBadge) roleBadge.textContent = isOwner ? 'Owner' : 'Caregiver';
     if (addBtn) addBtn.style.display = isOwner ? 'block' : 'none';
-    if (!caregivers || caregivers.length === 0) {
-      container.innerHTML = '<div style="font-size:13px;color:#7A9A7A;padding:8px 0;">No one else on this profile yet.</div>';
-      return;
+
+    let html = '';
+
+    // Active care team
+    if (caregivers && caregivers.length > 0) {
+      html += caregivers.map(c => {
+        const initial = (c.name || c.phone_number || '?').charAt(0).toUpperCase();
+        const isMe = c.id === currentUser.id;
+        const roleLabel = c.role === 'owner' ? 'Owner' : c.role === 'caregiver_doctor' ? 'Doctor' : 'Caregiver';
+        const roleBg = c.role === 'owner' ? '#E8F5F0' : c.role === 'caregiver_doctor' ? '#FFF4E8' : '#EEF4FF';
+        const roleColor = c.role === 'owner' ? '#2D8A6A' : c.role === 'caregiver_doctor' ? '#B86A1A' : '#2D6BE4';
+        const avatarBg = c.role === 'owner' ? '#E8F5F0' : '#EEF4FF';
+        const avatarColor = c.role === 'owner' ? '#2D8A6A' : '#2D6BE4';
+        const removeBtn = isOwner && !isMe && c.role !== 'owner'
+          ? `<button onclick="removeCaregiver('${c.id}')" style="background:none;border:none;font-size:11px;color:#C0392B;cursor:pointer;font-family:'DM Sans',sans-serif;margin-left:6px;flex-shrink:0;">Remove</button>`
+          : '';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F0F2F0;">
+          <div style="width:36px;height:36px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;font-size:13px;color:${avatarColor};font-weight:500;flex-shrink:0;">${initial}</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:500;color:#1A2D22;">${isMe ? 'You' : (c.name || c.phone_number || '—')}</div>
+            <div style="font-size:11px;color:#7A9A7A;margin-top:1px;">${isMe ? '' : (c.phone_number || '')}</div>
+          </div>
+          <div style="font-size:9px;font-weight:600;padding:2px 8px;border-radius:100px;background:${roleBg};color:${roleColor};text-transform:uppercase;letter-spacing:0.4px;flex-shrink:0;">${roleLabel}</div>
+          ${removeBtn}
+        </div>`;
+      }).join('');
     }
-    container.innerHTML = caregivers.map(c => {
-      const initial = (c.name || c.phone_number || '?').charAt(0).toUpperCase();
-      const isMe = c.id === currentUser.id;
-      const roleLabel = c.role === 'owner' ? 'Owner' : c.role === 'caregiver_doctor' ? 'Doctor' : 'Caregiver';
-      const roleBg = c.role === 'owner' ? '#E8F5F0' : c.role === 'caregiver_doctor' ? '#FFF4E8' : '#EEF4FF';
-      const roleColor = c.role === 'owner' ? '#2D8A6A' : c.role === 'caregiver_doctor' ? '#B86A1A' : '#2D6BE4';
-      const avatarBg = c.role === 'owner' ? '#E8F5F0' : '#EEF4FF';
-      const avatarColor = c.role === 'owner' ? '#2D8A6A' : '#2D6BE4';
-      const removeBtn = isOwner && !isMe && c.role !== 'owner'
-        ? `<button onclick="removeCaregiver('${c.id}')" style="background:none;border:none;font-size:11px;color:#C0392B;cursor:pointer;font-family:'DM Sans',sans-serif;margin-left:6px;flex-shrink:0;">Remove</button>`
-        : '';
-      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F0F2F0;">
-        <div style="width:36px;height:36px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;font-size:13px;color:${avatarColor};font-weight:500;flex-shrink:0;">${initial}</div>
-        <div style="flex:1;">
-          <div style="font-size:13px;font-weight:500;color:#1A2D22;">${isMe ? 'You' : (c.name || c.phone_number || '—')}</div>
-          <div style="font-size:11px;color:#7A9A7A;margin-top:1px;">${isMe ? '' : (c.phone_number || '')}</div>
-        </div>
-        <div style="font-size:9px;font-weight:600;padding:2px 8px;border-radius:100px;background:${roleBg};color:${roleColor};text-transform:uppercase;letter-spacing:0.4px;flex-shrink:0;">${roleLabel}</div>
-        ${removeBtn}
-      </div>`;
-    }).join('');
+
+    // Pending invites
+    if (pendingInvites && pendingInvites.length > 0 && isOwner) {
+      html += `<div style="font-size:10px;color:#7A9A7A;text-transform:uppercase;letter-spacing:1px;margin:12px 0 6px;font-weight:500;">Pending invites</div>`;
+      html += pendingInvites.map(inv => {
+        const label = inv.email || inv.phone_number || '—';
+        const roleLabel = inv.role === 'owner' ? 'Owner' : inv.role === 'caregiver_doctor' ? 'Doctor' : 'Caregiver';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F0F2F0;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#F5F7F5;display:flex;align-items:center;justify-content:center;font-size:13px;color:#C0D0C0;font-weight:500;flex-shrink:0;">?</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:500;color:#1A2D22;">${label}</div>
+            <div style="font-size:11px;color:#7A9A7A;margin-top:1px;">Invite pending</div>
+          </div>
+          <div style="font-size:9px;font-weight:600;padding:2px 8px;border-radius:100px;background:#F5F7F5;color:#7A9A7A;text-transform:uppercase;letter-spacing:0.4px;flex-shrink:0;">${roleLabel}</div>
+          <button onclick="revokeInvite('${inv.id}')" style="background:none;border:none;font-size:11px;color:#C0392B;cursor:pointer;font-family:'DM Sans',sans-serif;margin-left:6px;flex-shrink:0;">Revoke</button>
+        </div>`;
+      }).join('');
+    }
+
+    if (!html) {
+      html = '<div style="font-size:13px;color:#7A9A7A;padding:8px 0;">No one else on this profile yet.</div>';
+    }
+
+    container.innerHTML = html;
   } catch(e) {
     container.innerHTML = '<div style="font-size:13px;color:#7A9A7A;">Could not load care team.</div>';
   }
 }
 
+async function revokeInvite(inviteId) {
+  if (!confirm('Revoke this invite?')) return;
+  try {
+    await fetch(`${API}/invites/${inviteId}`, { method: 'DELETE' });
+    await loadCareTeam();
+  } catch(e) { alert('Could not revoke invite.'); }
+}
 async function removeCaregiver(userId) {
   if (!confirm('Remove this person from the care team?')) return;
   try {
