@@ -1370,10 +1370,8 @@ window.addEventListener('load', async () => {
   const urlInvite = urlParams.get('invite');
 
   if (urlInvite) {
-    // Invite accept flow — handled after login
     localStorage.setItem('kado_pending_invite', urlInvite);
   }
-
   if (urlPhone) {
     const btn = document.getElementById('login-btn');
     btn.textContent = 'Loading...';
@@ -1400,15 +1398,19 @@ window.addEventListener('load', async () => {
     btn.textContent = 'View my records';
     btn.disabled = false;
   }
-
   const saved = localStorage.getItem('kado_user');
   if (saved) {
     currentUser = JSON.parse(saved);
     await loadApp();
     await handlePendingInvite();
+    return;
+  }
+  // No logged in user — if invite token exists, show login with context
+  if (urlInvite) {
+    document.getElementById('login-title').textContent = 'Accept invite';
+    document.getElementById('login-sub').textContent = 'Enter your WhatsApp number to accept the invite and view the shared health records';
   }
 });
-
 async function handlePendingInvite() {
   const token = localStorage.getItem('kado_pending_invite');
   if (!token || !currentUser) return;
@@ -1430,6 +1432,12 @@ async function handlePendingInvite() {
         localStorage.setItem('kado_user', JSON.stringify(currentUser));
         updateAvatars();
         await Promise.all([loadRecords(), loadKados(), loadCoverage()]);
+        // Show success toast
+        const toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2D8A6A;color:white;padding:12px 20px;border-radius:12px;font-size:13px;z-index:9999;';
+        toast.textContent = `✓ You now have access to ${newPatient.name}'s health records`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
       }
     }
   } catch(e) { console.log('Invite accept error:', e); }
