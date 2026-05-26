@@ -684,7 +684,7 @@ async function loadCareTeam() {
       apiFetch(`/patients/${selectedPatient.id}/invites/pending`)
     ]);
     const myRole = (caregivers.find(c => c.id === currentUser.id) || {}).role || selectedPatient.role;
-    const isOwner = myRole === 'owner';
+const isOwner = myRole === 'owner' || selectedPatient.role === 'owner';
     if (roleBadge) roleBadge.textContent = isOwner ? 'Owner' : 'Caregiver';
     if (addBtn) addBtn.style.display = isOwner ? 'block' : 'none';
 
