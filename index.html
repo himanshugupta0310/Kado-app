@@ -1413,9 +1413,10 @@ window.addEventListener('load', async () => {
   }
 });
 async function handlePendingInvite() {
-  const token = localStorage.getItem('kado_pending_invite');
+  const token = localStorage.getItem('kado_pending_invite') || window._pendingInviteToken;
   if (!token || !currentUser) return;
   localStorage.removeItem('kado_pending_invite');
+  window._pendingInviteToken = null;
   try {
     const res = await fetch(`${API}/invites/accept`, {
       method: 'POST',
