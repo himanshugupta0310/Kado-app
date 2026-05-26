@@ -716,7 +716,8 @@ const isOwner = myRole === 'owner' || selectedPatient.role === 'owner';
     }
 
     // Pending invites
-    if (pendingInvites && pendingInvites.length > 0 && isOwner) {
+    console.log('pending check:', pendingInvites?.length, 'isOwner:', isOwner);
+if (pendingInvites && pendingInvites.length > 0 && isOwner) {
       html += `<div style="font-size:10px;color:#7A9A7A;text-transform:uppercase;letter-spacing:1px;margin:12px 0 6px;font-weight:500;">Pending invites</div>`;
       html += pendingInvites.map(inv => {
         const label = inv.email || inv.phone_number || '—';
