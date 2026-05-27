@@ -488,12 +488,129 @@ function switchTab(tab) {
   currentTab = tab;
   document.getElementById('tab-records').classList.toggle('active', tab === 'records');
   document.getElementById('tab-recs').classList.toggle('active', tab === 'recs');
+  document.getElementById('tab-summary').classList.toggle('active', tab === 'summary');
   document.getElementById('tab-content-records').style.display = tab === 'records' ? 'block' : 'none';
   document.getElementById('tab-content-recs').style.display = tab === 'recs' ? 'block' : 'none';
+  document.getElementById('tab-content-summary').style.display = tab === 'summary' ? 'block' : 'none';
   if (tab === 'records') loadPatientRecords();
   if (tab === 'recs') loadPatientRecs();
+  if (tab === 'summary') loadDoctorSummary();
 }
 
+// ── DOCTOR SUMMARY ──
+let doctorSummarySpeciality = 'general';
+
+async function loadDoctorSummary() {
+  const container = document.getElementById('tab-content-summary');
+  container.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">Checking summary...</div></div>`;
+
+  try {
+    const [summaryData, specialities] = await Promise.all([
+      apiFetch(`/patients/${currentPatient.id}/summary?type=doctor&speciality=general`),
+      apiFetch(`/patients/${currentPatient.id}/specialities`)
+    ]);
+
+    const specHtml = specialities.map(s =>
+      `<button onclick="selectDoctorSpeciality('${s.name}')" class="doc-spec-chip" data-name="${s.name}" style="padding:6px 12px;border-radius:100px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:11px;color:#7A9A7A;cursor:pointer;font-family:'DM Sans',sans-serif;">${s.name} <span style="color:#C0D0C0;">(${s.count})</span></button>`
+    ).join('');
+
+    const staleNotice = summaryData.is_stale && summaryData.summary
+      ? `<div style="background:#FFF4E8;border-radius:12px;padding:12px;font-size:12px;color:#B86A1A;margin-bottom:16px;">${summaryData.current_report_count - summaryData.summary.report_count} new report(s) added since last summary on ${new Date(summaryData.summary.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}.</div>`
+      : '';
+
+    container.innerHTML = `
+      <div style="padding:16px 20px;">
+        ${staleNotice}
+        <div style="margin-bottom:12px;">
+          <div style="font-size:11px;color:#7A9A7A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Speciality focus</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">${specHtml}</div>
+          <input type="text" id="doc-spec-other" placeholder="Other speciality..." style="width:100%;background:#F5F7F5;border:1.5px solid transparent;border-radius:10px;padding:10px 14px;font-size:13px;color:#1A2D22;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:8px;"/>
+          <button onclick="selectDoctorSpeciality('general')" id="doc-general-btn" style="width:100%;background:#EEF4FF;border:1.5px solid #2D6BE4;border-radius:10px;padding:10px;font-size:12px;color:#2D6BE4;cursor:pointer;font-family:'DM Sans',sans-serif;">General summary — no specific speciality</button>
+        </div>
+        <button onclick="generateDoctorSummary()" id="doc-summary-btn" style="width:100%;background:#2D6BE4;color:white;border:none;padding:14px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:16px;">Generate Clinical Summary</button>
+        ${summaryData.summary && !summaryData.is_stale ? renderDoctorSummary(summaryData.summary.content, summaryData.summary.biomarker_trends) : ''}
+      </div>`;
+  } catch(e) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-title">Could not load summary</div></div>`;
+  }
+}
+
+function selectDoctorSpeciality(name) {
+  doctorSummarySpeciality = name;
+  document.querySelectorAll('.doc-spec-chip').forEach(btn => {
+    const isSelected = btn.dataset.name === name;
+    btn.style.borderColor = isSelected ? '#2D6BE4' : '#EEF0EE';
+    btn.style.background = isSelected ? '#EEF4FF' : '#F5F7F5';
+    btn.style.color = isSelected ? '#2D6BE4' : '#7A9A7A';
+  });
+  const genBtn = document.getElementById('doc-general-btn');
+  if (name === 'general') {
+    genBtn.style.borderColor = '#2D6BE4'; genBtn.style.background = '#EEF4FF'; genBtn.style.color = '#2D6BE4';
+  } else {
+    genBtn.style.borderColor = '#EEF0EE'; genBtn.style.background = '#F5F7F5'; genBtn.style.color = '#7A9A7A';
+  }
+}
+
+async function generateDoctorSummary() {
+  const btn = document.getElementById('doc-summary-btn');
+  const otherInput = document.getElementById('doc-spec-other')?.value.trim();
+  if (otherInput) doctorSummarySpeciality = otherInput;
+  btn.disabled = true;
+  btn.textContent = 'Generating... (15-20 seconds)';
+  try {
+    const cached = await apiFetch(`/patients/${currentPatient.id}/summary?type=doctor&speciality=${doctorSummarySpeciality}`);
+    if (cached.summary && !cached.is_stale) {
+      const container = document.getElementById('tab-content-summary');
+      const existing = container.querySelector('.summary-result');
+      if (existing) existing.remove();
+      container.querySelector('div').insertAdjacentHTML('beforeend', renderDoctorSummary(cached.summary.content, cached.summary.biomarker_trends));
+      btn.disabled = false; btn.textContent = 'Generate Clinical Summary';
+      return;
+    }
+    const res = await fetch(`${API}/patients/${currentPatient.id}/summary`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'doctor', speciality: doctorSummarySpeciality })
+    });
+    const data = await res.json();
+    if (data.success) {
+      const container = document.getElementById('tab-content-summary');
+      const existing = container.querySelector('.summary-result');
+      if (existing) existing.remove();
+      container.querySelector('div').insertAdjacentHTML('beforeend', renderDoctorSummary(data.content, data.trends));
+    }
+  } catch(e) { alert('Could not generate summary.'); }
+  btn.disabled = false;
+  btn.textContent = 'Generate Clinical Summary';
+}
+
+function renderDoctorSummary(content, trends) {
+  return `<div class="summary-result" style="background:white;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,0.05);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:#1A2D22;">Clinical Summary</div>
+      <button onclick="printDoctorSummary()" style="background:none;border:none;font-size:12px;color:#2D6BE4;cursor:pointer;font-family:'DM Sans',sans-serif;">Share PDF</button>
+    </div>
+    <div id="doc-summary-content">${content}</div>
+  </div>`;
+}
+
+function printDoctorSummary() {
+  const content = document.getElementById('doc-summary-content')?.innerHTML || '';
+  const w = window.open('', '_blank');
+  w.document.write(`<html><head><title>Clinical Summary — ${currentPatient?.name}</title>
+  <style>body{font-family:'DM Sans',sans-serif;padding:40px;max-width:800px;margin:0 auto;}h3{font-size:16px;border-bottom:1px solid #eee;padding-bottom:6px;margin-bottom:8px;}p,li{font-size:13px;line-height:1.7;color:#333;}.trend-item{background:#f5f5f5;border-radius:8px;padding:10px;margin-bottom:8px;}</style>
+  </head><body>
+  <div style="text-align:center;margin-bottom:32px;">
+    <div style="font-size:24px;font-weight:bold;">kado.care</div>
+    <div style="font-size:14px;color:#666;">Clinical Summary — ${currentPatient?.name}</div>
+    <div style="font-size:12px;color:#999;">${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+  </div>
+  ${content}
+  <div style="margin-top:40px;text-align:center;font-size:11px;color:#ccc;">Generated by kado.care — For clinical reference only</div>
+  </body></html>`);
+  w.document.close();
+  w.print();
+}
 async function loadPatientRecords() {
   const container = document.getElementById('tab-content-records');
   container.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
