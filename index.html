@@ -951,6 +951,36 @@ async function submitCreateProfile() {
   btn.textContent = 'Create profile';
 }
 
+ function openAddDateSheet(reportId) {
+  const sheet = document.createElement('div');
+  sheet.id = 'add-date-sheet';
+  sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:flex;align-items:flex-end;';
+  sheet.innerHTML = `
+    <div style="background:white;border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;">
+      <div style="width:36px;height:4px;background:#EEF0EE;border-radius:2px;margin:0 auto 20px;"></div>
+      <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:300;color:#1A2D22;margin-bottom:6px;">Add report date</div>
+      <div style="font-size:12px;color:#7A9A7A;margin-bottom:20px;">When was this report done?</div>
+      <input type="date" id="report-date-input" style="width:100%;background:#F5F7F5;border:1.5px solid transparent;border-radius:12px;padding:12px 16px;font-size:14px;color:#1A2D22;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:12px;"/>
+      <button onclick="saveReportDate('${reportId}')" style="width:100%;background:#2D8A6A;color:white;border:none;padding:14px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Save date</button>
+      <button onclick="document.getElementById('add-date-sheet').remove()" style="margin-top:10px;width:100%;background:none;border:none;padding:14px;font-size:14px;color:#7A9A7A;cursor:pointer;font-family:'DM Sans',sans-serif;">Cancel</button>
+    </div>`;
+  document.body.appendChild(sheet);
+}
+
+async function saveReportDate(reportId) {
+  const dateInput = document.getElementById('report-date-input').value;
+  if (!dateInput) return;
+  try {
+    await fetch(`${API}/reports/${reportId}/date`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ report_date: dateInput })
+    });
+    document.getElementById('add-date-sheet').remove();
+    await loadRecords();
+  } catch(e) { alert('Could not save date.'); }
+}
+ 
 async function loadRecords() {
   const pid = currentUser._patientId || null;
   const pidParam = pid ? `patient_id=${pid}` : `user_id=${currentUser.id}`;
