@@ -1048,6 +1048,198 @@ async function saveReportDate(reportId) {
     await loadRecords();
   } catch(e) { alert('Could not save date.'); }
 }
+
+ // ── SUMMARY ──
+let summaryType = 'patient';
+let summarySpeciality = 'general';
+
+async function openSummarySheet() {
+  summaryType = 'patient';
+  summarySpeciality = 'general';
+  document.getElementById('summary-step-1').style.display = 'block';
+  document.getElementById('summary-step-2').style.display = 'none';
+  document.getElementById('summary-speciality-section').style.display = 'none';
+  document.getElementById('summary-stale-notice').style.display = 'none';
+  selectSummaryType('patient');
+
+  // Check if stale
+  try {
+    const data = await apiFetch(`/patients/${selectedPatient.id}/summary?type=patient&speciality=general`);
+    if (data.is_stale && data.summary) {
+      const diff = data.current_report_count - data.summary.report_count;
+      document.getElementById('summary-stale-notice').style.display = 'block';
+      document.getElementById('summary-stale-notice').textContent = `${diff} new report${diff > 1 ? 's' : ''} added since last summary on ${new Date(data.summary.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}. Regenerate for latest data.`;
+    }
+  } catch(e) {}
+
+  // Load specialities
+  try {
+    const specialities = await apiFetch(`/patients/${selectedPatient.id}/specialities`);
+    const container = document.getElementById('summary-speciality-list');
+    container.innerHTML = specialities.map(s =>
+      `<button onclick="selectSummarySpeciality('${s.name}')" class="speciality-chip" data-name="${s.name}" style="padding:6px 12px;border-radius:100px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:11px;color:#7A9A7A;cursor:pointer;font-family:'DM Sans',sans-serif;">${s.name} <span style="color:#C0D0C0;">(${s.count})</span></button>`
+    ).join('');
+  } catch(e) {}
+
+  document.getElementById('summary-overlay').classList.add('open');
+}
+
+function closeSummarySheet() {
+  document.getElementById('summary-overlay').classList.remove('open');
+}
+
+function selectSummaryType(type) {
+  summaryType = type;
+  const patBtn = document.getElementById('summary-type-patient');
+  const docBtn = document.getElementById('summary-type-doctor');
+  const specSection = document.getElementById('summary-speciality-section');
+  if (type === 'patient') {
+    patBtn.style.borderColor = '#2D8A6A'; patBtn.style.background = '#E8F5F0'; patBtn.style.color = '#2D8A6A';
+    docBtn.style.borderColor = '#EEF0EE'; docBtn.style.background = '#F5F7F5'; docBtn.style.color = '#7A9A7A';
+    specSection.style.display = 'none';
+  } else {
+    docBtn.style.borderColor = '#2D6BE4'; docBtn.style.background = '#EEF4FF'; docBtn.style.color = '#2D6BE4';
+    patBtn.style.borderColor = '#EEF0EE'; patBtn.style.background = '#F5F7F5'; patBtn.style.color = '#7A9A7A';
+    specSection.style.display = 'block';
+  }
+}
+
+function selectSummarySpeciality(name) {
+  summarySpeciality = name;
+  document.querySelectorAll('.speciality-chip').forEach(btn => {
+    const isSelected = btn.dataset.name === name;
+    btn.style.borderColor = isSelected ? '#2D6BE4' : '#EEF0EE';
+    btn.style.background = isSelected ? '#EEF4FF' : '#F5F7F5';
+    btn.style.color = isSelected ? '#2D6BE4' : '#7A9A7A';
+  });
+  const genBtn = document.getElementById('summary-general-btn');
+  if (name === 'general') {
+    genBtn.style.borderColor = '#2D6BE4';
+    genBtn.style.background = '#EEF4FF';
+    genBtn.style.color = '#2D6BE4';
+  } else {
+    genBtn.style.borderColor = '#EEF0EE';
+    genBtn.style.background = '#F5F7F5';
+    genBtn.style.color = '#7A9A7A';
+  }
+}
+
+async function generateSummary() {
+  const btn = document.getElementById('summary-generate-btn');
+  const otherInput = document.getElementById('summary-speciality-other').value.trim();
+  if (otherInput) summarySpeciality = otherInput;
+
+  btn.disabled = true;
+  btn.textContent = 'Generating... (this may take 15-20 seconds)';
+
+  try {
+    // Check cache first
+    const cached = await apiFetch(`/patients/${selectedPatient.id}/summary?type=${summaryType}&speciality=${summarySpeciality}`);
+    if (cached.summary && !cached.is_stale) {
+      showSummary(cached.summary.content, cached.summary.biomarker_trends);
+      btn.disabled = false;
+      btn.textContent = 'Generate Summary';
+      return;
+    }
+
+    // Generate fresh
+    const res = await fetch(`${API}/patients/${selectedPatient.id}/summary`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: summaryType, speciality: summarySpeciality })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showSummary(data.content, data.trends);
+    } else {
+      alert('Could not generate summary.');
+    }
+  } catch(e) {
+    alert('Could not generate summary.');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Generate Summary';
+}
+
+function showSummary(content, trends) {
+  document.getElementById('summary-step-1').style.display = 'none';
+  document.getElementById('summary-step-2').style.display = 'block';
+  const title = summaryType === 'patient' ? '🧑 Your Health Summary' : `🩺 Clinical Summary${summarySpeciality !== 'general' ? ' — ' + summarySpeciality : ''}`;
+  document.getElementById('summary-step2-title').textContent = title;
+
+  const container = document.getElementById('summary-content-area');
+  container.innerHTML = content;
+
+  // Render sparklines
+  container.querySelectorAll('.trend-item').forEach(item => {
+    try {
+      const values = JSON.parse(item.dataset.values || '[]');
+      const directions = JSON.parse(item.dataset.directions || '[]');
+      const name = item.dataset.name || '';
+      if (values.length < 2) return;
+
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const range = max - min || 1;
+      const w = 120, h = 36, pad = 4;
+
+      const points = values.map((v, i) => {
+        const x = pad + (i / (values.length - 1)) * (w - pad * 2);
+        const y = h - pad - ((v - min) / range) * (h - pad * 2);
+        return `${x},${y}`;
+      }).join(' ');
+
+      const lastDir = directions[directions.length - 1];
+      const lineColor = lastDir === 'high' ? '#C0392B' : lastDir === 'low' ? '#2D6BE4' : '#2D8A6A';
+      const arrow = lastDir === 'high' ? '↑' : lastDir === 'low' ? '↓' : '→';
+      const arrowColor = lastDir === 'high' ? '#C0392B' : lastDir === 'low' ? '#2D6BE4' : '#2D8A6A';
+
+      const sparkline = `<svg width="${w}" height="${h}" style="display:block;">
+        <polyline points="${points}" fill="none" stroke="${lineColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        ${values.map((v, i) => {
+          const x = pad + (i / (values.length - 1)) * (w - pad * 2);
+          const y = h - pad - ((v - min) / range) * (h - pad * 2);
+          const dir = directions[i];
+          const c = dir === 'high' ? '#C0392B' : dir === 'low' ? '#2D6BE4' : '#2D8A6A';
+          return `<circle cx="${x}" cy="${y}" r="3" fill="${c}"/>`;
+        }).join('')}
+      </svg>`;
+
+      const lastVal = values[values.length - 1];
+      item.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="trend-name">${name}</div>
+          <div style="font-size:13px;font-weight:500;color:${arrowColor};">${lastVal} ${arrow}</div>
+        </div>
+        ${sparkline}
+        <div style="display:flex;justify-content:space-between;margin-top:2px;">
+          <div style="font-size:10px;color:#7A9A7A;">${values[0]}</div>
+          <div style="font-size:10px;color:#7A9A7A;">${values[values.length-1]}</div>
+        </div>`;
+    } catch(e) {}
+  });
+}
+
+function backToSummaryStep1() {
+  document.getElementById('summary-step-1').style.display = 'block';
+  document.getElementById('summary-step-2').style.display = 'none';
+}
+
+function printSummary() {
+  const content = document.getElementById('summary-content-area').innerHTML;
+  const printDiv = document.getElementById('print-summary');
+  printDiv.innerHTML = `
+    <div style="font-family:'DM Sans',sans-serif;padding:40px;max-width:800px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:32px;">
+        <div style="font-family:'Fraunces',serif;font-size:28px;color:#1A2D22;">kado.care</div>
+        <div style="font-size:14px;color:#7A9A7A;margin-top:4px;">Health Summary — ${selectedPatient?.name}</div>
+        <div style="font-size:12px;color:#7A9A7A;">${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+      </div>
+      ${content}
+      <div style="margin-top:40px;text-align:center;font-size:11px;color:#C0D0C0;">Generated by kado.care — For informational purposes only</div>
+    </div>`;
+  window.print();
+}
  
 async function loadRecords() {
   const pid = currentUser._patientId || null;
