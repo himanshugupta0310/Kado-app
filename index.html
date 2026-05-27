@@ -1251,7 +1251,7 @@ async function loadRecords() {
   const activeIssues = kados ? kados.length : 0;
   const essentialTracked = biomarkers ? [...new Set(biomarkers.map(b => b.name))].length : 0;
   document.getElementById('stat-total').textContent = totalReports;
-  document.getElementById('stat-issues').textContent = activeIssues;
+  if (document.getElementById('stat-issues')) document.getElementById('stat-issues').textContent = activeIssues;
   document.getElementById('stat-essential').textContent = essentialTracked;
   const lastUpdate = reports && reports.length > 0 ? new Date(reports[0].created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'No reports yet';
   document.getElementById('records-sub').textContent = `Last updated ${lastUpdate}`;
