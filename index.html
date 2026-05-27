@@ -980,6 +980,8 @@ async function loadRecords() {
   });
   let html = '';
   Object.entries(grouped).sort((a, b) => {
+    if (a[0] === 'Date unknown') return 1;
+    if (b[0] === 'Date unknown') return -1;
     const dateA = new Date(a[1][0].report_date || a[1][0].created_at);
     const dateB = new Date(b[1][0].report_date || b[1][0].created_at);
     return dateB - dateA;
@@ -988,17 +990,17 @@ async function loadRecords() {
     reps.forEach(r => {
       const icon = getReportIcon(r.report_type);
       const iconBg = getIconBg(r.report_type);
-      const dateStr = r.report_date ? r.report_date + 'T12:00:00' : r.created_at;
-      const date = new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      const displayDate = r.report_date
+        ? new Date(r.report_date + 'T12:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+        : `<span onclick="openAddDateSheet('${r.id}')" style="font-size:10px;color:#2D6BE4;cursor:pointer;text-decoration:underline;">Add date</span>`;
       const tags = (r.disease_tags || []).slice(0, 2).map(t => `<span class="tag tag-disease">${t}</span>`).join('');
       const typetag = `<span class="tag tag-type">${r.report_type || 'Report'}</span>`;
-      html += `<div class="record" onclick="window.open('${r.file_url}', '_blank')" style="cursor:pointer;"><div class="record-icon ${iconBg}">${icon}</div><div class="record-body"><div class="record-top"><div class="record-name">${r.report_type ? capitalize(r.report_type) : 'Health Report'}</div><div class="record-date">${date}</div></div><div class="record-meta">${typetag}${tags}</div></div><div class="record-arrow">›</div></div>`;
+      html += `<div class="record" onclick="window.open('${r.file_url}', '_blank')" style="cursor:pointer;"><div class="record-icon ${iconBg}">${icon}</div><div class="record-body"><div class="record-top"><div class="record-name">${r.report_type ? capitalize(r.report_type) : 'Health Report'}</div><div class="record-date">${displayDate}</div></div><div class="record-meta">${typetag}${tags}</div></div><div class="record-arrow">›</div></div>`;
     });
     html += `</div>`;
   });
   container.innerHTML = html;
 }
-
 async function loadKados() {
   const pid = currentUser._patientId || null;
   const pidParam = pid ? `patient_id=${pid}` : `user_id=${currentUser.id}`;
