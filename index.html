@@ -412,6 +412,74 @@
   </div>
 </div>
 
+ <!-- ═══════════ SUMMARY SHEET ═══════════ -->
+<div class="sheet-overlay" id="summary-overlay" onclick="closeSummarySheet()">
+  <div class="sheet" onclick="event.stopPropagation()" style="max-height:92vh;overflow-y:auto;">
+    <div class="sheet-handle"></div>
+
+    <!-- Step 1: Choose type -->
+    <div id="summary-step-1">
+      <div class="sheet-title">Health Summary</div>
+      <div class="sheet-sub">Choose summary type</div>
+      <div style="display:flex;gap:8px;margin-bottom:20px;">
+        <button id="summary-type-patient" onclick="selectSummaryType('patient')" style="flex:1;padding:14px;border-radius:14px;border:1.5px solid #2D8A6A;background:#E8F5F0;font-size:13px;color:#2D8A6A;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">
+          🧑 Patient<br><span style="font-size:10px;font-weight:400;color:#7A9A7A;">Simple language</span>
+        </button>
+        <button id="summary-type-doctor" onclick="selectSummaryType('doctor')" style="flex:1;padding:14px;border-radius:14px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:13px;color:#7A9A7A;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">
+          🩺 Doctor<br><span style="font-size:10px;font-weight:400;color:#7A9A7A;">Medical terminology</span>
+        </button>
+      </div>
+
+      <!-- Speciality selector (doctor only) -->
+      <div id="summary-speciality-section" style="display:none;margin-bottom:20px;">
+        <div style="font-size:11px;color:#7A9A7A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Speciality (optional)</div>
+        <div id="summary-speciality-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;"></div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="text" id="summary-speciality-other" placeholder="Other speciality..." style="flex:1;background:#F5F7F5;border:1.5px solid transparent;border-radius:10px;padding:10px 14px;font-size:13px;color:#1A2D22;font-family:'DM Sans',sans-serif;outline:none;"/>
+        </div>
+        <button onclick="selectSummarySpeciality('general')" id="summary-general-btn" style="margin-top:8px;width:100%;background:#F5F7F5;border:1.5px solid #EEF0EE;border-radius:10px;padding:10px;font-size:12px;color:#7A9A7A;cursor:pointer;font-family:'DM Sans',sans-serif;">General summary — no specific speciality</button>
+      </div>
+
+      <!-- Stale notice -->
+      <div id="summary-stale-notice" style="display:none;background:#FFF4E8;border-radius:12px;padding:12px;font-size:12px;color:#B86A1A;margin-bottom:16px;"></div>
+
+      <button id="summary-generate-btn" onclick="generateSummary()" style="width:100%;background:#2D8A6A;color:white;border:none;padding:14px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Generate Summary</button>
+      <button class="sheet-cancel" onclick="closeSummarySheet()">Cancel</button>
+    </div>
+
+    <!-- Step 2: Show generated summary -->
+    <div id="summary-step-2" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <button onclick="backToSummaryStep1()" style="background:none;border:none;font-size:13px;color:#7A9A7A;cursor:pointer;font-family:'DM Sans',sans-serif;">‹ Back</button>
+        <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:#1A2D22;" id="summary-step2-title">Summary</div>
+        <button onclick="printSummary()" style="background:none;border:none;font-size:13px;color:#2D6BE4;cursor:pointer;font-family:'DM Sans',sans-serif;">Share PDF</button>
+      </div>
+      <div id="summary-content-area"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Print styles -->
+<style>
+@media print {
+  body > *:not(#print-summary) { display: none !important; }
+  #print-summary { display: block !important; }
+}
+#print-summary { display: none; }
+.summary-content { font-family: 'DM Sans', sans-serif; }
+.summary-section { margin-bottom: 20px; }
+.summary-section h3 { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 300; color: #1A2D22; margin-bottom: 8px; border-bottom: 1px solid #EEF0EE; padding-bottom: 6px; }
+.summary-section p, .summary-section li { font-size: 13px; color: #3A4D3A; line-height: 1.7; }
+.summary-section ul { padding-left: 16px; }
+.trend-item { background: #F5F7F5; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+.trend-name { font-size: 12px; font-weight: 500; color: #1A2D22; margin-bottom: 4px; }
+.trend-sparkline { display: block; }
+.urgent-item { background: #FFF0F0; border-radius: 8px; padding: 8px 12px; margin-bottom: 6px; font-size: 13px; color: #C0392B; }
+.watch-item { background: #FFFBE0; border-radius: 8px; padding: 8px 12px; margin-bottom: 6px; font-size: 13px; color: #B8860B; }
+.good-item { background: #E8F5F0; border-radius: 8px; padding: 8px 12px; margin-bottom: 6px; font-size: 13px; color: #2D8A6A; }
+</style>
+<div id="print-summary"></div>
+ 
  <!-- ═══════════ INVITE SHEET ═══════════ -->
 <div class="sheet-overlay" id="invite-overlay" onclick="closeInviteSheet()">
   <div class="sheet" onclick="event.stopPropagation()">
