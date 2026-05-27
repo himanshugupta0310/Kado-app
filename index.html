@@ -974,7 +974,7 @@ async function loadRecords() {
   reports.forEach(r => {
     const dateStr = r.report_date ? r.report_date + 'T12:00:00' : r.created_at;
     const date = new Date(dateStr);
-    const key = date.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+    const key = r.report_date ? date.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }) : 'Date unknown';
     if (!grouped[key]) grouped[key] = [];
     grouped[key].push(r);
   });
