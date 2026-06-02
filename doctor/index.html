@@ -789,9 +789,10 @@ function showScreen(name) {
 function getReportIcon(type) {
   if (!type) return '&#128203;';
   const t = type.toLowerCase();
-  if (t.includes('blood') || t.includes('lab') || t.includes('pathology')) return '&#129978;';
-  if (t.includes('mri') || t.includes('ct') || t.includes('xray') || t.includes('x-ray') || t.includes('ultrasound') || t.includes('usg') || t.includes('pet') || t.includes('dexa')) return '&#129978;';
-  if (t.includes('prescription')) return '&#128138;';
+  if (t.includes('blood') || t.includes('lab') || t.includes('pathology')) return '🩸';
+if (t.includes('mri') || t.includes('ct') || t.includes('xray') || t.includes('x-ray') || t.includes('ultrasound') || t.includes('usg') || t.includes('pet') || t.includes('dexa')) return '🫁';
+if (t.includes('prescription')) return '💊';
+return '📄';
   return '&#128196;';
 }
 
