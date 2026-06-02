@@ -612,6 +612,10 @@ function selectSummaryType(type) {
   doctorSummaryType = type;
   document.getElementById('summary-type-general').classList.toggle('active', type === 'general');
   document.getElementById('summary-type-speciality').classList.toggle('active', type === 'speciality');
+  if (type === 'speciality' && !currentDoctor.specialization) {
+    document.getElementById('speciality-modal-input').value = '';
+    document.getElementById('speciality-modal').classList.add('open');
+  }
 }
 
 function closeSpecialityModal() { document.getElementById('speciality-modal').classList.remove('open'); }
