@@ -8,10 +8,8 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #F5F7F5; font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
-
   .screen { display: none; padding-bottom: 80px; min-height: 100vh; }
   .screen.active { display: block; }
-
   .nav { background: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EEF0EE; position: sticky; top: 0; z-index: 10; }
   .nav-logo { font-family: 'Fraunces', serif; font-size: 18px; color: #1A2D22; }
   .nav-logo span { color: #E8866A; }
@@ -20,7 +18,6 @@
   .mode-btn.active { background: #2D8A6A; color: white; }
   .mode-btn.inactive { background: none; color: #7A9A7A; }
   .avatar { width: 32px; height: 32px; background: #EEF4FF; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #2D6BE4; font-weight: 500; cursor: pointer; border: 1.5px solid #2D6BE4; }
-
   #screen-login { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; background: #F0F4FF; min-height: 100vh; }
   .login-logo { font-family: 'Fraunces', serif; font-size: 32px; color: #1A2D22; margin-bottom: 8px; }
   .login-logo span { color: #E8866A; }
@@ -37,12 +34,10 @@
   .login-btn:disabled { background: #A0B4E8; cursor: default; }
   .login-error { font-size: 12px; color: #C0392B; margin-top: 8px; text-align: center; display: none; }
   .login-note { font-size: 11px; color: #9B8778; text-align: center; margin-top: 16px; }
-
   .hero { background: white; padding: 20px 20px 16px; border-bottom: 1px solid #EEF0EE; }
   .hero-greeting { font-size: 13px; color: #7A9A7A; margin-bottom: 4px; }
   .hero-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 300; color: #1A2D22; }
   .hero-sub { font-size: 12px; color: #7A9A7A; margin-top: 3px; }
-
   .patient-list { padding: 16px 20px; }
   .patient-card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; box-shadow: 0 1px 8px rgba(0,0,0,0.05); cursor: pointer; border: 1.5px solid transparent; transition: border 0.15s; }
   .patient-card:active { border-color: #2D6BE4; }
@@ -50,23 +45,17 @@
   .patient-info { flex: 1; }
   .patient-name { font-size: 15px; font-weight: 500; color: #1A2D22; }
   .patient-meta { font-size: 11px; color: #7A9A7A; margin-top: 2px; }
-  .patient-badge { background: #FFF0F0; color: #C0392B; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 100px; flex-shrink: 0; }
-  .patient-badge.none { background: #E8F5F0; color: #2D8A6A; }
   .patient-arrow { color: #C0D0C0; font-size: 18px; }
   .empty-state { text-align: center; padding: 60px 20px; color: #7A9A7A; }
   .empty-state-icon { font-size: 48px; margin-bottom: 12px; }
   .empty-state-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 300; color: #1A2D22; margin-bottom: 6px; }
   .empty-state-sub { font-size: 13px; line-height: 1.5; }
-
   .tab-bar { background: white; display: flex; border-bottom: 1px solid #EEF0EE; position: sticky; top: 57px; z-index: 9; }
   .tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; color: #7A9A7A; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
   .tab.active { color: #2D6BE4; border-bottom-color: #2D6BE4; font-weight: 500; }
-
-  /* Records bucket tabs */
   .bucket-tabs { display: flex; gap: 6px; padding: 12px 16px; overflow-x: auto; background: white; border-bottom: 1px solid #EEF0EE; }
   .bucket-tab { padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid #EEF0EE; background: #F5F7F5; color: #7A9A7A; white-space: nowrap; font-family: 'DM Sans', sans-serif; transition: all 0.2s; flex-shrink: 0; }
   .bucket-tab.active { background: #EEF4FF; border-color: #2D6BE4; color: #2D6BE4; }
-
   .section { padding: 16px 20px 0; }
   .section-title { font-size: 11px; color: #7A9A7A; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: 500; }
   .record { background: white; border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start; box-shadow: 0 1px 8px rgba(0,0,0,0.05); cursor: pointer; }
@@ -80,46 +69,11 @@
   .tag-type { background: #EEF0FF; color: #5B5BD6; }
   .tag-disease { background: #FFF4E8; color: #B86A1A; }
   .record-arrow { color: #C0D0C0; font-size: 16px; margin-top: 2px; }
-  .icon-blood { background: #FFF0F0; } .icon-scan { background: #EEF0FF; }
-  .icon-prescription { background: #FFF8E0; } .icon-consultation { background: #F0F7F2; }
+  .icon-blood { background: #FFF0F0; }
+  .icon-scan { background: #EEF0FF; }
+  .icon-prescription { background: #FFF8E0; }
   .icon-other { background: #F5F5F5; }
-
-  .rec-list { padding: 16px 20px; }
-  .rec-card { background: white; border-radius: 20px; margin-bottom: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden; }
-  .rec-header { padding: 16px 18px 12px; border-bottom: 1px solid #F0F2F0; }
-  .rec-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-  .rec-title { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 300; color: #1A2D22; }
-  .rec-severity { font-size: 9px; font-weight: 600; padding: 3px 10px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.4px; flex-shrink: 0; }
-  .sev-urgent { background: #FFF0F0; color: #C0392B; border: 1px solid #C0392B; }
-  .sev-watch { background: #FFFBE0; color: #B8860B; border: 1px solid #B8860B; }
-  .rec-value { background: #F5F7F5; border-radius: 10px; padding: 8px 12px; font-size: 13px; color: #1A2D22; margin-bottom: 8px; }
-  .rec-info { font-size: 12px; color: #7A9A7A; line-height: 1.6; }
-  .rec-doctor-status { display: flex; align-items: center; gap: 6px; padding: 8px 18px; background: #F5F7F5; font-size: 11px; }
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .dot-vetted { background: #2D8A6A; } .dot-edited { background: #2D6BE4; }
-  .dot-paused { background: #B8860B; } .dot-needs_info { background: #C0392B; }
-  .dot-unreviewed { background: #C0D0C0; }
-  .status-text { color: #7A9A7A; }
-
-  .rec-actions { padding: 12px 18px 16px; display: flex; flex-wrap: wrap; gap: 8px; }
-  .action-btn { padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; border: 1.5px solid; transition: all 0.15s; }
-  .action-btn:active { transform: scale(0.97); }
-  .btn-vet { background: #E8F5F0; color: #2D8A6A; border-color: #2D8A6A; }
-  .btn-edit { background: #EEF4FF; color: #2D6BE4; border-color: #2D6BE4; }
-  .btn-pause { background: #FFFBE0; color: #B8860B; border-color: #B8860B; }
-  .btn-remove { background: #FFF0F0; color: #C0392B; border-color: #C0392B; }
-  .btn-info { background: #F5F7F5; color: #7A9A7A; border-color: #C0D0C0; }
-  .btn-active { opacity: 0.5; cursor: default; }
-
-  .rec-edit-area { padding: 0 18px 14px; }
-  .rec-edit-label { font-size: 10px; color: #7A9A7A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-  .rec-edit-text { font-size: 12px; color: #2D6BE4; line-height: 1.6; background: #EEF4FF; border-radius: 10px; padding: 10px 12px; }
-  .rec-needs-info { padding: 0 18px 14px; }
-  .rec-question { font-size: 12px; color: #C0392B; background: #FFF0F0; border-radius: 10px; padding: 10px 12px; line-height: 1.6; margin-bottom: 6px; }
-  .rec-response { font-size: 12px; color: #2D8A6A; background: #E8F5F0; border-radius: 10px; padding: 10px 12px; line-height: 1.6; }
-
   .invite-fab { position: fixed; bottom: 24px; right: 20px; background: #2D6BE4; color: white; border: none; border-radius: 16px; padding: 12px 20px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; box-shadow: 0 4px 16px rgba(45,107,228,0.4); z-index: 20; display: none; }
-
   .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: flex-end; }
   .sheet-overlay.open { display: flex; }
   .sheet { background: white; border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; max-height: 85vh; overflow-y: auto; }
@@ -129,12 +83,10 @@
   .sheet-cancel { margin-top: 10px; width: 100%; background: none; border: none; padding: 14px; font-size: 14px; color: #7A9A7A; cursor: pointer; font-family: 'DM Sans', sans-serif; }
   .primary-btn { width: 100%; background: #2D6BE4; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
   .primary-btn:disabled { background: #A0B4E8; cursor: default; }
-
   .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 12px; }
   .spinner { width: 32px; height: 32px; border: 3px solid #EEF0EE; border-top-color: #2D6BE4; border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-text { font-size: 13px; color: #7A9A7A; }
-
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: flex-end; }
   .modal-overlay.open { display: flex; }
   .modal { background: white; border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; max-height: 80vh; overflow-y: auto; }
@@ -144,12 +96,15 @@
   .modal-textarea { width: 100%; background: #F5F7F5; border: 1.5px solid transparent; border-radius: 12px; padding: 12px 16px; font-size: 14px; color: #1A2D22; font-family: 'DM Sans', sans-serif; resize: none; outline: none; min-height: 100px; }
   .modal-textarea:focus { border-color: #2D6BE4; background: white; }
   .modal-close { margin-top: 12px; width: 100%; background: #F5F7F5; border: none; padding: 14px; border-radius: 12px; font-size: 14px; color: #1A2D22; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-
   .summary-section { margin-bottom: 20px; }
   .summary-section h3 { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 300; color: #1A2D22; margin-bottom: 8px; border-bottom: 1px solid #EEF0EE; padding-bottom: 6px; }
   .summary-section p, .summary-section li { font-size: 13px; color: #3A4D3A; line-height: 1.7; }
   .trend-item { background: #F5F7F5; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
   .trend-name { font-size: 12px; font-weight: 500; color: #1A2D22; margin-bottom: 4px; }
+  .summary-type-btn { flex: 1; padding: 12px 8px; border-radius: 100px; border: 1.5px solid #EEF0EE; background: #F5F7F5; font-size: 12px; color: #7A9A7A; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; text-align: center; transition: all 0.2s; }
+  .summary-type-btn.active { background: #EEF4FF; border-color: #2D6BE4; color: #2D6BE4; }
+  .lang-btn { padding: 6px 12px; border-radius: 100px; border: 1.5px solid #EEF0EE; background: #F5F7F5; font-size: 11px; color: #7A9A7A; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .lang-btn.active { border-color: #2D6BE4; background: #EEF4FF; color: #2D6BE4; }
 </style>
 </head>
 <body>
@@ -190,7 +145,7 @@
     <div class="avatar" id="avatar-main" onclick="showScreen('doctor-profile')">D</div>
   </div>
   <div class="hero">
-    <div class="hero-greeting" id="patients-greeting">Good morning 👋</div>
+    <div class="hero-greeting" id="patients-greeting">Good morning</div>
     <div class="hero-title" id="patients-title">Your Patients</div>
     <div class="hero-sub" id="patients-sub">Loading...</div>
   </div>
@@ -201,13 +156,13 @@
 <!-- PATIENT DETAIL SCREEN -->
 <div class="screen" id="screen-patient-detail">
   <div class="nav">
-    <button style="background:none;border:none;font-size:22px;cursor:pointer;color:#1A2D22;padding:0;" onclick="showScreen('patients')">‹</button>
+    <button style="background:none;border:none;font-size:22px;cursor:pointer;color:#1A2D22;padding:0;" onclick="showScreen('patients')">&#8249;</button>
     <div class="nav-logo" id="detail-patient-name" style="position:absolute;left:50%;transform:translateX(-50%);">Patient</div>
     <div style="width:32px;"></div>
   </div>
   <div class="tab-bar">
     <div class="tab active" id="tab-records" onclick="switchTab('records')">Records</div>
-    <div class="tab" id="tab-recs" onclick="switchTab('recs')">Prescription</div>
+    <div class="tab" id="tab-recs" onclick="switchTab('recs')">My Prescriptions</div>
     <div class="tab" id="tab-summary" onclick="switchTab('summary')">Summary</div>
   </div>
   <div id="tab-content-records"></div>
@@ -216,16 +171,16 @@
       <div style="font-size:11px;color:#7A9A7A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Add Prescription</div>
       <div style="display:flex;gap:8px;margin-bottom:16px;">
         <button onclick="document.getElementById('rx-file-input').click()" style="flex:1;padding:14px;border-radius:14px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:13px;color:#1A2D22;cursor:pointer;font-family:'DM Sans',sans-serif;">
-          📎 Upload File / PDF
+          &#128206; Upload File / PDF
         </button>
         <button onclick="document.getElementById('rx-camera-input').click()" style="flex:1;padding:14px;border-radius:14px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:13px;color:#1A2D22;cursor:pointer;font-family:'DM Sans',sans-serif;">
-          📷 Take Photo
+          &#128247; Take Photo
         </button>
       </div>
       <input type="file" id="rx-file-input" accept=".pdf,image/*" style="display:none;" onchange="uploadPrescription(this)"/>
       <input type="file" id="rx-camera-input" accept="image/*" capture="camera" style="display:none;" onchange="uploadPrescription(this)"/>
       <div id="rx-upload-status" style="display:none;background:#E8F5F0;border-radius:12px;padding:12px;font-size:13px;color:#2D8A6A;margin-bottom:16px;">Uploading...</div>
-      <div style="font-size:11px;color:#7A9A7A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;margin-top:8px;">Previous Prescriptions</div>
+      <div style="font-size:11px;color:#7A9A7A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;margin-top:8px;">My Previous Prescriptions</div>
       <div id="rx-list"></div>
     </div>
   </div>
@@ -236,7 +191,7 @@
 <div class="screen" id="screen-doctor-profile">
   <div class="nav">
     <div class="nav-logo">kado<span>.</span>care</div>
-    <button style="background:none;border:none;font-size:18px;cursor:pointer;color:#1A2D22;" onclick="showScreen('patients')">✕</button>
+    <button style="background:none;border:none;font-size:18px;cursor:pointer;color:#1A2D22;" onclick="showScreen('patients')">&#x2715;</button>
   </div>
   <div style="padding:20px;">
     <div style="background:white;border-radius:18px;padding:20px;box-shadow:0 1px 8px rgba(0,0,0,0.05);margin-bottom:12px;text-align:center;">
@@ -248,11 +203,11 @@
     <div style="background:white;border-radius:18px;padding:0 20px;box-shadow:0 1px 8px rgba(0,0,0,0.05);margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #F0F2F0;cursor:pointer;" onclick="window.open('https://kado.care/privacy','_blank')">
         <div style="font-size:13px;color:#1A2D22;">Privacy Policy</div>
-        <div style="font-size:13px;color:#7A9A7A;">›</div>
+        <div style="font-size:13px;color:#7A9A7A;">&#8250;</div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;cursor:pointer;" onclick="window.open('mailto:support@kado.care','_blank')">
         <div style="font-size:13px;color:#1A2D22;">Contact Support</div>
-        <div style="font-size:13px;color:#7A9A7A;">›</div>
+        <div style="font-size:13px;color:#7A9A7A;">&#8250;</div>
       </div>
     </div>
     <div style="background:white;border-radius:18px;padding:20px;box-shadow:0 1px 8px rgba(0,0,0,0.05);">
@@ -272,7 +227,7 @@
     <div style="width:32px;"></div>
   </div>
   <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;text-align:center;">
-    <div style="font-size:48px;margin-bottom:16px;">🏥</div>
+    <div style="font-size:48px;margin-bottom:16px;">&#127973;</div>
     <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:300;color:#1A2D22;margin-bottom:8px;">Your personal health</div>
     <div style="font-size:13px;color:#7A9A7A;margin-bottom:28px;line-height:1.6;">View and manage your own health records on the Kado patient app.</div>
     <button onclick="window.open('https://app.kado.care','_blank')" style="background:#2D8A6A;color:white;border:none;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Open my health records</button>
@@ -284,20 +239,43 @@
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
     <div class="sheet-title">Invite a patient</div>
-    <div class="sheet-sub">They'll receive a message to start sharing their records with you</div>
+    <div class="sheet-sub">They will receive a message to start sharing their records with you</div>
     <div style="display:flex;gap:8px;margin-bottom:12px;">
-      <button id="doc-invite-method-wa" onclick="selectDocInviteMethod('whatsapp')" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid #2D6BE4;background:#EEF4FF;font-size:12px;color:#2D6BE4;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">💬 WhatsApp</button>
-      <button id="doc-invite-method-email" onclick="selectDocInviteMethod('email')" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:12px;color:#7A9A7A;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">📧 Email</button>
+      <button id="doc-invite-method-wa" onclick="selectDocInviteMethod('whatsapp')" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid #2D6BE4;background:#EEF4FF;font-size:12px;color:#2D6BE4;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">WhatsApp</button>
+      <button id="doc-invite-method-email" onclick="selectDocInviteMethod('email')" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:12px;color:#7A9A7A;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">Email</button>
     </div>
     <div id="doc-invite-wa-input" class="input-group">
       <span class="input-prefix">+91</span>
-      <input type="tel" id="patient-invite-phone" placeholder="Patient's WhatsApp number" maxlength="10" inputmode="numeric"/>
+      <input type="tel" id="patient-invite-phone" placeholder="Patient WhatsApp number" maxlength="10" inputmode="numeric"/>
     </div>
     <div id="doc-invite-email-input" class="input-group" style="display:none;">
-      <input type="email" id="patient-invite-email" placeholder="Patient's email address" style="width:100%;"/>
+      <input type="email" id="patient-invite-email" placeholder="Patient email address" style="width:100%;"/>
+    </div>
+    <!-- Language selector shown for WhatsApp only -->
+    <div id="invite-language-section" style="margin-bottom:16px;">
+      <div style="font-size:11px;color:#7A9A7A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Message Language</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="lang-btn active" id="lang-english" onclick="selectInviteLanguage('english')">English</button>
+        <button class="lang-btn" id="lang-hindi" onclick="selectInviteLanguage('hindi')">Hindi</button>
+        <button class="lang-btn" id="lang-hinglish" onclick="selectInviteLanguage('hinglish')">Hinglish</button>
+        <button class="lang-btn" id="lang-punjabi" onclick="selectInviteLanguage('punjabi')">Punjabi</button>
+        <button class="lang-btn" id="lang-kannada" onclick="selectInviteLanguage('kannada')">Kannada</button>
+      </div>
     </div>
     <button class="primary-btn" id="invite-patient-btn" onclick="sendPatientInvite()">Send invite on WhatsApp</button>
     <button class="sheet-cancel" onclick="closeInvitePatientSheet()">Cancel</button>
+  </div>
+</div>
+
+<!-- SPECIALITY MODAL -->
+<div class="modal-overlay" id="speciality-modal" onclick="closeSpecialityModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Your speciality</div>
+    <div class="modal-sub">Enter your medical speciality for a focused summary</div>
+    <input type="text" id="speciality-modal-input" placeholder="e.g. Cardiologist, Neurologist..." style="width:100%;background:#F5F7F5;border:1.5px solid transparent;border-radius:12px;padding:12px 16px;font-size:14px;color:#1A2D22;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:12px;"/>
+    <button class="primary-btn" onclick="saveAndGenerateSpecialitySummary()">Generate Summary</button>
+    <button class="modal-close" onclick="closeSpecialityModal()">Cancel</button>
   </div>
 </div>
 
@@ -308,7 +286,7 @@
     <div class="modal-title">Vet recommendation</div>
     <div class="modal-sub">Add an optional note for the patient</div>
     <textarea class="modal-textarea" id="vet-note" placeholder="e.g. This is consistent with your recent results. Continue monitoring."></textarea>
-    <button class="primary-btn" style="margin-top:12px;" onclick="submitReview('vetted')">Confirm — looks good</button>
+    <button class="primary-btn" style="margin-top:12px;" onclick="submitReview('vetted')">Confirm - looks good</button>
     <button class="modal-close" onclick="closeVetModal()">Cancel</button>
   </div>
 </div>
@@ -331,7 +309,7 @@
     <div class="modal-handle"></div>
     <div class="modal-title">Ask patient for more info</div>
     <div class="modal-sub">Patient will receive a WhatsApp notification with your question</div>
-    <textarea class="modal-textarea" id="info-question" placeholder="e.g. Please share your latest HbA1c test. I need to assess this before advising."></textarea>
+    <textarea class="modal-textarea" id="info-question" placeholder="e.g. Please share your latest HbA1c test."></textarea>
     <button class="primary-btn" style="margin-top:12px;" onclick="submitReview('needs_info')">Send question</button>
     <button class="modal-close" onclick="closeInfoModal()">Cancel</button>
   </div>
@@ -351,6 +329,11 @@ let currentPatient = null;
 let activeKadoId = null;
 let currentTab = 'records';
 let activeBucket = 'all';
+let selectedInviteLanguage = 'english';
+let doctorSummaryType = 'general';
+let doctorSummarySpeciality = 'general';
+let allReports = [];
+let docInviteMethod = 'whatsapp';
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -359,7 +342,7 @@ function getGreeting() {
   return 'Good evening';
 }
 
-// ── LOGIN ──
+// LOGIN
 async function handleLogin() {
   const input = document.getElementById('phone-input').value.trim().replace(/\s/g, '');
   const btn = document.getElementById('login-btn');
@@ -367,37 +350,28 @@ async function handleLogin() {
   err.style.display = 'none';
   if (input.length < 10) { err.textContent = 'Please enter a valid 10-digit number.'; err.style.display = 'block'; return; }
   const phone = '+91' + input;
-  btn.disabled = true;
-  btn.textContent = 'Checking...';
+  btn.disabled = true; btn.textContent = 'Checking...';
   try {
-    const res = await fetch(`${API}/user?phone=${encodeURIComponent(phone)}`);
+    const res = await fetch(API + '/user?phone=' + encodeURIComponent(phone));
     if (res.ok) {
       const data = await res.json();
       if (data && data.id && data.user_type === 'doctor') {
         currentDoctor = data;
         localStorage.setItem('kado_doctor', JSON.stringify(data));
-        await loadPatientsScreen();
-        return;
+        await loadPatientsScreen(); return;
       }
-      if (data && data.id && data.user_type !== 'doctor') {
+      if (data && data.id) {
         document.getElementById('register-fields').style.display = 'block';
         document.getElementById('login-sub-text').textContent = 'Complete your doctor profile';
-        btn.disabled = false;
-        btn.textContent = 'Register as doctor';
-        btn.onclick = registerDoctor;
-        return;
+        btn.disabled = false; btn.textContent = 'Register as doctor'; btn.onclick = registerDoctor; return;
       }
     }
     document.getElementById('register-fields').style.display = 'block';
     document.getElementById('login-sub-text').textContent = 'Create your doctor profile';
-    btn.disabled = false;
-    btn.textContent = 'Create account';
-    btn.onclick = registerDoctor;
+    btn.disabled = false; btn.textContent = 'Create account'; btn.onclick = registerDoctor;
   } catch (e) {
-    err.textContent = 'Something went wrong. Please try again.';
-    err.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'Continue';
+    err.textContent = 'Something went wrong. Please try again.'; err.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Continue';
   }
 }
 
@@ -408,37 +382,29 @@ async function registerDoctor() {
   const btn = document.getElementById('login-btn');
   const err = document.getElementById('login-error');
   if (!name) { err.textContent = 'Please enter your name.'; err.style.display = 'block'; return; }
-  btn.disabled = true;
-  btn.textContent = 'Creating account...';
+  btn.disabled = true; btn.textContent = 'Creating account...';
   try {
-    const res = await fetch(`${API}/doctor/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch(API + '/doctor/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone_number: phone, name, specialization: spec || null })
     });
     const data = await res.json();
     if (data.id) {
-      currentDoctor = data;
-      localStorage.setItem('kado_doctor', JSON.stringify(data));
-      await loadPatientsScreen();
+      currentDoctor = data; localStorage.setItem('kado_doctor', JSON.stringify(data)); await loadPatientsScreen();
     } else {
-      err.textContent = data.error || 'Could not create account.';
-      err.style.display = 'block';
-      btn.disabled = false;
-      btn.textContent = 'Create account';
+      err.textContent = data.error || 'Could not create account.'; err.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Create account';
     }
   } catch (e) {
-    err.textContent = 'Something went wrong.';
-    err.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'Create account';
+    err.textContent = 'Something went wrong.'; err.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Create account';
   }
 }
 
 async function loadPatientsScreen() {
   document.getElementById('avatar-main').textContent = (currentDoctor.name || 'D').charAt(0).toUpperCase();
-  document.getElementById('patients-greeting').textContent = getGreeting() + ' 👋';
-  document.getElementById('patients-title').textContent = `Dr. ${currentDoctor.name?.split(' ').pop() || ''}'s Patients`;
+  document.getElementById('patients-greeting').textContent = getGreeting() + ' ';
+  document.getElementById('patients-title').textContent = 'Dr. ' + (currentDoctor.name || '').split(' ').pop() + "'s Patients";
   showScreen('patients');
   document.getElementById('invite-fab').style.display = 'block';
   await loadPatients();
@@ -446,40 +412,32 @@ async function loadPatientsScreen() {
 
 async function loadPatients() {
   const container = document.getElementById('patients-list');
-  container.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">Loading patients...</div></div>`;
+  container.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">Loading patients...</div></div>';
   try {
-    const patients = await apiFetch(`/doctor/patients?doctor_id=${currentDoctor.id}`);
-    document.getElementById('patients-sub').textContent = `${patients.length} patient${patients.length !== 1 ? 's' : ''} linked`;
+    const patients = await apiFetch('/doctor/patients?doctor_id=' + currentDoctor.id);
+    document.getElementById('patients-sub').textContent = patients.length + ' patient' + (patients.length !== 1 ? 's' : '') + ' linked';
     if (!patients || patients.length === 0) {
-      container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-title">No patients yet</div><div class="empty-state-sub">Tap "+ Invite patient" to invite your first patient</div></div>`;
+      container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#128101;</div><div class="empty-state-title">No patients yet</div><div class="empty-state-sub">Tap "+ Invite patient" to get started</div></div>';
       return;
     }
     const reportCounts = await Promise.all(patients.map(async p => {
-      try {
-        const reports = await apiFetch(`/records?patient_id=${p.id}`);
-        return reports ? reports.length : 0;
-      } catch { return 0; }
+      try { const r = await apiFetch('/records?patient_id=' + p.id); return r ? r.length : 0; } catch { return 0; }
     }));
-    container.innerHTML = `<div class="patient-list">${patients.map((p, i) => {
+    container.innerHTML = '<div class="patient-list">' + patients.map((p, i) => {
       const initial = (p.name || '?').charAt(0).toUpperCase();
-      const meta = [p.age ? `${p.age} yrs` : null, p.gender ? capitalize(p.gender) : null].filter(Boolean).join(' · ');
+      const meta = [p.age ? p.age + ' yrs' : null, p.gender ? capitalize(p.gender) : null].filter(Boolean).join(' · ');
       const count = reportCounts[i];
       const badge = count > 0
-        ? `<div style="background:#EEF4FF;color:#2D6BE4;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;flex-shrink:0;">${count} report${count !== 1 ? 's' : ''}</div>`
-        : `<div style="background:#E8F5F0;color:#2D8A6A;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;flex-shrink:0;">No reports</div>`;
-      return `<div class="patient-card" onclick="openPatient(${i})" data-idx="${i}">
-        <div class="patient-avatar">${initial}</div>
-        <div class="patient-info">
-          <div class="patient-name">${p.name || 'Unknown'}</div>
-          <div class="patient-meta">${meta || '—'}</div>
-        </div>
-        ${badge}
-        <div class="patient-arrow">›</div>
-      </div>`;
-    }).join('')}</div>`;
+        ? '<div style="background:#EEF4FF;color:#2D6BE4;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;flex-shrink:0;">' + count + ' report' + (count !== 1 ? 's' : '') + '</div>'
+        : '<div style="background:#E8F5F0;color:#2D8A6A;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;flex-shrink:0;">No reports</div>';
+      return '<div class="patient-card" onclick="openPatient(' + i + ')">' +
+        '<div class="patient-avatar">' + initial + '</div>' +
+        '<div class="patient-info"><div class="patient-name">' + (p.name || 'Unknown') + '</div><div class="patient-meta">' + (meta || '—') + '</div></div>' +
+        badge + '<div class="patient-arrow">&#8250;</div></div>';
+    }).join('') + '</div>';
     window._patients = patients;
   } catch (e) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-title">Could not load patients</div></div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#9888;&#65039;</div><div class="empty-state-title">Could not load patients</div></div>';
   }
 }
 
@@ -491,52 +449,41 @@ async function openPatient(i) {
   switchTab('records');
 }
 
-// ── TABS ──
+// TABS
 function switchTab(tab) {
   currentTab = tab;
-  document.getElementById('tab-records').classList.toggle('active', tab === 'records');
-  document.getElementById('tab-recs').classList.toggle('active', tab === 'recs');
-  document.getElementById('tab-summary').classList.toggle('active', tab === 'summary');
-  document.getElementById('tab-content-records').style.display = tab === 'records' ? 'block' : 'none';
-  document.getElementById('tab-content-recs').style.display = tab === 'recs' ? 'block' : 'none';
-  document.getElementById('tab-content-summary').style.display = tab === 'summary' ? 'block' : 'none';
+  ['records','recs','summary'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('tab-content-' + t).style.display = t === tab ? 'block' : 'none';
+  });
   if (tab === 'records') loadPatientRecords();
   if (tab === 'recs') loadPrescriptions();
   if (tab === 'summary') loadDoctorSummary();
 }
 
-// ── PRESCRIPTION UPLOAD ──
+// MY PRESCRIPTIONS
 async function uploadPrescription(input) {
   const file = input.files[0];
   if (!file) return;
   const status = document.getElementById('rx-upload-status');
-  status.style.display = 'block';
-  status.textContent = 'Uploading prescription...';
-  status.style.background = '#E8F5F0';
-  status.style.color = '#2D8A6A';
+  status.style.display = 'block'; status.textContent = 'Uploading prescription...';
+  status.style.background = '#E8F5F0'; status.style.color = '#2D8A6A';
   try {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('patient_id', currentPatient.id);
     formData.append('doctor_id', currentDoctor.id);
     formData.append('document_type', 'prescription');
-    const res = await fetch(`${API}/doctor/upload-report`, {
-      method: 'POST',
-      body: formData
-    });
+    const res = await fetch(API + '/doctor/upload-report', { method: 'POST', body: formData });
     const data = await res.json();
     if (data.success) {
-      status.textContent = 'Prescription uploaded successfully!';
+      status.textContent = 'Uploaded successfully!';
       setTimeout(() => { status.style.display = 'none'; loadPrescriptions(); }, 2000);
     } else {
-      status.style.background = '#FFF0F0';
-      status.style.color = '#C0392B';
-      status.textContent = 'Upload failed. Please try again.';
+      status.style.background = '#FFF0F0'; status.style.color = '#C0392B'; status.textContent = 'Upload failed. Please try again.';
     }
   } catch(e) {
-    status.style.background = '#FFF0F0';
-    status.style.color = '#C0392B';
-    status.textContent = 'Upload failed. Please try again.';
+    status.style.background = '#FFF0F0'; status.style.color = '#C0392B'; status.textContent = 'Upload failed.';
   }
   input.value = '';
 }
@@ -545,56 +492,55 @@ async function loadPrescriptions() {
   const container = document.getElementById('rx-list');
   if (!container) return;
   try {
-    const reports = await apiFetch(`/records?patient_id=${currentPatient.id}`);
-    const prescriptions = (reports || []).filter(r =>
-      r.document_type === 'prescription' || r.report_type === 'prescription' ||
-      (r.report_type || '').toLowerCase().includes('prescription')
-    );
+    const reports = await apiFetch('/records?patient_id=' + currentPatient.id);
+    // Show only prescriptions uploaded by THIS doctor
+    const prescriptions = (reports || []).filter(r => {
+      const isRx = r.document_type === 'prescription' || (r.report_type || '').toLowerCase().includes('prescription');
+      const byMe = Array.isArray(r.uploaded_by_doctor_ids) && r.uploaded_by_doctor_ids.includes(currentDoctor.id);
+      return isRx && byMe;
+    });
     if (prescriptions.length === 0) {
-      container.innerHTML = '<div style="font-size:13px;color:#7A9A7A;padding:8px 0;">No prescriptions yet.</div>';
-      return;
+      container.innerHTML = '<div style="font-size:13px;color:#7A9A7A;padding:8px 0;">No prescriptions from you yet.</div>'; return;
     }
     container.innerHTML = prescriptions.map(r => {
       const date = r.report_date
         ? new Date(r.report_date + 'T12:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
         : 'Date unknown';
-      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F0F2F0;cursor:pointer;" onclick="window.open('${r.file_url}', '_blank')">
-        <div style="width:36px;height:36px;border-radius:10px;background:#FFF4E8;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📋</div>
-        <div style="flex:1;">
-          <div style="font-size:13px;font-weight:500;color:#1A2D22;">Prescription</div>
-          <div style="font-size:11px;color:#7A9A7A;margin-top:1px;">${date}</div>
-        </div>
-        <div style="font-size:18px;color:#C0D0C0;">›</div>
-      </div>`;
+      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F0F2F0;cursor:pointer;" onclick="window.open(\'' + r.file_url + '\', \'_blank\')">' +
+        '<div style="width:36px;height:36px;border-radius:10px;background:#FFF4E8;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">&#128203;</div>' +
+        '<div style="flex:1;"><div style="font-size:13px;font-weight:500;color:#1A2D22;">Prescription</div><div style="font-size:11px;color:#7A9A7A;margin-top:1px;">' + date + '</div></div>' +
+        '<div style="font-size:18px;color:#C0D0C0;">&#8250;</div></div>';
     }).join('');
   } catch(e) {
     container.innerHTML = '<div style="font-size:13px;color:#7A9A7A;">Could not load prescriptions.</div>';
   }
 }
 
-// ── PATIENT RECORDS WITH BUCKET TABS ──
-let allReports = [];
-
+// RECORDS WITH BUCKET TABS
 async function loadPatientRecords() {
   const container = document.getElementById('tab-content-records');
-  container.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
+  container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
   try {
-    allReports = await apiFetch(`/records?patient_id=${currentPatient.id}`);
+    allReports = await apiFetch('/records?patient_id=' + currentPatient.id);
     if (!allReports || allReports.length === 0) {
-      container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🗂️</div><div class="empty-state-title">No records yet</div><div class="empty-state-sub">Patient hasn't uploaded any reports</div></div>`;
-      return;
+      container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#128193;</div><div class="empty-state-title">No records yet</div></div>'; return;
     }
     renderRecordsBucket(activeBucket);
   } catch (e) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-title">Could not load records</div></div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#9888;&#65039;</div><div class="empty-state-title">Could not load records</div></div>';
   }
 }
 
 function getBucket(r) {
   const t = (r.document_type || r.report_type || '').toLowerCase();
   if (t.includes('blood') || t.includes('lab') || t.includes('pathology') || t.includes('haematology') || t.includes('biochemistry')) return 'blood';
-  if (t.includes('mri') || t.includes('ct') || t.includes('xray') || t.includes('x-ray') || t.includes('ultrasound') || t.includes('scan') || t.includes('imaging') || t.includes('radiology')) return 'imaging';
-  if (t.includes('prescription') || t.includes('prescription')) return 'prescription';
+  // Imaging = radiology ONLY: xray, usg, ct, mri, pet, dexa, mammogram, angiography
+  if (t === 'imaging' || t.includes('mri') || t.includes('ct scan') || t === 'x-ray' || t.includes('xray') ||
+      t.includes('ultrasound') || t.includes('usg') || t.includes('pet scan') || t.includes('dexa') ||
+      t.includes('mammogram') || t.includes('angiograph') || t.includes('fluoroscop') ||
+      t.includes('nuclear medicine') || t.includes('radiolog')) return 'imaging';
+  if (t === 'prescription' || t.includes('prescription')) return 'prescription';
+  // dental, consultation, discharge, ecg, echo, etc all go to others
   return 'other';
 }
 
@@ -602,118 +548,119 @@ function renderRecordsBucket(bucket) {
   activeBucket = bucket;
   const container = document.getElementById('tab-content-records');
   const filtered = bucket === 'all' ? allReports : allReports.filter(r => getBucket(r) === bucket);
-
-  const bucketHtml = `<div class="bucket-tabs">
-    <div class="bucket-tab ${bucket === 'all' ? 'active' : ''}" onclick="renderRecordsBucket('all')">All</div>
-    <div class="bucket-tab ${bucket === 'blood' ? 'active' : ''}" onclick="renderRecordsBucket('blood')">🩸 Blood Tests</div>
-    <div class="bucket-tab ${bucket === 'imaging' ? 'active' : ''}" onclick="renderRecordsBucket('imaging')">🫁 Imaging</div>
-    <div class="bucket-tab ${bucket === 'prescription' ? 'active' : ''}" onclick="renderRecordsBucket('prescription')">💊 Prescriptions</div>
-    <div class="bucket-tab ${bucket === 'other' ? 'active' : ''}" onclick="renderRecordsBucket('other')">📄 Others</div>
-  </div>`;
-
+  const bucketHtml = '<div class="bucket-tabs">' +
+    ['all','blood','imaging','prescription','other'].map(b => {
+      const labels = { all: 'All', blood: 'Blood Tests', imaging: 'Imaging', prescription: 'Prescriptions', other: 'Others' };
+      return '<div class="bucket-tab ' + (bucket === b ? 'active' : '') + '" onclick="renderRecordsBucket(\'' + b + '\')">' + labels[b] + '</div>';
+    }).join('') + '</div>';
   if (!filtered || filtered.length === 0) {
-    container.innerHTML = bucketHtml + `<div class="empty-state"><div class="empty-state-icon">🗂️</div><div class="empty-state-title">No records in this category</div></div>`;
-    return;
+    container.innerHTML = bucketHtml + '<div class="empty-state"><div class="empty-state-icon">&#128193;</div><div class="empty-state-title">No records in this category</div></div>'; return;
   }
-
   const grouped = {};
   filtered.forEach(r => {
-    const dateStr = r.report_date ? r.report_date + 'T12:00:00' : r.created_at;
-    const key = r.report_date ? new Date(dateStr).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }) : 'Date unknown';
+    const key = r.report_date ? new Date(r.report_date + 'T12:00:00').toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }) : 'Date unknown';
     if (!grouped[key]) grouped[key] = [];
     grouped[key].push(r);
   });
-
   let html = bucketHtml;
   Object.entries(grouped).sort((a, b) => {
-    if (a[0] === 'Date unknown') return 1;
-    if (b[0] === 'Date unknown') return -1;
+    if (a[0] === 'Date unknown') return 1; if (b[0] === 'Date unknown') return -1;
     return new Date(b[1][0].report_date || b[1][0].created_at) - new Date(a[1][0].report_date || a[1][0].created_at);
   }).forEach(([month, reps]) => {
-    html += `<div class="section"><div class="section-title">${month}</div>`;
+    html += '<div class="section"><div class="section-title">' + month + '</div>';
     reps.forEach(r => {
-      const icon = getReportIcon(r.report_type);
-      const iconBg = getIconBg(r.report_type);
-      const date = r.report_date
-        ? new Date(r.report_date + 'T12:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
-        : 'Date unknown';
-      const tags = (r.disease_tags || []).slice(0, 2).map(t => `<span class="tag tag-disease">${t}</span>`).join('');
-      html += `<div class="record" onclick="window.open('${r.file_url}','_blank')"><div class="record-icon ${iconBg}">${icon}</div><div class="record-body"><div class="record-top"><div class="record-name">${r.report_type ? capitalize(r.report_type) : 'Health Report'}</div><div class="record-date">${date}</div></div><div class="record-meta"><span class="tag tag-type">${r.report_type || 'Report'}</span>${tags}</div></div><div class="record-arrow">›</div></div>`;
+      const date = r.report_date ? new Date(r.report_date + 'T12:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'Date unknown';
+      const tags = (r.disease_tags || []).slice(0,2).map(t => '<span class="tag tag-disease">' + t + '</span>').join('');
+      html += '<div class="record" onclick="window.open(\'' + r.file_url + '\',\'_blank\')">' +
+        '<div class="record-icon ' + getIconBg(r.report_type) + '">' + getReportIcon(r.report_type) + '</div>' +
+        '<div class="record-body"><div class="record-top"><div class="record-name">' + capitalize(r.report_type || 'Health Report') + '</div><div class="record-date">' + date + '</div></div>' +
+        '<div class="record-meta"><span class="tag tag-type">' + (r.report_type || 'Report') + '</span>' + tags + '</div></div>' +
+        '<div class="record-arrow">&#8250;</div></div>';
     });
-    html += `</div>`;
+    html += '</div>';
   });
   container.innerHTML = html;
 }
 
-// ── DOCTOR SUMMARY ──
-let doctorSummarySpeciality = 'general';
-
+// SUMMARY - 2 types: General + Speciality
 async function loadDoctorSummary() {
   const container = document.getElementById('tab-content-summary');
-  container.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">Checking summary...</div></div>`;
+  container.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">Checking summary...</div></div>';
   try {
-    const [summaryData, specialities] = await Promise.all([
-      apiFetch(`/patients/${currentPatient.id}/summary?type=doctor&speciality=general`),
-      apiFetch(`/patients/${currentPatient.id}/specialities`)
-    ]);
-    const specHtml = specialities.map(s =>
-      `<button onclick="selectDoctorSpeciality('${s.name}')" class="doc-spec-chip" data-name="${s.name}" style="padding:6px 12px;border-radius:100px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:11px;color:#7A9A7A;cursor:pointer;font-family:'DM Sans',sans-serif;">${s.name}</button>`
-    ).join('');
+    const summaryData = await apiFetch('/patients/' + currentPatient.id + '/summary?type=doctor&speciality=general');
     const staleNotice = summaryData.is_stale && summaryData.summary
-      ? `<div style="background:#FFF4E8;border-radius:12px;padding:12px;font-size:12px;color:#B86A1A;margin-bottom:16px;">${summaryData.current_report_count - summaryData.summary.report_count} new report(s) added since last summary on ${new Date(summaryData.summary.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}.</div>`
+      ? '<div style="background:#FFF4E8;border-radius:12px;padding:12px;font-size:12px;color:#B86A1A;margin-bottom:16px;">' + (summaryData.current_report_count - summaryData.summary.report_count) + ' new report(s) added since last summary on ' + new Date(summaryData.summary.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) + '.</div>'
       : '';
-    container.innerHTML = `
-      <div style="padding:16px 20px;">
-        ${staleNotice}
-        <div style="margin-bottom:12px;">
-          <div style="font-size:11px;color:#7A9A7A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Speciality focus</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">${specHtml}</div>
-          <input type="text" id="doc-spec-other" placeholder="Other speciality..." style="width:100%;background:#F5F7F5;border:1.5px solid transparent;border-radius:10px;padding:10px 14px;font-size:13px;color:#1A2D22;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:8px;"/>
-          <button onclick="selectDoctorSpeciality('general')" id="doc-general-btn" style="width:100%;background:#EEF4FF;border:1.5px solid #2D6BE4;border-radius:10px;padding:10px;font-size:12px;color:#2D6BE4;cursor:pointer;font-family:'DM Sans',sans-serif;">General summary — no specific speciality</button>
-        </div>
-        <button onclick="generateDoctorSummary()" id="doc-summary-btn" style="width:100%;background:#2D6BE4;color:white;border:none;padding:14px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:16px;">Generate Clinical Summary</button>
-        ${summaryData.summary && !summaryData.is_stale ? renderDoctorSummary(summaryData.summary.content, summaryData.summary.biomarker_trends) : ''}
-      </div>`;
+    const specLabel = currentDoctor.specialization ? currentDoctor.specialization + ' Summary' : 'Speciality Summary';
+    container.innerHTML =
+      '<div style="padding:16px 20px;">' +
+      staleNotice +
+      '<div style="font-size:11px;color:#7A9A7A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Summary type</div>' +
+      '<div style="display:flex;gap:8px;margin-bottom:20px;">' +
+        '<button class="summary-type-btn active" id="summary-type-general" onclick="selectSummaryType(\'general\')">General Summary</button>' +
+        '<button class="summary-type-btn" id="summary-type-speciality" onclick="selectSummaryType(\'speciality\')">' + specLabel + '</button>' +
+      '</div>' +
+      '<button onclick="generateDoctorSummary()" id="doc-summary-btn" style="width:100%;background:#2D6BE4;color:white;border:none;padding:14px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:\'DM Sans\',sans-serif;margin-bottom:16px;">Generate Clinical Summary</button>' +
+      (summaryData.summary && !summaryData.is_stale ? renderDoctorSummary(summaryData.summary.content, summaryData.summary.biomarker_trends) : '') +
+      '</div>';
   } catch(e) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-title">Could not load summary</div></div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#9888;&#65039;</div><div class="empty-state-title">Could not load summary</div></div>';
   }
 }
 
-function selectDoctorSpeciality(name) {
-  doctorSummarySpeciality = name;
-  document.querySelectorAll('.doc-spec-chip').forEach(btn => {
-    const isSelected = btn.dataset.name === name;
-    btn.style.borderColor = isSelected ? '#2D6BE4' : '#EEF0EE';
-    btn.style.background = isSelected ? '#EEF4FF' : '#F5F7F5';
-    btn.style.color = isSelected ? '#2D6BE4' : '#7A9A7A';
-  });
-  const genBtn = document.getElementById('doc-general-btn');
-  if (name === 'general') {
-    genBtn.style.borderColor = '#2D6BE4'; genBtn.style.background = '#EEF4FF'; genBtn.style.color = '#2D6BE4';
-  } else {
-    genBtn.style.borderColor = '#EEF0EE'; genBtn.style.background = '#F5F7F5'; genBtn.style.color = '#7A9A7A';
-  }
+function selectSummaryType(type) {
+  doctorSummaryType = type;
+  document.getElementById('summary-type-general').classList.toggle('active', type === 'general');
+  document.getElementById('summary-type-speciality').classList.toggle('active', type === 'speciality');
+}
+
+function closeSpecialityModal() { document.getElementById('speciality-modal').classList.remove('open'); }
+
+async function saveAndGenerateSpecialitySummary() {
+  const spec = document.getElementById('speciality-modal-input').value.trim();
+  if (!spec) return;
+  try {
+    await fetch(API + '/doctor/update-profile', {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ doctor_id: currentDoctor.id, specialization: spec })
+    });
+    currentDoctor.specialization = spec;
+    localStorage.setItem('kado_doctor', JSON.stringify(currentDoctor));
+  } catch(e) {}
+  closeSpecialityModal();
+  doctorSummarySpeciality = spec;
+  await triggerSummaryGeneration();
 }
 
 async function generateDoctorSummary() {
+  if (doctorSummaryType === 'speciality') {
+    if (!currentDoctor.specialization) {
+      document.getElementById('speciality-modal-input').value = '';
+      document.getElementById('speciality-modal').classList.add('open');
+      return;
+    }
+    doctorSummarySpeciality = currentDoctor.specialization;
+  } else {
+    doctorSummarySpeciality = 'general';
+  }
+  await triggerSummaryGeneration();
+}
+
+async function triggerSummaryGeneration() {
   const btn = document.getElementById('doc-summary-btn');
-  const otherInput = document.getElementById('doc-spec-other')?.value.trim();
-  if (otherInput) doctorSummarySpeciality = otherInput;
-  btn.disabled = true;
-  btn.textContent = 'Generating... (15-20 seconds)';
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating... (15-20 seconds)'; }
   try {
-    const cached = await apiFetch(`/patients/${currentPatient.id}/summary?type=doctor&speciality=${doctorSummarySpeciality}`);
+    const cached = await apiFetch('/patients/' + currentPatient.id + '/summary?type=doctor&speciality=' + doctorSummarySpeciality);
     if (cached.summary && !cached.is_stale) {
       const container = document.getElementById('tab-content-summary');
       const existing = container.querySelector('.summary-result');
       if (existing) existing.remove();
       container.querySelector('div').insertAdjacentHTML('beforeend', renderDoctorSummary(cached.summary.content, cached.summary.biomarker_trends));
-      btn.disabled = false; btn.textContent = 'Generate Clinical Summary';
+      if (btn) { btn.disabled = false; btn.textContent = 'Generate Clinical Summary'; }
       return;
     }
-    const res = await fetch(`${API}/patients/${currentPatient.id}/summary`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch(API + '/patients/' + currentPatient.id + '/summary', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'doctor', speciality: doctorSummarySpeciality })
     });
     const data = await res.json();
@@ -724,105 +671,67 @@ async function generateDoctorSummary() {
       container.querySelector('div').insertAdjacentHTML('beforeend', renderDoctorSummary(data.content, data.trends));
     }
   } catch(e) { alert('Could not generate summary.'); }
-  btn.disabled = false;
-  btn.textContent = 'Generate Clinical Summary';
+  if (btn) { btn.disabled = false; btn.textContent = 'Generate Clinical Summary'; }
 }
 
 function renderDoctorSummary(content, trends) {
-  return `<div class="summary-result" style="background:white;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,0.05);">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-      <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:#1A2D22;">Clinical Summary</div>
-      <button onclick="printDoctorSummary()" style="background:none;border:1.5px solid #2D6BE4;border-radius:8px;padding:6px 12px;font-size:12px;color:#2D6BE4;cursor:pointer;font-family:'DM Sans',sans-serif;">Share PDF</button>
-    </div>
-    <div id="doc-summary-content">${content}</div>
-  </div>`;
+  return '<div class="summary-result" style="background:white;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,0.05);">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
+      '<div style="font-family:\'Fraunces\',serif;font-size:16px;font-weight:300;color:#1A2D22;">Clinical Summary</div>' +
+      '<button onclick="printDoctorSummary()" style="background:none;border:1.5px solid #2D6BE4;border-radius:8px;padding:6px 12px;font-size:12px;color:#2D6BE4;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Share PDF</button>' +
+    '</div><div id="doc-summary-content">' + content + '</div></div>';
 }
 
 function printDoctorSummary() {
-  const content = document.getElementById('doc-summary-content')?.innerHTML || '';
+  const content = document.getElementById('doc-summary-content') ? document.getElementById('doc-summary-content').innerHTML : '';
   const w = window.open('', '_blank');
-  w.document.write(`<html><head><title>Clinical Summary — ${currentPatient?.name}</title>
-  <style>body{font-family:'DM Sans',sans-serif;padding:40px;max-width:800px;margin:0 auto;}h3{font-size:16px;border-bottom:1px solid #eee;padding-bottom:6px;margin-bottom:8px;}p,li{font-size:13px;line-height:1.7;color:#333;}.trend-item{background:#f5f5f5;border-radius:8px;padding:10px;margin-bottom:8px;}</style>
-  </head><body>
-  <div style="text-align:center;margin-bottom:32px;">
-    <div style="font-size:24px;font-weight:bold;">kado.care</div>
-    <div style="font-size:14px;color:#666;">Clinical Summary — ${currentPatient?.name}</div>
-    <div style="font-size:12px;color:#999;">${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-  </div>
-  ${content}
-  <div style="margin-top:40px;text-align:center;font-size:11px;color:#ccc;">Generated by kado.care — For clinical reference only</div>
-  </body></html>`);
-  w.document.close();
-  w.print();
+  w.document.write('<html><head><title>Clinical Summary</title><style>body{font-family:sans-serif;padding:40px;max-width:800px;margin:0 auto;}h3{font-size:16px;border-bottom:1px solid #eee;padding-bottom:6px;margin-bottom:8px;}p,li{font-size:13px;line-height:1.7;color:#333;}</style></head><body>' +
+    '<div style="text-align:center;margin-bottom:32px;"><div style="font-size:24px;font-weight:bold;">kado.care</div>' +
+    '<div style="font-size:14px;color:#666;">Clinical Summary - ' + (currentPatient ? currentPatient.name : '') + '</div>' +
+    '<div style="font-size:12px;color:#999;">' + new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div></div>' +
+    content + '<div style="margin-top:40px;text-align:center;font-size:11px;color:#ccc;">Generated by kado.care - For clinical reference only</div></body></html>');
+  w.document.close(); w.print();
 }
 
-// ── REVIEW ACTIONS ──
-function openVetModal(kadoId) {
-  activeKadoId = kadoId;
-  document.getElementById('vet-note').value = '';
-  document.getElementById('vet-modal').classList.add('open');
-}
+// REVIEW ACTIONS
+function openVetModal(kadoId) { activeKadoId = kadoId; document.getElementById('vet-note').value = ''; document.getElementById('vet-modal').classList.add('open'); }
 function closeVetModal() { document.getElementById('vet-modal').classList.remove('open'); }
-
-function openEditModal(kadoId, existing) {
-  activeKadoId = kadoId;
-  document.getElementById('edit-text').value = existing || '';
-  document.getElementById('edit-modal').classList.add('open');
-}
+function openEditModal(kadoId, existing) { activeKadoId = kadoId; document.getElementById('edit-text').value = existing || ''; document.getElementById('edit-modal').classList.add('open'); }
 function closeEditModal() { document.getElementById('edit-modal').classList.remove('open'); }
-
-function openInfoModal(kadoId) {
-  activeKadoId = kadoId;
-  document.getElementById('info-question').value = '';
-  document.getElementById('info-modal').classList.add('open');
-}
+function openInfoModal(kadoId) { activeKadoId = kadoId; document.getElementById('info-question').value = ''; document.getElementById('info-modal').classList.add('open'); }
 function closeInfoModal() { document.getElementById('info-modal').classList.remove('open'); }
 
 async function submitReview(status) {
   const body = { doctor_id: currentDoctor.id, doctor_status: status };
-  if (status === 'vetted') {
-    body.doctor_note = document.getElementById('vet-note').value.trim() || null;
-    closeVetModal();
-  } else if (status === 'edited') {
-    body.doctor_edit = document.getElementById('edit-text').value.trim();
-    if (!body.doctor_edit) return;
-    closeEditModal();
-  } else if (status === 'needs_info') {
-    body.needs_info_question = document.getElementById('info-question').value.trim();
-    if (!body.needs_info_question) return;
-    closeInfoModal();
-  }
-  await sendReview(activeKadoId, body);
-}
-
-async function quickReview(kadoId, status) {
-  if (status === 'removed' && !confirm('Remove this recommendation from both your view and the patient\'s?')) return;
-  await sendReview(kadoId, { doctor_id: currentDoctor.id, doctor_status: status });
-}
-
-async function sendReview(kadoId, body) {
+  if (status === 'vetted') { body.doctor_note = document.getElementById('vet-note').value.trim() || null; closeVetModal(); }
+  else if (status === 'edited') { body.doctor_edit = document.getElementById('edit-text').value.trim(); if (!body.doctor_edit) return; closeEditModal(); }
+  else if (status === 'needs_info') { body.needs_info_question = document.getElementById('info-question').value.trim(); if (!body.needs_info_question) return; closeInfoModal(); }
   try {
-    await fetch(`${API}/kado-cards/${kadoId}/review`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
+    await fetch(API + '/kado-cards/' + activeKadoId + '/review', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     await loadPrescriptions();
   } catch (e) { alert('Could not save review.'); }
 }
 
-// ── INVITE PATIENT ──
+// INVITE PATIENT
+function selectInviteLanguage(lang) {
+  selectedInviteLanguage = lang;
+  ['english','hindi','hinglish','punjabi','kannada'].forEach(l => {
+    const btn = document.getElementById('lang-' + l);
+    if (btn) btn.classList.toggle('active', l === lang);
+  });
+}
+
 function openInvitePatientSheet() {
   document.getElementById('patient-invite-phone').value = '';
+  selectedInviteLanguage = 'english';
+  selectInviteLanguage('english');
   document.getElementById('invite-patient-overlay').classList.add('open');
 }
-function closeInvitePatientSheet() {
-  document.getElementById('invite-patient-overlay').classList.remove('open');
-}
+function closeInvitePatientSheet() { document.getElementById('invite-patient-overlay').classList.remove('open'); }
 
 async function sendPatientInvite() {
   const btn = document.getElementById('invite-patient-btn');
-  let body = { doctor_user_id: currentDoctor.id };
+  let body = { doctor_user_id: currentDoctor.id, language: selectedInviteLanguage };
   if (docInviteMethod === 'whatsapp') {
     const input = document.getElementById('patient-invite-phone').value.trim().replace(/\s/g, '');
     if (input.length < 10) { document.getElementById('patient-invite-phone').focus(); return; }
@@ -832,112 +741,74 @@ async function sendPatientInvite() {
     if (!email || !email.includes('@')) { document.getElementById('patient-invite-email').focus(); return; }
     body.email = email;
   }
-  btn.disabled = true;
-  btn.textContent = 'Sending...';
+  btn.disabled = true; btn.textContent = 'Sending...';
   try {
-    const res = await fetch(`${API}/doctor/invite-patient`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
+    const res = await fetch(API + '/doctor/invite-patient', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const data = await res.json();
-    if (data.success) {
-      closeInvitePatientSheet();
-      alert('Invite sent!');
-    } else {
-      alert(data.error || 'Could not send invite.');
-    }
+    if (data.success) { closeInvitePatientSheet(); alert('Invite sent!'); }
+    else { alert(data.error || 'Could not send invite.'); }
   } catch (e) { alert('Could not send invite.'); }
-  btn.disabled = false;
-  btn.textContent = 'Send invite on WhatsApp';
+  btn.disabled = false; btn.textContent = 'Send invite on WhatsApp';
 }
 
-// ── MODE TOGGLE ──
-function setMode(mode) {
-  if (mode === 'professional') {
-    showScreen('patients');
-    document.getElementById('invite-fab').style.display = 'block';
-  } else {
-    showScreen('personal');
-    document.getElementById('invite-fab').style.display = 'none';
-  }
-}
-
-// ── DOCTOR PROFILE ──
-function showDoctorProfile() {
-  document.getElementById('profile-avatar-lg').textContent = (currentDoctor.name || 'D').charAt(0).toUpperCase();
-  document.getElementById('profile-name-lg').textContent = currentDoctor.name || 'Doctor';
-  document.getElementById('profile-spec-lg').textContent = currentDoctor.specialization || '';
-  document.getElementById('profile-phone-lg').textContent = currentDoctor.phone_number || '';
-  showScreen('doctor-profile');
-}
-
-function logoutDoctor() {
-  currentDoctor = null;
-  localStorage.removeItem('kado_doctor');
-  showScreen('login');
-}
-
-// ── DOC INVITE METHOD TOGGLE ──
-let docInviteMethod = 'whatsapp';
 function selectDocInviteMethod(method) {
   docInviteMethod = method;
   const waBtn = document.getElementById('doc-invite-method-wa');
   const emailBtn = document.getElementById('doc-invite-method-email');
   const waInput = document.getElementById('doc-invite-wa-input');
   const emailInput = document.getElementById('doc-invite-email-input');
+  const langSection = document.getElementById('invite-language-section');
   const sendBtn = document.getElementById('invite-patient-btn');
   if (method === 'whatsapp') {
     waBtn.style.borderColor = '#2D6BE4'; waBtn.style.background = '#EEF4FF'; waBtn.style.color = '#2D6BE4';
     emailBtn.style.borderColor = '#EEF0EE'; emailBtn.style.background = '#F5F7F5'; emailBtn.style.color = '#7A9A7A';
     waInput.style.display = 'flex'; emailInput.style.display = 'none';
-    sendBtn.textContent = 'Send invite on WhatsApp';
+    langSection.style.display = 'block'; sendBtn.textContent = 'Send invite on WhatsApp';
   } else {
     emailBtn.style.borderColor = '#2D6BE4'; emailBtn.style.background = '#EEF4FF'; emailBtn.style.color = '#2D6BE4';
     waBtn.style.borderColor = '#EEF0EE'; waBtn.style.background = '#F5F7F5'; waBtn.style.color = '#7A9A7A';
     emailInput.style.display = 'flex'; waInput.style.display = 'none';
-    sendBtn.textContent = 'Send invite by email';
+    langSection.style.display = 'none'; sendBtn.textContent = 'Send invite by email';
   }
 }
 
-// ── UTILS ──
+function setMode(mode) {
+  if (mode === 'professional') { showScreen('patients'); document.getElementById('invite-fab').style.display = 'block'; }
+  else { showScreen('personal'); document.getElementById('invite-fab').style.display = 'none'; }
+}
+
+function logoutDoctor() { currentDoctor = null; localStorage.removeItem('kado_doctor'); showScreen('login'); }
+
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
-  const el = document.getElementById(`screen-${name}`);
+  const el = document.getElementById('screen-' + name);
   el.classList.add('active');
   el.style.display = name === 'login' ? 'flex' : 'block';
 }
 
 function getReportIcon(type) {
-  if (!type) return '📋';
+  if (!type) return '&#128203;';
   const t = type.toLowerCase();
-  if (t.includes('blood') || t.includes('lab') || t.includes('pathology')) return '🩸';
-  if (t.includes('scan') || t.includes('mri') || t.includes('xray') || t.includes('imaging')) return '🫁';
-  if (t.includes('prescription')) return '💊';
-  if (t.includes('consultation')) return '🩺';
-  return '📄';
+  if (t.includes('blood') || t.includes('lab') || t.includes('pathology')) return '&#129978;';
+  if (t.includes('mri') || t.includes('ct') || t.includes('xray') || t.includes('x-ray') || t.includes('ultrasound') || t.includes('usg') || t.includes('pet') || t.includes('dexa')) return '&#129978;';
+  if (t.includes('prescription')) return '&#128138;';
+  return '&#128196;';
 }
 
 function getIconBg(type) {
   if (!type) return 'icon-other';
   const t = type.toLowerCase();
   if (t.includes('blood') || t.includes('lab') || t.includes('pathology')) return 'icon-blood';
-  if (t.includes('scan') || t.includes('mri') || t.includes('xray') || t.includes('imaging')) return 'icon-scan';
+  if (t.includes('mri') || t.includes('ct') || t.includes('xray') || t.includes('x-ray') || t.includes('ultrasound') || t.includes('usg') || t.includes('pet') || t.includes('dexa')) return 'icon-scan';
   if (t.includes('prescription')) return 'icon-prescription';
-  if (t.includes('consultation')) return 'icon-consultation';
   return 'icon-other';
 }
 
 function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
-function escapeStr(s) { return (s || '').replace(/'/g, '&#39;').replace(/"/g, '&quot;').substring(0, 200); }
 
-// ── INIT ──
 window.addEventListener('load', async () => {
   const saved = localStorage.getItem('kado_doctor');
-  if (saved) {
-    currentDoctor = JSON.parse(saved);
-    await loadPatientsScreen();
-  }
+  if (saved) { currentDoctor = JSON.parse(saved); await loadPatientsScreen(); }
 });
 
 document.getElementById('phone-input').addEventListener('keypress', e => {
