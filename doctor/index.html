@@ -539,7 +539,7 @@ function getBucket(r) {
       t.includes('ultrasound') || t.includes('usg') || t.includes('pet scan') || t.includes('dexa') ||
       t.includes('mammogram') || t.includes('angiograph') || t.includes('fluoroscop') ||
       t.includes('nuclear medicine') || t.includes('radiolog')) return 'imaging';
-  if (t === 'prescription' || t.includes('prescription')) return 'prescription';
+  if (t === 'prescription' || t.includes('prescription') || t.includes('consultation')) return 'prescription';
   // dental, consultation, discharge, ecg, echo, etc all go to others
   return 'other';
 }
