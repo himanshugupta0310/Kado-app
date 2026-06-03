@@ -13,7 +13,7 @@
   .nav { background: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EEF0EE; position: sticky; top: 0; z-index: 10; }
   .nav-logo { font-family: 'Fraunces', serif; font-size: 18px; color: #1A2D22; }
   .nav-logo span { color: #E8866A; }
-  .mode-toggle { display: flex; align-items: center; gap: 6px; background: #F5F7F5; border-radius: 20px; padding: 4px 6px; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; }
+  .mode-toggle { display: flex; align-items: center; gap: 6px; background: #F5F7F5; border-radius: 20px; padding: 4px 6px; border: none; font-family: 'DM Sans', sans-serif; }
   .mode-btn { font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 14px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
   .mode-btn.active { background: #2D8A6A; color: white; }
   .mode-btn.inactive { background: none; color: #7A9A7A; }
@@ -29,8 +29,7 @@
   .input-group:focus-within { border-color: #2D6BE4; background: white; }
   .input-prefix { font-size: 14px; color: #1A2D22; font-weight: 500; flex-shrink: 0; }
   .input-group input { border: none; background: none; outline: none; font-size: 14px; color: #1A2D22; width: 100%; font-family: 'DM Sans', sans-serif; }
-  .login-btn { width: 100%; background: #2D6BE4; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
-  .login-btn:hover { background: #1E55C0; }
+  .login-btn { width: 100%; background: #2D6BE4; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
   .login-btn:disabled { background: #A0B4E8; cursor: default; }
   .login-error { font-size: 12px; color: #C0392B; margin-top: 8px; text-align: center; display: none; }
   .login-note { font-size: 11px; color: #9B8778; text-align: center; margin-top: 16px; }
@@ -39,13 +38,14 @@
   .hero-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 300; color: #1A2D22; }
   .hero-sub { font-size: 12px; color: #7A9A7A; margin-top: 3px; }
   .patient-list { padding: 16px 20px; }
-  .patient-card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; box-shadow: 0 1px 8px rgba(0,0,0,0.05); cursor: pointer; border: 1.5px solid transparent; transition: border 0.15s; }
+  .patient-card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 14px; box-shadow: 0 1px 8px rgba(0,0,0,0.05); cursor: pointer; border: 1.5px solid transparent; transition: border 0.15s; }
   .patient-card:active { border-color: #2D6BE4; }
   .patient-avatar { width: 44px; height: 44px; background: #EEF4FF; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #2D6BE4; font-weight: 500; flex-shrink: 0; }
-  .patient-info { flex: 1; }
+  .patient-info { flex: 1; min-width: 0; }
   .patient-name { font-size: 15px; font-weight: 500; color: #1A2D22; }
   .patient-meta { font-size: 11px; color: #7A9A7A; margin-top: 2px; }
-  .patient-arrow { color: #C0D0C0; font-size: 18px; }
+  .patient-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .patient-arrow { color: #C0D0C0; font-size: 18px; flex-shrink: 0; margin-top: 2px; }
   .empty-state { text-align: center; padding: 60px 20px; color: #7A9A7A; }
   .empty-state-icon { font-size: 48px; margin-bottom: 12px; }
   .empty-state-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 300; color: #1A2D22; margin-bottom: 6px; }
@@ -68,6 +68,9 @@
   .tag { padding: 3px 8px; border-radius: 100px; font-size: 9px; font-weight: 500; }
   .tag-type { background: #EEF0FF; color: #5B5BD6; }
   .tag-disease { background: #FFF4E8; color: #B86A1A; }
+  .tag-unconfirmed { background: #FFF4E8; color: #B86A1A; border: 1px solid #B86A1A; }
+  .tag-diagnosis { background: #FFF0F0; color: #C0392B; }
+  .tag-procedure { background: #EEF0FF; color: #5B5BD6; }
   .record-arrow { color: #C0D0C0; font-size: 16px; margin-top: 2px; }
   .icon-blood { background: #FFF0F0; }
   .icon-scan { background: #EEF0FF; }
@@ -76,7 +79,7 @@
   .invite-fab { position: fixed; bottom: 24px; right: 20px; background: #2D6BE4; color: white; border: none; border-radius: 16px; padding: 12px 20px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; box-shadow: 0 4px 16px rgba(45,107,228,0.4); z-index: 20; display: none; }
   .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: flex-end; }
   .sheet-overlay.open { display: flex; }
-  .sheet { background: white; border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; max-height: 85vh; overflow-y: auto; }
+  .sheet { background: white; border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; max-height: 90vh; overflow-y: auto; }
   .sheet-handle { width: 36px; height: 4px; background: #EEF0EE; border-radius: 2px; margin: 0 auto 20px; }
   .sheet-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 300; color: #1A2D22; margin-bottom: 6px; }
   .sheet-sub { font-size: 12px; color: #7A9A7A; margin-bottom: 20px; }
@@ -89,12 +92,15 @@
   .loading-text { font-size: 13px; color: #7A9A7A; }
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: flex-end; }
   .modal-overlay.open { display: flex; }
-  .modal { background: white; border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; max-height: 80vh; overflow-y: auto; }
+  .modal { background: white; border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; max-height: 85vh; overflow-y: auto; }
   .modal-handle { width: 36px; height: 4px; background: #EEF0EE; border-radius: 2px; margin: 0 auto 20px; }
   .modal-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: #1A2D22; margin-bottom: 6px; }
   .modal-sub { font-size: 12px; color: #7A9A7A; margin-bottom: 20px; }
-  .modal-textarea { width: 100%; background: #F5F7F5; border: 1.5px solid transparent; border-radius: 12px; padding: 12px 16px; font-size: 14px; color: #1A2D22; font-family: 'DM Sans', sans-serif; resize: none; outline: none; min-height: 100px; }
+  .modal-textarea { width: 100%; background: #F5F7F5; border: 1.5px solid transparent; border-radius: 12px; padding: 12px 16px; font-size: 14px; color: #1A2D22; font-family: 'DM Sans', sans-serif; resize: none; outline: none; min-height: 80px; }
   .modal-textarea:focus { border-color: #2D6BE4; background: white; }
+  .modal-input { width: 100%; background: #F5F7F5; border: 1.5px solid transparent; border-radius: 12px; padding: 12px 16px; font-size: 14px; color: #1A2D22; font-family: 'DM Sans', sans-serif; outline: none; margin-bottom: 10px; }
+  .modal-input:focus { border-color: #2D6BE4; background: white; }
+  .modal-label { font-size: 11px; color: #7A9A7A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; margin-top: 4px; }
   .modal-close { margin-top: 12px; width: 100%; background: #F5F7F5; border: none; padding: 14px; border-radius: 12px; font-size: 14px; color: #1A2D22; cursor: pointer; font-family: 'DM Sans', sans-serif; }
   .summary-section { margin-bottom: 20px; }
   .summary-section h3 { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 300; color: #1A2D22; margin-bottom: 8px; border-bottom: 1px solid #EEF0EE; padding-bottom: 6px; }
@@ -105,11 +111,14 @@
   .summary-type-btn.active { background: #EEF4FF; border-color: #2D6BE4; color: #2D6BE4; }
   .lang-btn { padding: 6px 12px; border-radius: 100px; border: 1.5px solid #EEF0EE; background: #F5F7F5; font-size: 11px; color: #7A9A7A; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
   .lang-btn.active { border-color: #2D6BE4; background: #EEF4FF; color: #2D6BE4; }
+  /* Patient detail bars */
+  .patient-detail-bars { padding: 12px 20px; background: white; border-bottom: 1px solid #EEF0EE; display: flex; flex-wrap: wrap; gap: 6px; }
+  .detail-note { padding: 6px 20px 10px; background: white; border-bottom: 1px solid #EEF0EE; font-size: 12px; color: #7A9A7A; font-style: italic; }
 </style>
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
+<!-- LOGIN -->
 <div class="screen active" id="screen-login" style="padding-bottom:0;">
   <div class="login-logo">kado<span>.</span>care</div>
   <div class="login-tagline">For healthcare professionals</div>
@@ -121,12 +130,8 @@
       <input type="tel" id="phone-input" placeholder="WhatsApp number" maxlength="10" inputmode="numeric"/>
     </div>
     <div id="register-fields" style="display:none;">
-      <div class="input-group">
-        <input type="text" id="name-input" placeholder="Full name e.g. Dr. Priya Sharma" style="width:100%;"/>
-      </div>
-      <div class="input-group">
-        <input type="text" id="spec-input" placeholder="Specialization e.g. Cardiologist" style="width:100%;"/>
-      </div>
+      <div class="input-group"><input type="text" id="name-input" placeholder="Full name e.g. Dr. Priya Sharma" style="width:100%;"/></div>
+      <div class="input-group"><input type="text" id="spec-input" placeholder="Specialization e.g. Cardiologist" style="width:100%;"/></div>
     </div>
     <button class="login-btn" id="login-btn" onclick="handleLogin()">Continue</button>
     <div class="login-error" id="login-error"></div>
@@ -134,7 +139,7 @@
   </div>
 </div>
 
-<!-- PATIENTS LIST SCREEN -->
+<!-- PATIENTS LIST -->
 <div class="screen" id="screen-patients">
   <div class="nav" style="justify-content:space-between;">
     <div class="mode-toggle">
@@ -153,13 +158,17 @@
   <button class="invite-fab" id="invite-fab" onclick="openInvitePatientSheet()">+ Invite patient</button>
 </div>
 
-<!-- PATIENT DETAIL SCREEN -->
+<!-- PATIENT DETAIL -->
 <div class="screen" id="screen-patient-detail">
   <div class="nav">
     <button style="background:none;border:none;font-size:22px;cursor:pointer;color:#1A2D22;padding:0;" onclick="showScreen('patients')">&#8249;</button>
     <div class="nav-logo" id="detail-patient-name" style="position:absolute;left:50%;transform:translateX(-50%);">Patient</div>
-    <div style="width:32px;"></div>
+    <button onclick="openPatientNotesModal()" style="background:none;border:none;font-size:13px;color:#2D6BE4;cursor:pointer;font-family:'DM Sans',sans-serif;">Edit</button>
   </div>
+  <!-- Diagnosis + Procedure bars -->
+  <div class="patient-detail-bars" id="patient-detail-bars" style="display:none;"></div>
+  <!-- Free note -->
+  <div class="detail-note" id="patient-detail-note" style="display:none;"></div>
   <div class="tab-bar">
     <div class="tab active" id="tab-records" onclick="switchTab('records')">Records</div>
     <div class="tab" id="tab-recs" onclick="switchTab('recs')">My Prescriptions</div>
@@ -170,12 +179,8 @@
     <div style="padding:16px 20px;">
       <div style="font-size:11px;color:#7A9A7A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Add Prescription</div>
       <div style="display:flex;gap:8px;margin-bottom:16px;">
-        <button onclick="document.getElementById('rx-file-input').click()" style="flex:1;padding:14px;border-radius:14px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:13px;color:#1A2D22;cursor:pointer;font-family:'DM Sans',sans-serif;">
-          &#128206; Upload File / PDF
-        </button>
-        <button onclick="document.getElementById('rx-camera-input').click()" style="flex:1;padding:14px;border-radius:14px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:13px;color:#1A2D22;cursor:pointer;font-family:'DM Sans',sans-serif;">
-          &#128247; Take Photo
-        </button>
+        <button onclick="document.getElementById('rx-file-input').click()" style="flex:1;padding:14px;border-radius:14px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:13px;color:#1A2D22;cursor:pointer;font-family:'DM Sans',sans-serif;">Upload File / PDF</button>
+        <button onclick="document.getElementById('rx-camera-input').click()" style="flex:1;padding:14px;border-radius:14px;border:1.5px solid #EEF0EE;background:#F5F7F5;font-size:13px;color:#1A2D22;cursor:pointer;font-family:'DM Sans',sans-serif;">Take Photo</button>
       </div>
       <input type="file" id="rx-file-input" accept=".pdf,image/*" style="display:none;" onchange="uploadPrescription(this)"/>
       <input type="file" id="rx-camera-input" accept="image/*" capture="camera" style="display:none;" onchange="uploadPrescription(this)"/>
@@ -187,7 +192,7 @@
   <div id="tab-content-summary" style="display:none;"></div>
 </div>
 
-<!-- DOCTOR PROFILE SCREEN -->
+<!-- DOCTOR PROFILE -->
 <div class="screen" id="screen-doctor-profile">
   <div class="nav">
     <div class="nav-logo">kado<span>.</span>care</div>
@@ -202,12 +207,10 @@
     </div>
     <div style="background:white;border-radius:18px;padding:0 20px;box-shadow:0 1px 8px rgba(0,0,0,0.05);margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #F0F2F0;cursor:pointer;" onclick="window.open('https://kado.care/privacy','_blank')">
-        <div style="font-size:13px;color:#1A2D22;">Privacy Policy</div>
-        <div style="font-size:13px;color:#7A9A7A;">&#8250;</div>
+        <div style="font-size:13px;color:#1A2D22;">Privacy Policy</div><div style="font-size:13px;color:#7A9A7A;">&#8250;</div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;cursor:pointer;" onclick="window.open('mailto:support@kado.care','_blank')">
-        <div style="font-size:13px;color:#1A2D22;">Contact Support</div>
-        <div style="font-size:13px;color:#7A9A7A;">&#8250;</div>
+        <div style="font-size:13px;color:#1A2D22;">Contact Support</div><div style="font-size:13px;color:#7A9A7A;">&#8250;</div>
       </div>
     </div>
     <div style="background:white;border-radius:18px;padding:20px;box-shadow:0 1px 8px rgba(0,0,0,0.05);">
@@ -251,7 +254,6 @@
     <div id="doc-invite-email-input" class="input-group" style="display:none;">
       <input type="email" id="patient-invite-email" placeholder="Patient email address" style="width:100%;"/>
     </div>
-    <!-- Language selector shown for WhatsApp only -->
     <div id="invite-language-section" style="margin-bottom:16px;">
       <div style="font-size:11px;color:#7A9A7A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Message Language</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -267,13 +269,30 @@
   </div>
 </div>
 
+<!-- PATIENT NOTES MODAL -->
+<div class="modal-overlay" id="patient-notes-modal" onclick="closePatientNotesModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="notes-modal-title">Patient Notes</div>
+    <div class="modal-sub">Only visible to you</div>
+    <div class="modal-label">Diagnosis</div>
+    <input type="text" class="modal-input" id="notes-diagnosis" placeholder="e.g. Type 2 Diabetes, Hypertension"/>
+    <div class="modal-label">Procedure</div>
+    <input type="text" class="modal-input" id="notes-procedure" placeholder="e.g. Knee replacement, Appendectomy"/>
+    <div class="modal-label">Note</div>
+    <textarea class="modal-textarea" id="notes-note" placeholder="e.g. Teenage boy with epilepsy, referred by Dr. Sharma"></textarea>
+    <button class="primary-btn" style="margin-top:16px;" onclick="savePatientNotes()">Save</button>
+    <button class="modal-close" onclick="closePatientNotesModal()">Cancel</button>
+  </div>
+</div>
+
 <!-- SPECIALITY MODAL -->
 <div class="modal-overlay" id="speciality-modal" onclick="closeSpecialityModal()">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <div class="modal-title">Your speciality</div>
     <div class="modal-sub">Enter your medical speciality for a focused summary</div>
-    <input type="text" id="speciality-modal-input" placeholder="e.g. Cardiologist, Neurologist..." style="width:100%;background:#F5F7F5;border:1.5px solid transparent;border-radius:12px;padding:12px 16px;font-size:14px;color:#1A2D22;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:12px;"/>
+    <input type="text" id="speciality-modal-input" class="modal-input" placeholder="e.g. Cardiologist, Neurologist..."/>
     <button class="primary-btn" onclick="saveAndGenerateSpecialitySummary()">Generate Summary</button>
     <button class="modal-close" onclick="closeSpecialityModal()">Cancel</button>
   </div>
@@ -285,7 +304,7 @@
     <div class="modal-handle"></div>
     <div class="modal-title">Vet recommendation</div>
     <div class="modal-sub">Add an optional note for the patient</div>
-    <textarea class="modal-textarea" id="vet-note" placeholder="e.g. This is consistent with your recent results. Continue monitoring."></textarea>
+    <textarea class="modal-textarea" id="vet-note" placeholder="e.g. This is consistent with your recent results."></textarea>
     <button class="primary-btn" style="margin-top:12px;" onclick="submitReview('vetted')">Confirm - looks good</button>
     <button class="modal-close" onclick="closeVetModal()">Cancel</button>
   </div>
@@ -296,7 +315,6 @@
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <div class="modal-title">Edit recommendation</div>
-    <div class="modal-sub">Your version will be shown alongside the original</div>
     <textarea class="modal-textarea" id="edit-text" placeholder="Write your updated recommendation..."></textarea>
     <button class="primary-btn" style="margin-top:12px;" onclick="submitReview('edited')">Save edit</button>
     <button class="modal-close" onclick="closeEditModal()">Cancel</button>
@@ -308,7 +326,6 @@
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <div class="modal-title">Ask patient for more info</div>
-    <div class="modal-sub">Patient will receive a WhatsApp notification with your question</div>
     <textarea class="modal-textarea" id="info-question" placeholder="e.g. Please share your latest HbA1c test."></textarea>
     <button class="primary-btn" style="margin-top:12px;" onclick="submitReview('needs_info')">Send question</button>
     <button class="modal-close" onclick="closeInfoModal()">Cancel</button>
@@ -317,7 +334,6 @@
 
 <script>
 const API = 'https://api.kado.care';
-
 async function apiFetch(path) {
   const res = await fetch(API + path);
   if (!res.ok) throw new Error('API error: ' + res.status);
@@ -326,6 +342,7 @@ async function apiFetch(path) {
 
 let currentDoctor = null;
 let currentPatient = null;
+let currentPatientNotes = {};
 let activeKadoId = null;
 let currentTab = 'records';
 let activeBucket = 'all';
@@ -356,9 +373,7 @@ async function handleLogin() {
     if (res.ok) {
       const data = await res.json();
       if (data && data.id && data.user_type === 'doctor') {
-        currentDoctor = data;
-        localStorage.setItem('kado_doctor', JSON.stringify(data));
-        await loadPatientsScreen(); return;
+        currentDoctor = data; localStorage.setItem('kado_doctor', JSON.stringify(data)); await loadPatientsScreen(); return;
       }
       if (data && data.id) {
         document.getElementById('register-fields').style.display = 'block';
@@ -370,7 +385,7 @@ async function handleLogin() {
     document.getElementById('login-sub-text').textContent = 'Create your doctor profile';
     btn.disabled = false; btn.textContent = 'Create account'; btn.onclick = registerDoctor;
   } catch (e) {
-    err.textContent = 'Something went wrong. Please try again.'; err.style.display = 'block';
+    err.textContent = 'Something went wrong.'; err.style.display = 'block';
     btn.disabled = false; btn.textContent = 'Continue';
   }
 }
@@ -403,7 +418,7 @@ async function registerDoctor() {
 
 async function loadPatientsScreen() {
   document.getElementById('avatar-main').textContent = (currentDoctor.name || 'D').charAt(0).toUpperCase();
-  document.getElementById('patients-greeting').textContent = getGreeting() + ' ';
+  document.getElementById('patients-greeting').textContent = getGreeting();
   document.getElementById('patients-title').textContent = 'Dr. ' + (currentDoctor.name || '').split(' ').pop() + "'s Patients";
   showScreen('patients');
   document.getElementById('invite-fab').style.display = 'block';
@@ -420,22 +435,50 @@ async function loadPatients() {
       container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#128101;</div><div class="empty-state-title">No patients yet</div><div class="empty-state-sub">Tap "+ Invite patient" to get started</div></div>';
       return;
     }
-    const reportCounts = await Promise.all(patients.map(async p => {
-      try { const r = await apiFetch('/records?patient_id=' + p.id); return r ? r.length : 0; } catch { return 0; }
-    }));
+
+    // Fetch report counts and doctor notes for all patients
+    const [reportCounts, notesArr] = await Promise.all([
+      Promise.all(patients.map(async p => {
+        try { const r = await apiFetch('/records?patient_id=' + p.id); return r ? r.length : 0; } catch { return 0; }
+      })),
+      Promise.all(patients.map(async p => {
+        try { return await apiFetch('/patients/' + p.id + '/doctor-notes?doctor_id=' + currentDoctor.id); } catch { return {}; }
+      }))
+    ]);
+
     container.innerHTML = '<div class="patient-list">' + patients.map((p, i) => {
       const initial = (p.name || '?').charAt(0).toUpperCase();
-      const meta = [p.age ? p.age + ' yrs' : null, p.gender ? capitalize(p.gender) : null].filter(Boolean).join(' · ');
+      const agegender = [p.age ? p.age + 'yrs' : null, p.gender ? p.gender.charAt(0).toUpperCase() : null].filter(Boolean).join(', ');
+      const meta = agegender || '—';
       const count = reportCounts[i];
+      const notes = notesArr[i] || {};
       const badge = count > 0
         ? '<div style="background:#EEF4FF;color:#2D6BE4;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;flex-shrink:0;">' + count + ' report' + (count !== 1 ? 's' : '') + '</div>'
         : '<div style="background:#E8F5F0;color:#2D8A6A;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;flex-shrink:0;">No reports</div>';
+
+      // Diagnosis tags on card
+      const diagTags = notes.diagnosis
+        ? notes.diagnosis.split(',').map(d => '<span class="tag tag-diagnosis">' + d.trim() + '</span>').join('')
+        : '';
+
       return '<div class="patient-card" onclick="openPatient(' + i + ')">' +
         '<div class="patient-avatar">' + initial + '</div>' +
-        '<div class="patient-info"><div class="patient-name">' + (p.name || 'Unknown') + '</div><div class="patient-meta">' + (meta || '—') + '</div></div>' +
-        badge + '<div class="patient-arrow">&#8250;</div></div>';
+        '<div class="patient-info">' +
+          '<div style="display:flex;align-items:baseline;gap:6px;">' +
+            '<div class="patient-name">' + (p.name || 'Unknown') + '</div>' +
+            '<div style="font-size:11px;color:#7A9A7A;">' + meta + '</div>' +
+          '</div>' +
+          (diagTags ? '<div class="patient-tags">' + diagTags + '</div>' : '') +
+        '</div>' +
+        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">' +
+          badge +
+          '<button onclick="event.stopPropagation();openPatientNotesModalFromList(' + i + ')" style="background:none;border:none;font-size:11px;color:#2D6BE4;cursor:pointer;font-family:\'DM Sans\',sans-serif;padding:0;">Edit notes</button>' +
+        '</div>' +
+        '<div class="patient-arrow">&#8250;</div>' +
+      '</div>';
     }).join('') + '</div>';
     window._patients = patients;
+    window._patientNotes = notesArr;
   } catch (e) {
     container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#9888;&#65039;</div><div class="empty-state-title">Could not load patients</div></div>';
   }
@@ -443,10 +486,78 @@ async function loadPatients() {
 
 async function openPatient(i) {
   currentPatient = window._patients[i];
+  currentPatientNotes = window._patientNotes ? window._patientNotes[i] || {} : {};
   activeBucket = 'all';
   document.getElementById('detail-patient-name').textContent = currentPatient.name || 'Patient';
   showScreen('patient-detail');
+  renderPatientDetailBars();
   switchTab('records');
+}
+
+function renderPatientDetailBars() {
+  const barsDiv = document.getElementById('patient-detail-bars');
+  const noteDiv = document.getElementById('patient-detail-note');
+  const tags = [];
+  if (currentPatientNotes.diagnosis) {
+    currentPatientNotes.diagnosis.split(',').forEach(d => {
+      tags.push('<span class="tag tag-diagnosis">' + d.trim() + '</span>');
+    });
+  }
+  if (currentPatientNotes.procedure) {
+    currentPatientNotes.procedure.split(',').forEach(d => {
+      tags.push('<span class="tag tag-procedure">' + d.trim() + '</span>');
+    });
+  }
+  if (tags.length > 0) {
+    barsDiv.innerHTML = tags.join('');
+    barsDiv.style.display = 'flex';
+  } else {
+    barsDiv.style.display = 'none';
+  }
+  if (currentPatientNotes.note) {
+    noteDiv.textContent = currentPatientNotes.note;
+    noteDiv.style.display = 'block';
+  } else {
+    noteDiv.style.display = 'none';
+  }
+}
+
+// PATIENT NOTES
+function openPatientNotesModal() {
+  document.getElementById('notes-modal-title').textContent = (currentPatient?.name || 'Patient') + ' — Notes';
+  document.getElementById('notes-diagnosis').value = currentPatientNotes.diagnosis || '';
+  document.getElementById('notes-procedure').value = currentPatientNotes.procedure || '';
+  document.getElementById('notes-note').value = currentPatientNotes.note || '';
+  document.getElementById('patient-notes-modal').classList.add('open');
+}
+
+function openPatientNotesModalFromList(i) {
+  currentPatient = window._patients[i];
+  currentPatientNotes = window._patientNotes ? window._patientNotes[i] || {} : {};
+  openPatientNotesModal();
+}
+
+function closePatientNotesModal() { document.getElementById('patient-notes-modal').classList.remove('open'); }
+
+async function savePatientNotes() {
+  const diagnosis = document.getElementById('notes-diagnosis').value.trim();
+  const procedure = document.getElementById('notes-procedure').value.trim();
+  const note = document.getElementById('notes-note').value.trim();
+  try {
+    await fetch(API + '/patients/' + currentPatient.id + '/doctor-notes', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ doctor_id: currentDoctor.id, diagnosis, procedure, note })
+    });
+    currentPatientNotes = { diagnosis, procedure, note };
+    // Update cached notes
+    if (window._patientNotes && window._patients) {
+      const idx = window._patients.findIndex(p => p.id === currentPatient.id);
+      if (idx >= 0) window._patientNotes[idx] = currentPatientNotes;
+    }
+    closePatientNotesModal();
+    renderPatientDetailBars();
+    await loadPatients(); // Refresh list to show updated tags
+  } catch(e) { alert('Could not save notes.'); }
 }
 
 // TABS
@@ -466,7 +577,7 @@ async function uploadPrescription(input) {
   const file = input.files[0];
   if (!file) return;
   const status = document.getElementById('rx-upload-status');
-  status.style.display = 'block'; status.textContent = 'Uploading prescription...';
+  status.style.display = 'block'; status.textContent = 'Uploading...';
   status.style.background = '#E8F5F0'; status.style.color = '#2D8A6A';
   try {
     const formData = new FormData();
@@ -477,10 +588,10 @@ async function uploadPrescription(input) {
     const res = await fetch(API + '/doctor/upload-report', { method: 'POST', body: formData });
     const data = await res.json();
     if (data.success) {
-      status.textContent = 'Uploaded successfully!';
+      status.textContent = 'Uploaded!';
       setTimeout(() => { status.style.display = 'none'; loadPrescriptions(); }, 2000);
     } else {
-      status.style.background = '#FFF0F0'; status.style.color = '#C0392B'; status.textContent = 'Upload failed. Please try again.';
+      status.style.background = '#FFF0F0'; status.style.color = '#C0392B'; status.textContent = 'Upload failed.';
     }
   } catch(e) {
     status.style.background = '#FFF0F0'; status.style.color = '#C0392B'; status.textContent = 'Upload failed.';
@@ -493,9 +604,8 @@ async function loadPrescriptions() {
   if (!container) return;
   try {
     const reports = await apiFetch('/records?patient_id=' + currentPatient.id);
-    // Show only prescriptions uploaded by THIS doctor
     const prescriptions = (reports || []).filter(r => {
-      const isRx = r.document_type === 'prescription' || (r.report_type || '').toLowerCase().includes('prescription');
+      const isRx = r.document_type === 'prescription' || (r.report_type || '').toLowerCase().includes('prescription') || (r.report_type || '').toLowerCase().includes('consultation');
       const byMe = Array.isArray(r.uploaded_by_doctor_ids) && r.uploaded_by_doctor_ids.includes(currentDoctor.id);
       return isRx && byMe;
     });
@@ -503,17 +613,13 @@ async function loadPrescriptions() {
       container.innerHTML = '<div style="font-size:13px;color:#7A9A7A;padding:8px 0;">No prescriptions from you yet.</div>'; return;
     }
     container.innerHTML = prescriptions.map(r => {
-      const date = r.report_date
-        ? new Date(r.report_date + 'T12:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-        : 'Date unknown';
+      const date = r.report_date ? new Date(r.report_date + 'T12:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Date unknown';
       return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F0F2F0;cursor:pointer;" onclick="window.open(\'' + r.file_url + '\', \'_blank\')">' +
         '<div style="width:36px;height:36px;border-radius:10px;background:#FFF4E8;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">&#128203;</div>' +
-        '<div style="flex:1;"><div style="font-size:13px;font-weight:500;color:#1A2D22;">Prescription</div><div style="font-size:11px;color:#7A9A7A;margin-top:1px;">' + date + '</div></div>' +
+        '<div style="flex:1;"><div style="font-size:13px;font-weight:500;color:#1A2D22;">Prescription</div><div style="font-size:11px;color:#7A9A7A;">' + date + '</div></div>' +
         '<div style="font-size:18px;color:#C0D0C0;">&#8250;</div></div>';
     }).join('');
-  } catch(e) {
-    container.innerHTML = '<div style="font-size:13px;color:#7A9A7A;">Could not load prescriptions.</div>';
-  }
+  } catch(e) { container.innerHTML = '<div style="font-size:13px;color:#7A9A7A;">Could not load.</div>'; }
 }
 
 // RECORDS WITH BUCKET TABS
@@ -534,13 +640,8 @@ async function loadPatientRecords() {
 function getBucket(r) {
   const t = (r.document_type || r.report_type || '').toLowerCase();
   if (t.includes('blood') || t.includes('lab') || t.includes('pathology') || t.includes('haematology') || t.includes('biochemistry')) return 'blood';
-  // Imaging = radiology ONLY: xray, usg, ct, mri, pet, dexa, mammogram, angiography
-  if (t === 'imaging' || t.includes('mri') || t.includes('ct scan') || t === 'x-ray' || t.includes('xray') ||
-      t.includes('ultrasound') || t.includes('usg') || t.includes('pet scan') || t.includes('dexa') ||
-      t.includes('mammogram') || t.includes('angiograph') || t.includes('fluoroscop') ||
-      t.includes('nuclear medicine') || t.includes('radiolog')) return 'imaging';
+  if (t === 'imaging' || t.includes('mri') || t.includes('ct scan') || t === 'x-ray' || t.includes('xray') || t.includes('ultrasound') || t.includes('usg') || t.includes('pet scan') || t.includes('dexa') || t.includes('mammogram') || t.includes('angiograph') || t.includes('radiolog')) return 'imaging';
   if (t === 'prescription' || t.includes('prescription') || t.includes('consultation')) return 'prescription';
-  // dental, consultation, discharge, ecg, echo, etc all go to others
   return 'other';
 }
 
@@ -554,7 +655,7 @@ function renderRecordsBucket(bucket) {
       return '<div class="bucket-tab ' + (bucket === b ? 'active' : '') + '" onclick="renderRecordsBucket(\'' + b + '\')">' + labels[b] + '</div>';
     }).join('') + '</div>';
   if (!filtered || filtered.length === 0) {
-    container.innerHTML = bucketHtml + '<div class="empty-state"><div class="empty-state-icon">&#128193;</div><div class="empty-state-title">No records in this category</div></div>'; return;
+    container.innerHTML = bucketHtml + '<div class="empty-state"><div class="empty-state-icon">&#128193;</div><div class="empty-state-title">No records here</div></div>'; return;
   }
   const grouped = {};
   filtered.forEach(r => {
@@ -571,10 +672,11 @@ function renderRecordsBucket(bucket) {
     reps.forEach(r => {
       const date = r.report_date ? new Date(r.report_date + 'T12:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'Date unknown';
       const tags = (r.disease_tags || []).slice(0,2).map(t => '<span class="tag tag-disease">' + t + '</span>').join('');
+      const unconfirmedTag = r.identity_confirmed === false ? '<span class="tag tag-unconfirmed">Unconfirmed</span>' : '';
       html += '<div class="record" onclick="window.open(\'' + r.file_url + '\',\'_blank\')">' +
         '<div class="record-icon ' + getIconBg(r.report_type) + '">' + getReportIcon(r.report_type) + '</div>' +
         '<div class="record-body"><div class="record-top"><div class="record-name">' + capitalize(r.report_type || 'Health Report') + '</div><div class="record-date">' + date + '</div></div>' +
-        '<div class="record-meta"><span class="tag tag-type">' + (r.report_type || 'Report') + '</span>' + tags + '</div></div>' +
+        '<div class="record-meta"><span class="tag tag-type">' + (r.report_type || 'Report') + '</span>' + tags + unconfirmedTag + '</div></div>' +
         '<div class="record-arrow">&#8250;</div></div>';
     });
     html += '</div>';
@@ -582,19 +684,18 @@ function renderRecordsBucket(bucket) {
   container.innerHTML = html;
 }
 
-// SUMMARY - 2 types: General + Speciality
+// SUMMARY
 async function loadDoctorSummary() {
   const container = document.getElementById('tab-content-summary');
   container.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">Checking summary...</div></div>';
   try {
     const summaryData = await apiFetch('/patients/' + currentPatient.id + '/summary?type=doctor&speciality=general');
     const staleNotice = summaryData.is_stale && summaryData.summary
-      ? '<div style="background:#FFF4E8;border-radius:12px;padding:12px;font-size:12px;color:#B86A1A;margin-bottom:16px;">' + (summaryData.current_report_count - summaryData.summary.report_count) + ' new report(s) added since last summary on ' + new Date(summaryData.summary.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) + '.</div>'
+      ? '<div style="background:#FFF4E8;border-radius:12px;padding:12px;font-size:12px;color:#B86A1A;margin-bottom:16px;">' + (summaryData.current_report_count - summaryData.summary.report_count) + ' new report(s) since last summary.</div>'
       : '';
     const specLabel = currentDoctor.specialization ? currentDoctor.specialization + ' Summary' : 'Speciality Summary';
     container.innerHTML =
-      '<div style="padding:16px 20px;">' +
-      staleNotice +
+      '<div style="padding:16px 20px;">' + staleNotice +
       '<div style="font-size:11px;color:#7A9A7A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Summary type</div>' +
       '<div style="display:flex;gap:8px;margin-bottom:20px;">' +
         '<button class="summary-type-btn active" id="summary-type-general" onclick="selectSummaryType(\'general\')">General Summary</button>' +
@@ -693,7 +794,7 @@ function printDoctorSummary() {
     '<div style="text-align:center;margin-bottom:32px;"><div style="font-size:24px;font-weight:bold;">kado.care</div>' +
     '<div style="font-size:14px;color:#666;">Clinical Summary - ' + (currentPatient ? currentPatient.name : '') + '</div>' +
     '<div style="font-size:12px;color:#999;">' + new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div></div>' +
-    content + '<div style="margin-top:40px;text-align:center;font-size:11px;color:#ccc;">Generated by kado.care - For clinical reference only</div></body></html>');
+    content + '<div style="margin-top:40px;text-align:center;font-size:11px;color:#ccc;">Generated by kado.care</div></body></html>');
   w.document.close(); w.print();
 }
 
@@ -712,7 +813,6 @@ async function submitReview(status) {
   else if (status === 'needs_info') { body.needs_info_question = document.getElementById('info-question').value.trim(); if (!body.needs_info_question) return; closeInfoModal(); }
   try {
     await fetch(API + '/kado-cards/' + activeKadoId + '/review', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    await loadPrescriptions();
   } catch (e) { alert('Could not save review.'); }
 }
 
@@ -791,13 +891,12 @@ function showScreen(name) {
 }
 
 function getReportIcon(type) {
-  if (!type) return '&#128203;';
+  if (!type) return '📋';
   const t = type.toLowerCase();
   if (t.includes('blood') || t.includes('lab') || t.includes('pathology')) return '🩸';
-if (t.includes('mri') || t.includes('ct') || t.includes('xray') || t.includes('x-ray') || t.includes('ultrasound') || t.includes('usg') || t.includes('pet') || t.includes('dexa')) return '🫁';
-if (t.includes('prescription')) return '💊';
-return '📄';
-  return '&#128196;';
+  if (t.includes('mri') || t.includes('ct') || t.includes('xray') || t.includes('x-ray') || t.includes('ultrasound') || t.includes('usg') || t.includes('pet') || t.includes('dexa')) return '🫁';
+  if (t.includes('prescription') || t.includes('consultation')) return '💊';
+  return '📄';
 }
 
 function getIconBg(type) {
@@ -805,7 +904,7 @@ function getIconBg(type) {
   const t = type.toLowerCase();
   if (t.includes('blood') || t.includes('lab') || t.includes('pathology')) return 'icon-blood';
   if (t.includes('mri') || t.includes('ct') || t.includes('xray') || t.includes('x-ray') || t.includes('ultrasound') || t.includes('usg') || t.includes('pet') || t.includes('dexa')) return 'icon-scan';
-  if (t.includes('prescription')) return 'icon-prescription';
+  if (t.includes('prescription') || t.includes('consultation')) return 'icon-prescription';
   return 'icon-other';
 }
 
