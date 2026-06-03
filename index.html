@@ -940,7 +940,8 @@ async function sendInvite() {
 }
  async function openSwitcher() {
   try {
-    allPatients = await apiFetch(`/patients?user_id=${currentUser.id}`);
+    const allLinked = await apiFetch(`/patients?user_id=${currentUser.id}`);
+allPatients = allLinked.filter(p => p.role === 'owner' || p.role === 'caregiver');
   } catch(e) { allPatients = []; }
 
   // always show switcher so user can access profile and create new profiles
