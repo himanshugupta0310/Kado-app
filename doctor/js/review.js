@@ -24,7 +24,7 @@ function closeInfoModal() {
 }
 
 async function submitReview(status) {
-  const body = { doctor_id: currentDoctor.id, doctor_status: status };
+  const body = { doctor_status: status };
   if (status === "vetted") {
     body.doctor_note = document.getElementById("vet-note").value.trim() || null;
     closeVetModal();
@@ -40,11 +40,7 @@ async function submitReview(status) {
     closeInfoModal();
   }
   try {
-    await fetch(API + "/kado-cards/" + activeKadoId + "/review", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    await apiPatch("/kado-cards/" + activeKadoId + "/review", body);
   } catch (e) {
     alert("Could not save review.");
   }

@@ -20,19 +20,80 @@
       <div class="login-card">
         <div class="login-title">Doctor login</div>
         <div class="login-sub" id="login-sub-text">
-          Enter your details to get started
+          Enter your WhatsApp number
         </div>
-        <div class="input-group">
-          <span class="input-prefix">+91</span>
-          <input
-            type="tel"
-            id="phone-input"
-            placeholder="WhatsApp number"
-            maxlength="10"
-            inputmode="numeric"
-          />
+
+        <!-- Step 1: phone -->
+        <div id="step-phone">
+          <div class="input-group">
+            <span class="input-prefix">+91</span>
+            <input
+              type="tel"
+              id="phone-input"
+              placeholder="WhatsApp number"
+              maxlength="10"
+              inputmode="numeric"
+            />
+          </div>
+          <button class="login-btn" id="send-otp-btn" onclick="handleSendOtp()">
+            Send OTP
+          </button>
         </div>
-        <div id="register-fields" style="display: none">
+
+        <!-- Step 2: OTP -->
+        <div id="step-otp" style="display: none">
+          <div class="input-group">
+            <input
+              type="tel"
+              id="otp-input"
+              placeholder="6-digit OTP"
+              maxlength="6"
+              inputmode="numeric"
+              style="width: 100%; letter-spacing: 4px; font-size: 18px"
+            />
+          </div>
+          <button
+            class="login-btn"
+            id="verify-otp-btn"
+            onclick="handleVerifyOtp()"
+          >
+            Verify OTP
+          </button>
+          <div style="text-align: center; margin-top: 10px">
+            <button
+              onclick="backToPhone()"
+              style="
+                background: none;
+                border: none;
+                font-size: 12px;
+                color: #7a9a7a;
+                cursor: pointer;
+                font-family: &quot;DM Sans&quot;, sans-serif;
+              "
+            >
+              ← Change number
+            </button>
+            <span style="color: #c0d0c0; margin: 0 8px">·</span>
+            <button
+              id="resend-btn"
+              onclick="handleResendOtp()"
+              disabled
+              style="
+                background: none;
+                border: none;
+                font-size: 12px;
+                color: #c0d0c0;
+                cursor: pointer;
+                font-family: &quot;DM Sans&quot;, sans-serif;
+              "
+            >
+              Resend in 30s
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: register (new doctor) -->
+        <div id="step-register" style="display: none">
           <div class="input-group">
             <input
               type="text"
@@ -49,10 +110,30 @@
               style="width: 100%"
             />
           </div>
+          <button
+            class="login-btn"
+            id="register-btn"
+            onclick="handleRegister()"
+          >
+            Create account
+          </button>
+          <div style="text-align: center; margin-top: 10px">
+            <button
+              onclick="backToPhone()"
+              style="
+                background: none;
+                border: none;
+                font-size: 12px;
+                color: #7a9a7a;
+                cursor: pointer;
+                font-family: &quot;DM Sans&quot;, sans-serif;
+              "
+            >
+              ← Change number
+            </button>
+          </div>
         </div>
-        <button class="login-btn" id="login-btn" onclick="handleLogin()">
-          Continue
-        </button>
+
         <div class="login-error" id="login-error"></div>
         <div class="login-note">
           Your number is used only to verify your identity

@@ -19,10 +19,7 @@ function closeInvitePatientSheet() {
 
 async function sendPatientInvite() {
   const btn = document.getElementById("invite-patient-btn");
-  let body = {
-    doctor_user_id: currentDoctor.id,
-    language: selectedInviteLanguage,
-  };
+  let body = { language: selectedInviteLanguage };
   if (docInviteMethod === "whatsapp") {
     const input = document
       .getElementById("patient-invite-phone")
@@ -44,12 +41,7 @@ async function sendPatientInvite() {
   btn.disabled = true;
   btn.textContent = "Sending...";
   try {
-    const res = await fetch(API + "/doctor/invite-patient", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const data = await res.json();
+    const data = await apiPost("/doctor/invite-patient", body);
     if (data.success) {
       closeInvitePatientSheet();
       alert("Invite sent!");

@@ -1,93 +1,170 @@
-async function handleLogin() {
+let loginPhone = "";
+let _resendTimer = null;
+
+function showErr(msg) {
+  const el = document.getElementById("login-error");
+  el.textContent = msg;
+  el.style.display = "block";
+}
+function clearErr() {
+  document.getElementById("login-error").style.display = "none";
+}
+
+function backToPhone() {
+  clearInterval(_resendTimer);
+  document.getElementById("step-phone").style.display = "block";
+  document.getElementById("step-otp").style.display = "none";
+  document.getElementById("step-register").style.display = "none";
+  document.getElementById("login-sub-text").textContent =
+    "Enter your WhatsApp number";
+  const btn = document.getElementById("resend-btn");
+  btn.disabled = true;
+  btn.style.color = "#C0D0C0";
+  btn.textContent = "Resend in 30s";
+  clearErr();
+}
+
+function startResendCountdown(seconds = 30) {
+  const btn = document.getElementById("resend-btn");
+  btn.disabled = true;
+  btn.style.color = "#C0D0C0";
+  let remaining = seconds;
+  btn.textContent = `Resend in ${remaining}s`;
+  clearInterval(_resendTimer);
+  _resendTimer = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(_resendTimer);
+      btn.disabled = false;
+      btn.style.color = "#2D6BE4";
+      btn.textContent = "Resend OTP";
+    } else {
+      btn.textContent = `Resend in ${remaining}s`;
+    }
+  }, 1000);
+}
+
+async function handleSendOtp() {
   const input = document
     .getElementById("phone-input")
     .value.trim()
     .replace(/\s/g, "");
-  const btn = document.getElementById("login-btn");
-  const err = document.getElementById("login-error");
-  err.style.display = "none";
+  clearErr();
   if (input.length < 10) {
-    err.textContent = "Please enter a valid 10-digit number.";
-    err.style.display = "block";
+    showErr("Please enter a valid 10-digit number.");
     return;
   }
-  const phone = "+91" + input;
+  loginPhone = "+91" + input;
+  const btn = document.getElementById("send-otp-btn");
   btn.disabled = true;
-  btn.textContent = "Checking...";
+  btn.textContent = "Sending OTP...";
   try {
-    const res = await fetch(`${API}/user?phone=${encodeURIComponent(phone)}`);
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.id && data.user_type === "doctor") {
-        currentDoctor = data;
-        localStorage.setItem("kado_doctor", JSON.stringify(data));
-        await loadPatientsScreen();
-        return;
-      }
-      if (data && data.id) {
-        document.getElementById("register-fields").style.display = "block";
-        document.getElementById("login-sub-text").textContent =
-          "Complete your doctor profile";
-        btn.disabled = false;
-        btn.textContent = "Register as doctor";
-        btn.onclick = registerDoctor;
-        return;
-      }
+    const data = await apiPost("/doctor/auth/send-otp", {
+      phone_number: loginPhone,
+    });
+    if (data.success) {
+      document.getElementById("step-phone").style.display = "none";
+      document.getElementById("step-otp").style.display = "block";
+      document.getElementById("login-sub-text").textContent =
+        `OTP sent to ${loginPhone} on WhatsApp`;
+      document.getElementById("otp-input").focus();
+      startResendCountdown(30);
+    } else {
+      showErr(data.error || "Could not send OTP.");
     }
-    document.getElementById("register-fields").style.display = "block";
-    document.getElementById("login-sub-text").textContent =
-      "Create your doctor profile";
-    btn.disabled = false;
-    btn.textContent = "Create account";
-    btn.onclick = registerDoctor;
   } catch (e) {
-    err.textContent = "Something went wrong.";
-    err.style.display = "block";
-    btn.disabled = false;
-    btn.textContent = "Continue";
+    showErr("Something went wrong. Please try again.");
   }
+  btn.disabled = false;
+  btn.textContent = "Send OTP";
 }
 
-async function registerDoctor() {
-  const phone =
-    "+91" +
-    document.getElementById("phone-input").value.trim().replace(/\s/g, "");
-  const name = document.getElementById("name-input").value.trim();
-  const spec = document.getElementById("spec-input").value.trim();
-  const btn = document.getElementById("login-btn");
-  const err = document.getElementById("login-error");
-  if (!name) {
-    err.textContent = "Please enter your name.";
-    err.style.display = "block";
+async function handleResendOtp() {
+  const btn = document.getElementById("resend-btn");
+  btn.disabled = true;
+  btn.textContent = "Sending...";
+  try {
+    await apiPost("/doctor/auth/send-otp", { phone_number: loginPhone });
+  } catch {}
+  startResendCountdown(30);
+}
+
+async function handleVerifyOtp() {
+  const otp = document.getElementById("otp-input").value.trim();
+  clearErr();
+  if (otp.length < 6) {
+    showErr("Enter the 6-digit OTP.");
     return;
   }
+  const btn = document.getElementById("verify-otp-btn");
+  btn.disabled = true;
+  btn.textContent = "Verifying...";
+  try {
+    const data = await apiPost("/doctor/auth/verify-otp", {
+      phone_number: loginPhone,
+      otp,
+    });
+    if (data.token && data.doctor) {
+      setToken(data.token);
+      currentDoctor = data.doctor;
+      localStorage.setItem("kado_doctor", JSON.stringify(data.doctor));
+      await loadPatientsScreen();
+      return;
+    }
+    if (data.error === "Doctor not found. Please register first.") {
+      document.getElementById("step-otp").style.display = "none";
+      document.getElementById("step-register").style.display = "block";
+      document.getElementById("login-sub-text").textContent =
+        "Create your doctor profile";
+      clearErr();
+      btn.disabled = false;
+      btn.textContent = "Verify OTP";
+      return;
+    }
+    showErr(data.error || "Invalid OTP. Please try again.");
+  } catch (e) {
+    showErr("Something went wrong.");
+  }
+  btn.disabled = false;
+  btn.textContent = "Verify OTP";
+}
+
+async function handleRegister() {
+  const name = document.getElementById("name-input").value.trim();
+  const spec = document.getElementById("spec-input").value.trim();
+  clearErr();
+  if (!name) {
+    showErr("Please enter your name.");
+    return;
+  }
+  const btn = document.getElementById("register-btn");
   btn.disabled = true;
   btn.textContent = "Creating account...";
   try {
-    const res = await fetch(API + "/doctor/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        phone_number: phone,
-        name,
-        specialization: spec || null,
-      }),
+    const data = await apiPost("/doctor/register", {
+      phone_number: loginPhone,
+      name,
+      specialization: spec || null,
     });
-    const data = await res.json();
-    if (data.id) {
+    if (data.token && data.id) {
+      setToken(data.token);
       currentDoctor = data;
       localStorage.setItem("kado_doctor", JSON.stringify(data));
       await loadPatientsScreen();
     } else {
-      err.textContent = data.error || "Could not create account.";
-      err.style.display = "block";
-      btn.disabled = false;
-      btn.textContent = "Create account";
+      showErr(data.error || "Could not create account.");
     }
   } catch (e) {
-    err.textContent = "Something went wrong.";
-    err.style.display = "block";
-    btn.disabled = false;
-    btn.textContent = "Create account";
+    showErr("Something went wrong.");
   }
+  btn.disabled = false;
+  btn.textContent = "Create account";
+}
+
+function logoutDoctor() {
+  currentDoctor = null;
+  clearToken();
+  localStorage.removeItem("kado_doctor");
+  showScreen("login");
+  backToPhone();
 }
