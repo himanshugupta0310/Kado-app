@@ -111,7 +111,7 @@ async function loadPatients() {
               ? '<div class="patient-tags">' + diagTags + "</div>"
               : "") +
             "</div>" +
-            '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">' +
+            '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px;flex-shrink:0;">' +
             badge +
             '<button onclick="event.stopPropagation();openPatientNotesModalFromList(' +
             i +

@@ -211,7 +211,7 @@ body {
   padding: 16px;
   margin-bottom: 10px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 14px;
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
   cursor: pointer;
@@ -258,7 +258,6 @@ body {
   color: #c0d0c0;
   font-size: 18px;
   flex-shrink: 0;
-  margin-top: 2px;
 }
 .empty-state {
   text-align: center;
