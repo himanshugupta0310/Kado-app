@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Kado Care</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="/env.js" onerror="window.__KADO_API__=undefined"></script>
 
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -666,7 +667,7 @@
 </div>
 
 <script>
-const API = 'https://api.kado.care';
+const API = window.__KADO_API__ || 'https://api.kado.care';
 
 async function apiFetch(path) {
   const res = await fetch(API + path);
