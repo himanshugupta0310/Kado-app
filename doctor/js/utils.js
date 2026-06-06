@@ -13,6 +13,9 @@ function showScreen(name) {
   const el = document.getElementById("screen-" + name);
   el.classList.add("active");
   el.style.display = name === "login" ? "flex" : "block";
+  const uploadFab = document.getElementById("upload-fab");
+  if (uploadFab)
+    uploadFab.style.display = name === "patient-detail" ? "block" : "none";
 }
 
 function setMode(mode) {
@@ -23,12 +26,6 @@ function setMode(mode) {
     showScreen("personal");
     document.getElementById("invite-fab").style.display = "none";
   }
-}
-
-function logoutDoctor() {
-  currentDoctor = null;
-  localStorage.removeItem("kado_doctor");
-  showScreen("login");
 }
 
 function getReportIcon(type) {

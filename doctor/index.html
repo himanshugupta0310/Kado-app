@@ -175,6 +175,13 @@
         <div class="hero-sub" id="patients-sub">Loading...</div>
       </div>
       <div id="patients-list"></div>
+      <input
+        type="file"
+        id="tile-upload-input"
+        accept=".pdf,image/*"
+        style="display: none"
+        onchange="doTileUpload(this)"
+      />
       <button
         class="invite-fab"
         id="invite-fab"
@@ -183,6 +190,25 @@
         + Invite patient
       </button>
     </div>
+    <div
+      id="kado-toast"
+      style="
+        display: none;
+        position: fixed;
+        bottom: 90px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1a2d22;
+        color: #fff;
+        padding: 12px 20px;
+        border-radius: 14px;
+        font-size: 13px;
+        font-family: &quot;DM Sans&quot;, sans-serif;
+        z-index: 9999;
+        white-space: nowrap;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+      "
+    ></div>
 
     <!-- PATIENT DETAIL -->
     <div class="screen" id="screen-patient-detail">
@@ -335,6 +361,14 @@
         </div>
       </div>
       <div id="tab-content-summary" style="display: none"></div>
+      <button
+        id="upload-fab"
+        class="upload-fab"
+        onclick="document.getElementById('tile-upload-input').click()"
+        style="display: none"
+      >
+        + Upload report
+      </button>
     </div>
 
     <!-- DOCTOR PROFILE -->

@@ -139,6 +139,7 @@ async function openPatient(i) {
   activeBucket = "all";
   document.getElementById("detail-patient-name").textContent =
     currentPatient.name || "Patient";
+  window._tileUploadPatientId = currentPatient.id;
   showScreen("patient-detail");
   renderPatientDetailBars();
   switchTab("records");

@@ -176,6 +176,57 @@
         text-align: center;
         margin-top: 16px;
       }
+      .otp-inputs {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 16px;
+      }
+      .otp-inputs input {
+        width: 44px;
+        height: 52px;
+        text-align: center;
+        font-size: 22px;
+        font-weight: 600;
+        color: #1a2d22;
+        background: #f5f7f5;
+        border: 1.5px solid transparent;
+        border-radius: 12px;
+        outline: none;
+        font-family: "DM Sans", sans-serif;
+        transition: border 0.2s;
+      }
+      .otp-inputs input:focus {
+        border-color: #2d8a6a;
+        background: white;
+      }
+      .login-back {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #7a9a7a;
+        cursor: pointer;
+        margin-bottom: 20px;
+        width: fit-content;
+      }
+      .login-back:hover {
+        color: #2d8a6a;
+      }
+      .login-resend {
+        font-size: 12px;
+        color: #7a9a7a;
+        text-align: center;
+        margin-top: 14px;
+      }
+      .login-resend span {
+        color: #2d8a6a;
+        cursor: pointer;
+        font-weight: 500;
+      }
+      .login-resend span:hover {
+        text-decoration: underline;
+      }
 
       /* ── HERO ── */
       .hero {
@@ -1382,28 +1433,89 @@
       <div class="login-logo">kado<span>.</span>care</div>
       <div class="login-tagline">Making your health data simple</div>
       <div class="login-card">
-        <div class="login-title">Welcome back</div>
-        <div class="login-sub">
-          Enter your WhatsApp number to view your health records
+        <!-- Step 1: Phone -->
+        <div id="login-step-phone">
+          <div class="login-title" id="login-title">Welcome back</div>
+          <div class="login-sub" id="login-sub">
+            Enter your WhatsApp number to view your health records
+          </div>
+          <div class="input-group">
+            <span class="input-prefix">+91</span>
+            <input
+              type="tel"
+              id="phone-input"
+              placeholder="98765 43210"
+              maxlength="10"
+              inputmode="numeric"
+              onkeydown="if (event.key === 'Enter') requestOtp();"
+            />
+          </div>
+          <button class="login-btn" id="login-btn" onclick="requestOtp()">
+            Send OTP
+          </button>
+          <div class="login-error" id="login-error"></div>
+          <div class="login-note">
+            A 6-digit code will be sent to your WhatsApp
+          </div>
         </div>
-        <div class="input-group">
-          <span class="input-prefix">+91</span>
-          <input
-            type="tel"
-            id="phone-input"
-            placeholder="98765 43210"
-            maxlength="10"
-            inputmode="numeric"
-          />
-        </div>
-        <button class="login-btn" id="login-btn" onclick="handleLogin()">
-          View my records
-        </button>
-        <div class="login-error" id="login-error">
-          Number not found. Please check and try again.
-        </div>
-        <div class="login-note">
-          Your number is used only to verify your identity
+        <!-- Step 2: OTP -->
+        <div id="login-step-otp" style="display: none">
+          <div class="login-back" onclick="showPhoneStep()">
+            &#8592; Change number
+          </div>
+          <div class="login-title">Enter OTP</div>
+          <div class="login-sub" id="otp-sub">Sent to your WhatsApp</div>
+          <div class="otp-inputs" id="otp-inputs">
+            <input
+              type="tel"
+              maxlength="1"
+              inputmode="numeric"
+              oninput="otpInput(this, 0)"
+              onkeydown="otpKey(event, 0)"
+            />
+            <input
+              type="tel"
+              maxlength="1"
+              inputmode="numeric"
+              oninput="otpInput(this, 1)"
+              onkeydown="otpKey(event, 1)"
+            />
+            <input
+              type="tel"
+              maxlength="1"
+              inputmode="numeric"
+              oninput="otpInput(this, 2)"
+              onkeydown="otpKey(event, 2)"
+            />
+            <input
+              type="tel"
+              maxlength="1"
+              inputmode="numeric"
+              oninput="otpInput(this, 3)"
+              onkeydown="otpKey(event, 3)"
+            />
+            <input
+              type="tel"
+              maxlength="1"
+              inputmode="numeric"
+              oninput="otpInput(this, 4)"
+              onkeydown="otpKey(event, 4)"
+            />
+            <input
+              type="tel"
+              maxlength="1"
+              inputmode="numeric"
+              oninput="otpInput(this, 5)"
+              onkeydown="otpKey(event, 5)"
+            />
+          </div>
+          <button class="login-btn" id="otp-btn" onclick="verifyOtp()">
+            Verify
+          </button>
+          <div class="login-error" id="otp-error"></div>
+          <div class="login-resend">
+            Didn't receive it? <span onclick="resendOtp()">Resend OTP</span>
+          </div>
         </div>
       </div>
     </div>
@@ -2517,8 +2629,15 @@
     <script>
       const API = window.__KADO_API__ || "https://api.kado.care";
 
-      async function apiFetch(path) {
-        const res = await fetch(API + path);
+      function getToken() {
+        return localStorage.getItem("kado_token");
+      }
+
+      async function apiFetch(path, options = {}) {
+        const token = getToken();
+        const headers = { ...(options.headers || {}) };
+        if (token) headers["Authorization"] = "Bearer " + token;
+        const res = await fetch(API + path, { ...options, headers });
         if (!res.ok) throw new Error("API error: " + res.status);
         return res.json();
       }
@@ -2540,7 +2659,17 @@
         return "Good evening";
       }
 
-      async function handleLogin() {
+      let _loginPhone = null;
+
+      function showPhoneStep() {
+        document.getElementById("login-step-phone").style.display = "block";
+        document.getElementById("login-step-otp").style.display = "none";
+        document.getElementById("login-error").style.display = "none";
+        document.getElementById("login-btn").disabled = false;
+        document.getElementById("login-btn").textContent = "Send OTP";
+      }
+
+      async function requestOtp() {
         const input = document
           .getElementById("phone-input")
           .value.trim()
@@ -2555,23 +2684,122 @@
         }
         const phone = "+91" + input;
         btn.disabled = true;
-        btn.textContent = "Checking...";
+        btn.textContent = "Sending...";
         try {
-          const res = await fetch(
-            `${API}/user?phone=${encodeURIComponent(phone)}`,
-          );
-          if (!res.ok) throw new Error("not found");
+          const res = await fetch(`${API}/auth/request-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ phone }),
+          });
           const data = await res.json();
-          if (!data || !data.id) throw new Error("empty");
-          currentUser = data;
-          localStorage.setItem("kado_user", JSON.stringify(data));
-          await loadApp();
+          if (!res.ok) {
+            err.textContent = data.error || "Could not send OTP. Try again.";
+            err.style.display = "block";
+            btn.disabled = false;
+            btn.textContent = "Send OTP";
+            return;
+          }
+          _loginPhone = phone;
+          document.getElementById("login-step-phone").style.display = "none";
+          document.getElementById("login-step-otp").style.display = "block";
+          document.getElementById("otp-sub").textContent = `Sent to ${phone}`;
+          document.getElementById("otp-error").style.display = "none";
+          document.getElementById("otp-btn").disabled = false;
+          document.getElementById("otp-btn").textContent = "Verify";
+          const otpBoxes = document.querySelectorAll("#otp-inputs input");
+          otpBoxes.forEach((b) => (b.value = ""));
+          otpBoxes[0].focus();
         } catch (e) {
-          err.textContent =
-            "Number not found. Please send a report on WhatsApp first.";
+          err.textContent = "Could not send OTP. Please try again.";
           err.style.display = "block";
           btn.disabled = false;
-          btn.textContent = "View my records";
+          btn.textContent = "Send OTP";
+        }
+      }
+
+      function otpInput(el, idx) {
+        el.value = el.value.replace(/\D/g, "").slice(-1);
+        const boxes = document.querySelectorAll("#otp-inputs input");
+        if (el.value && idx < 5) boxes[idx + 1].focus();
+        if (idx === 5 && el.value) verifyOtp();
+      }
+
+      function otpKey(e, idx) {
+        const boxes = document.querySelectorAll("#otp-inputs input");
+        if (e.key === "Backspace" && !boxes[idx].value && idx > 0) {
+          boxes[idx - 1].focus();
+        }
+      }
+
+      async function verifyOtp() {
+        const boxes = document.querySelectorAll("#otp-inputs input");
+        const otp = Array.from(boxes)
+          .map((b) => b.value)
+          .join("");
+        const btn = document.getElementById("otp-btn");
+        const err = document.getElementById("otp-error");
+        err.style.display = "none";
+        if (otp.length < 6) {
+          err.textContent = "Enter all 6 digits.";
+          err.style.display = "block";
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = "Verifying...";
+        try {
+          const res = await fetch(`${API}/auth/verify-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ phone: _loginPhone, otp }),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            err.textContent = data.error || "Invalid OTP. Try again.";
+            err.style.display = "block";
+            btn.disabled = false;
+            btn.textContent = "Verify";
+            return;
+          }
+          localStorage.setItem("kado_token", data.token);
+          localStorage.setItem("kado_user", JSON.stringify(data.user));
+          currentUser = data.user;
+          await loadApp();
+        } catch (e) {
+          err.textContent = "Could not verify. Please try again.";
+          err.style.display = "block";
+          btn.disabled = false;
+          btn.textContent = "Verify";
+        }
+      }
+
+      async function resendOtp() {
+        if (!_loginPhone) return;
+        document.getElementById("otp-error").style.display = "none";
+        try {
+          const res = await fetch(`${API}/auth/request-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ phone: _loginPhone }),
+          });
+          const data = await res.json();
+          const err = document.getElementById("otp-error");
+          if (!res.ok) {
+            err.textContent = data.error || "Could not resend OTP.";
+            err.style.display = "block";
+          } else {
+            err.style.color = "#2d8a6a";
+            err.textContent = "OTP resent!";
+            err.style.display = "block";
+            setTimeout(() => {
+              err.style.display = "none";
+              err.style.color = "#c0392b";
+            }, 3000);
+            const boxes = document.querySelectorAll("#otp-inputs input");
+            boxes.forEach((b) => (b.value = ""));
+            boxes[0].focus();
+          }
+        } catch {
+          // silent
         }
       }
 
@@ -2580,7 +2808,9 @@
         selectedPatient = null;
         allPatients = [];
         localStorage.removeItem("kado_user");
+        localStorage.removeItem("kado_token");
         document.getElementById("bottom-nav").style.display = "none";
+        showPhoneStep();
         showScreen("login");
       }
 
@@ -4085,60 +4315,72 @@
 
       window.addEventListener("load", async () => {
         const urlParams = new URLSearchParams(window.location.search);
-        const urlPhone = urlParams.get("phone");
+        const urlToken = urlParams.get("token");
         const urlInvite = urlParams.get("invite");
 
         if (urlInvite) {
           localStorage.setItem("kado_pending_invite", urlInvite);
           window._pendingInviteToken = urlInvite;
         }
-        if (urlPhone) {
+
+        // Token-based magic link (from WhatsApp "Done" flow)
+        if (urlToken) {
           const btn = document.getElementById("login-btn");
           btn.textContent = "Loading...";
           btn.disabled = true;
           try {
-            const res = await fetch(
-              `${API}/user?phone=${encodeURIComponent(urlPhone)}`,
-            );
+            localStorage.setItem("kado_token", urlToken);
+            const res = await fetch(`${API}/auth/me`, {
+              headers: { Authorization: "Bearer " + urlToken },
+            });
             if (res.ok) {
               const data = await res.json();
               if (data && data.id) {
                 currentUser = data;
                 localStorage.setItem("kado_user", JSON.stringify(data));
-                await loadApp();
                 if (urlParams.get("gmail") === "connected") {
-                  const fresh = await fetch(
-                    `${API}/user?phone=${encodeURIComponent(urlPhone)}`,
-                  );
-                  if (fresh.ok) {
-                    currentUser = await fresh.json();
-                    localStorage.setItem(
-                      "kado_user",
-                      JSON.stringify(currentUser),
-                    );
-                  }
                   document.getElementById("gmail-sheet-title").textContent =
                     "Scan Gmail";
                   document.getElementById("gmail-sheet-sub").textContent =
                     "Find reports in your inbox";
                 }
+                await loadApp();
                 await handlePendingInvite();
                 return;
               }
             }
           } catch (e) {
-            console.log("Magic link login failed:", e);
+            console.log("Token login failed:", e);
           }
-          btn.textContent = "View my records";
+          localStorage.removeItem("kado_token");
+          btn.textContent = "Send OTP";
           btn.disabled = false;
         }
+
+        const savedToken = localStorage.getItem("kado_token");
         const saved = localStorage.getItem("kado_user");
-        if (saved) {
-          currentUser = JSON.parse(saved);
-          await loadApp();
-          await handlePendingInvite();
-          return;
+        if (savedToken && saved) {
+          try {
+            const payload = JSON.parse(atob(savedToken.split(".")[1]));
+            if (payload.exp && payload.exp * 1000 <= Date.now()) {
+              localStorage.removeItem("kado_token");
+              localStorage.removeItem("kado_user");
+              throw new Error("expired");
+            }
+          } catch {
+            localStorage.removeItem("kado_token");
+            localStorage.removeItem("kado_user");
+          }
+          if (localStorage.getItem("kado_token")) {
+            currentUser = JSON.parse(saved);
+            await loadApp();
+            await handlePendingInvite();
+            return;
+          }
         }
+        // Clear stale data
+        localStorage.removeItem("kado_user");
+        localStorage.removeItem("kado_token");
         // No logged in user — if invite token exists, show login with context
         if (urlInvite) {
           document.getElementById("login-title").textContent = "Accept invite";
@@ -4154,10 +4396,14 @@
         localStorage.removeItem("kado_pending_invite");
         window._pendingInviteToken = null;
         try {
+          const authToken = getToken();
           const res = await fetch(`${API}/invites/accept`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token, user_id: currentUser.id }),
+            headers: {
+              "Content-Type": "application/json",
+              ...(authToken ? { Authorization: "Bearer " + authToken } : {}),
+            },
+            body: JSON.stringify({ token }),
           });
           const data = await res.json();
           if (data.success) {

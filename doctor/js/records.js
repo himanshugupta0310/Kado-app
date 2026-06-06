@@ -1,3 +1,50 @@
+function showToast(msg, type) {
+  const el = document.getElementById("kado-toast");
+  if (!el) return;
+  el.textContent = msg;
+  el.style.background = type === "error" ? "#C0392B" : "#1A2D22";
+  el.style.display = "block";
+  clearTimeout(el._t);
+  el._t = setTimeout(() => {
+    el.style.display = "none";
+  }, 3000);
+}
+
+function triggerTileUpload(patientId, event) {
+  event.stopPropagation();
+  window._tileUploadPatientId = patientId;
+  document.getElementById("tile-upload-input").click();
+}
+
+async function doTileUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const patientId = window._tileUploadPatientId;
+  if (!patientId) return;
+  showToast("Uploading...", "info");
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("patient_id", patientId);
+    formData.append("document_type", "prescription");
+    const res = await fetch(API + "/doctor/upload-report", {
+      method: "POST",
+      headers: authHeaders(),
+      body: formData,
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast("Report uploaded successfully!", "success");
+      setTimeout(() => loadPatientRecords(), 1500);
+    } else {
+      showToast(data.error || "Upload failed.", "error");
+    }
+  } catch (e) {
+    showToast("Upload failed.", "error");
+  }
+  input.value = "";
+}
+
 async function uploadPrescription(input) {
   const file = input.files[0];
   if (!file) return;
