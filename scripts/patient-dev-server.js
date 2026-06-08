@@ -20,7 +20,8 @@ function loadEnv(file) {
   }
 }
 
-const env = loadEnv(path.join(__dirname, ".env"));
+const ROOT = path.join(__dirname, "..");
+const env = loadEnv(path.join(ROOT, ".env"));
 const PORT = parseInt(env.DEV_SERVER_PORT || "3000", 10);
 const BACKEND_PORT = env.BACKEND_PORT || "3001";
 const API_URL = `http://localhost:${BACKEND_PORT}`;
@@ -47,7 +48,7 @@ http
       return;
     }
 
-    let filePath = path.join(__dirname, url === "/" ? "index.html" : url);
+    let filePath = path.join(ROOT, url === "/" ? "index.html" : url);
     if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
       filePath = path.join(filePath, "index.html");
     }
