@@ -36,6 +36,8 @@ async function doTileUpload(input) {
     if (data.success) {
       showToast("Report uploaded successfully!", "success");
       setTimeout(() => loadPatientRecords(), 1500);
+    } else if (res.status === 409) {
+      showToast("This report was already uploaded.", "error");
     } else {
       showToast(data.error || "Upload failed.", "error");
     }
@@ -70,6 +72,10 @@ async function uploadPrescription(input) {
         status.style.display = "none";
         loadPrescriptions();
       }, 2000);
+    } else if (res.status === 409) {
+      status.style.background = "#FFF0F0";
+      status.style.color = "#C0392B";
+      status.textContent = "This report was already uploaded.";
     } else {
       status.style.background = "#FFF0F0";
       status.style.color = "#C0392B";
