@@ -283,9 +283,119 @@ function renderRecordsBucket(bucket) {
           tags +
           unconfirmedTag +
           "</div></div>" +
-          '<div class="record-arrow">&#8250;</div></div>';
+          '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">' +
+          "<button onclick=\"event.stopPropagation();openReportEditModal('" +
+          r.id +
+          "')\" style=\"background:none;border:none;font-size:11px;color:#2D6BE4;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;\">Edit</button>" +
+          '<span style="font-size:18px;color:#C0D0C0;">&#8250;</span>' +
+          "</div></div>";
       });
       html += "</div>";
     });
   container.innerHTML = html;
+}
+
+function openReportEditModal(reportId) {
+  const r = allReports.find((rep) => rep.id === reportId);
+  if (!r) return;
+  currentEditReport = r;
+  _reportPatientSelected = null;
+  document.getElementById("report-modal-title").textContent = "Edit Report";
+  document.getElementById("edit-report-name").value = r.report_type || "";
+  document.getElementById("edit-report-date").value = r.report_date || "";
+  document.getElementById("report-patient-search").value = "";
+  document.getElementById("report-patient-dropdown").innerHTML = "";
+  document.getElementById("report-edit-modal").classList.add("open");
+}
+
+function closeReportEditModal() {
+  document.getElementById("report-edit-modal").classList.remove("open");
+  currentEditReport = null;
+  _reportPatientSelected = null;
+}
+
+function fuzzyMatchPatient(query, name) {
+  if (!query.trim()) return true;
+  const words = query.toLowerCase().trim().split(/\s+/);
+  const s = (name || "").toLowerCase();
+  return words.every((w) => s.includes(w));
+}
+
+function filterReportPatients() {
+  const q = document.getElementById("report-patient-search").value;
+  renderReportPatientList(q);
+}
+
+function renderReportPatientList(query) {
+  const container = document.getElementById("report-patient-dropdown");
+  if (!container) return;
+  if (!query.trim()) {
+    container.innerHTML = "";
+    return;
+  }
+  const patients = window._patients || [];
+  const filtered = patients.filter((p) => fuzzyMatchPatient(query, p.name));
+  if (filtered.length === 0) {
+    container.innerHTML =
+      '<div style="font-size:12px;color:#7A9A7A;padding:8px 12px;">No patients found</div>';
+    return;
+  }
+  container.innerHTML = filtered
+    .map((p) => {
+      const isSelected =
+        _reportPatientSelected && _reportPatientSelected.id === p.id;
+      return (
+        "<div onclick=\"selectReportPatient('" +
+        p.id +
+        '\')" style="padding:8px 12px;cursor:pointer;border-radius:8px;background:' +
+        (isSelected ? "#EEF4FF" : "transparent") +
+        ";color:" +
+        (isSelected ? "#2D6BE4" : "#1A2D22") +
+        ";font-size:13px;font-weight:" +
+        (isSelected ? "600" : "400") +
+        ';">' +
+        (p.name || "Unknown") +
+        (isSelected ? ' <span style="font-size:10px;">&#10003;</span>' : "") +
+        "</div>"
+      );
+    })
+    .join("");
+}
+
+function selectReportPatient(patientId) {
+  const patients = window._patients || [];
+  const p = patients.find((x) => x.id === patientId) || null;
+  if (_reportPatientSelected && _reportPatientSelected.id === patientId) {
+    _reportPatientSelected = null;
+  } else {
+    _reportPatientSelected = p;
+  }
+  const q = document.getElementById("report-patient-search").value;
+  renderReportPatientList(q);
+}
+
+async function saveReportEdit() {
+  if (!currentEditReport) return;
+  const name = document.getElementById("edit-report-name").value.trim();
+  const date = document.getElementById("edit-report-date").value;
+  const updates = {};
+  if (name) updates.report_type = name;
+  if (date) updates.report_date = date;
+  if (_reportPatientSelected) updates.patient_id = _reportPatientSelected.id;
+  if (Object.keys(updates).length === 0) {
+    closeReportEditModal();
+    return;
+  }
+  try {
+    const res = await fetch(API + "/reports/" + currentEditReport.id, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updates),
+    });
+    if (!res.ok) throw new Error("Save failed");
+    closeReportEditModal();
+    loadPatientRecords();
+  } catch (e) {
+    alert("Could not save report.");
+  }
 }

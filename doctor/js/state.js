@@ -8,4 +8,6 @@ let selectedInviteLanguage = "english";
 let doctorSummaryType = "general";
 let doctorSummarySpeciality = "general";
 let allReports = [];
+let currentEditReport = null;
+let _reportPatientSelected = null;
 let docInviteMethod = "whatsapp";

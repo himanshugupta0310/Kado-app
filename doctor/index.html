@@ -798,6 +798,62 @@
       </div>
     </div>
 
+    <!-- REPORT EDIT MODAL -->
+    <div
+      class="modal-overlay"
+      id="report-edit-modal"
+      onclick="closeReportEditModal()"
+    >
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-handle"></div>
+        <div class="modal-title" id="report-modal-title">Edit Report</div>
+        <div class="modal-label">Report name</div>
+        <input
+          type="text"
+          class="modal-input"
+          id="edit-report-name"
+          placeholder="e.g. Blood Test, MRI Scan"
+        />
+        <div class="modal-label">Report date</div>
+        <input type="date" class="modal-input" id="edit-report-date" />
+        <div class="modal-label" style="margin-top: 16px">
+          Switch report to
+          <span style="font-size: 11px; color: #888; font-weight: 400"
+            >(if wrongly assigned)</span
+          >
+        </div>
+        <input
+          type="text"
+          class="modal-input"
+          id="report-patient-search"
+          placeholder="Search patients..."
+          oninput="filterReportPatients()"
+          autocomplete="off"
+        />
+        <div
+          id="report-patient-dropdown"
+          style="
+            max-height: 180px;
+            overflow-y: auto;
+            border: 1px solid #e8ede8;
+            border-radius: 10px;
+            margin-top: 4px;
+            background: #fff;
+          "
+        ></div>
+        <button
+          class="primary-btn"
+          style="margin-top: 16px"
+          onclick="saveReportEdit()"
+        >
+          Save
+        </button>
+        <button class="modal-close" onclick="closeReportEditModal()">
+          Cancel
+        </button>
+      </div>
+    </div>
+
     <!-- SPECIALITY MODAL -->
     <div
       class="modal-overlay"
