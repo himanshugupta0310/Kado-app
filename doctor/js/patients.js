@@ -27,7 +27,7 @@ async function loadPatients() {
       " linked";
     if (!patients || patients.length === 0) {
       container.innerHTML =
-        '<div class="empty-state"><div class="empty-state-icon">&#128101;</div><div class="empty-state-title">No patients yet</div><div class="empty-state-sub">Tap "+ Invite patient" to get started</div></div>';
+        '<div class="empty-state"><div class="empty-state-icon">&#128101;</div><div class="empty-state-title">No patients yet</div><div class="empty-state-sub">Tap "+ Add patient" to get started</div></div>';
       return;
     }
 

@@ -1,3 +1,71 @@
+function openAddPatientSheet() {
+  document.getElementById("add-patient-choice-overlay").classList.add("open");
+}
+
+function closeAddPatientSheet() {
+  document
+    .getElementById("add-patient-choice-overlay")
+    .classList.remove("open");
+}
+
+function openInviteFromChoice() {
+  closeAddPatientSheet();
+  document.getElementById("patient-invite-phone").value = "";
+  selectedInviteLanguage = "english";
+  selectInviteLanguage("english");
+  document.getElementById("invite-patient-overlay").classList.add("open");
+}
+
+function openAddPatientFormSheet() {
+  closeAddPatientSheet();
+  document.getElementById("add-patient-name").value = "";
+  document.getElementById("add-patient-age").value = "";
+  document.getElementById("add-patient-gender").value = "";
+  document.getElementById("add-patient-phone").value = "";
+  document.getElementById("add-patient-form-overlay").classList.add("open");
+}
+
+function closeAddPatientFormSheet() {
+  document.getElementById("add-patient-form-overlay").classList.remove("open");
+}
+
+async function submitAddPatient() {
+  const name = document.getElementById("add-patient-name").value.trim();
+  const age = document.getElementById("add-patient-age").value.trim();
+  const gender = document.getElementById("add-patient-gender").value;
+  if (!name) {
+    document.getElementById("add-patient-name").focus();
+    return;
+  }
+  if (!age) {
+    document.getElementById("add-patient-age").focus();
+    return;
+  }
+  if (!gender) {
+    document.getElementById("add-patient-gender").focus();
+    return;
+  }
+  const btn = document.getElementById("add-patient-submit-btn");
+  btn.disabled = true;
+  btn.textContent = "Adding...";
+  try {
+    const phone = document.getElementById("add-patient-phone").value.trim();
+    const body = { name, age, gender };
+    if (phone) body.phone_number = phone;
+    const data = await apiPost("/doctor/add-patient", body);
+    if (data && data.id) {
+      closeAddPatientFormSheet();
+      await loadPatients();
+    } else {
+      alert(data.error || "Could not add patient.");
+    }
+  } catch (e) {
+    alert("Could not add patient.");
+  }
+  btn.disabled = false;
+  btn.textContent = "Add patient";
+}
+
 function selectInviteLanguage(lang) {
   selectedInviteLanguage = lang;
   ["english", "hindi", "hinglish", "punjabi", "kannada"].forEach((l) => {

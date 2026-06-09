@@ -189,9 +189,9 @@
       <button
         class="invite-fab"
         id="invite-fab"
-        onclick="openInvitePatientSheet()"
+        onclick="openAddPatientSheet()"
       >
-        + Invite patient
+        + Add patient
       </button>
     </div>
     <div
@@ -576,6 +576,183 @@
           "
         >
           Open my health records
+        </button>
+      </div>
+    </div>
+
+    <!-- ADD PATIENT CHOICE SHEET -->
+    <div
+      class="sheet-overlay"
+      id="add-patient-choice-overlay"
+      onclick="closeAddPatientSheet()"
+    >
+      <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Add patient</div>
+        <div
+          onclick="openAddPatientFormSheet()"
+          style="
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            border-radius: 14px;
+            border: 1.5px solid #e8ede8;
+            background: #f8fbf8;
+            cursor: pointer;
+            margin-bottom: 10px;
+          "
+        >
+          <div
+            style="
+              width: 44px;
+              height: 44px;
+              border-radius: 12px;
+              background: #e8f5f0;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 20px;
+              flex-shrink: 0;
+            "
+          >
+            &#128100;
+          </div>
+          <div>
+            <div
+              style="
+                font-size: 14px;
+                font-weight: 600;
+                color: #1a2d22;
+                margin-bottom: 2px;
+              "
+            >
+              Add yourself
+            </div>
+            <div style="font-size: 12px; color: #7a9a7a">
+              Fill in patient details directly
+            </div>
+          </div>
+        </div>
+        <div
+          onclick="openInviteFromChoice()"
+          style="
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            border-radius: 14px;
+            border: 1.5px solid #e8ede8;
+            background: #f8fbf8;
+            cursor: pointer;
+            margin-bottom: 10px;
+          "
+        >
+          <div
+            style="
+              width: 44px;
+              height: 44px;
+              border-radius: 12px;
+              background: #eef4ff;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 20px;
+              flex-shrink: 0;
+            "
+          >
+            &#128241;
+          </div>
+          <div>
+            <div
+              style="
+                font-size: 14px;
+                font-weight: 600;
+                color: #1a2d22;
+                margin-bottom: 2px;
+              "
+            >
+              Invite
+            </div>
+            <div style="font-size: 12px; color: #7a9a7a">
+              Send a WhatsApp or email invite
+            </div>
+          </div>
+        </div>
+        <button class="sheet-cancel" onclick="closeAddPatientSheet()">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- ADD PATIENT FORM SHEET -->
+    <div
+      class="sheet-overlay"
+      id="add-patient-form-overlay"
+      onclick="closeAddPatientFormSheet()"
+    >
+      <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Add patient</div>
+        <div class="sheet-sub">Fill in the patient's details</div>
+        <div class="input-group" style="margin-bottom: 10px">
+          <input
+            type="text"
+            id="add-patient-name"
+            placeholder="Full name *"
+            style="width: 100%"
+          />
+        </div>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px">
+          <div class="input-group" style="flex: 1">
+            <input
+              type="number"
+              id="add-patient-age"
+              placeholder="Age *"
+              min="0"
+              max="120"
+              style="width: 100%"
+            />
+          </div>
+          <div class="input-group" style="flex: 1">
+            <select
+              id="add-patient-gender"
+              style="
+                width: 100%;
+                border: none;
+                background: transparent;
+                font-size: 14px;
+                font-family: &quot;DM Sans&quot;, sans-serif;
+                color: #1a2d22;
+                outline: none;
+              "
+            >
+              <option value="">Gender *</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group" style="margin-bottom: 16px">
+          <span class="input-prefix">+91</span>
+          <input
+            type="tel"
+            id="add-patient-phone"
+            placeholder="WhatsApp number (optional)"
+            maxlength="10"
+            inputmode="numeric"
+          />
+        </div>
+        <button
+          class="primary-btn"
+          id="add-patient-submit-btn"
+          onclick="submitAddPatient()"
+        >
+          Add patient
+        </button>
+        <button class="sheet-cancel" onclick="closeAddPatientFormSheet()">
+          Cancel
         </button>
       </div>
     </div>
