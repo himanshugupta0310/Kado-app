@@ -715,7 +715,7 @@
       </div>
     </div>
 
-    <!-- PATIENT NOTES MODAL -->
+    <!-- PATIENT EDIT MODAL -->
     <div
       class="modal-overlay"
       id="patient-notes-modal"
@@ -723,9 +723,42 @@
     >
       <div class="modal" onclick="event.stopPropagation()">
         <div class="modal-handle"></div>
-        <div class="modal-title" id="notes-modal-title">Patient Notes</div>
-        <div class="modal-sub">Only visible to you</div>
-        <div class="modal-label">Diagnosis</div>
+        <div class="modal-title" id="notes-modal-title">Edit Patient</div>
+        <div class="modal-label">Name</div>
+        <input
+          type="text"
+          class="modal-input"
+          id="edit-patient-name"
+          placeholder="Patient name"
+        />
+        <div style="display: flex; gap: 10px">
+          <div style="flex: 1">
+            <div class="modal-label">Age</div>
+            <input
+              type="number"
+              class="modal-input"
+              id="edit-patient-age"
+              placeholder="e.g. 35"
+              min="0"
+              max="120"
+            />
+          </div>
+          <div style="flex: 1">
+            <div class="modal-label">Gender</div>
+            <select class="modal-input" id="edit-patient-gender">
+              <option value="">Select</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-label" style="margin-top: 16px">
+          Diagnosis
+          <span style="font-size: 11px; color: #888; font-weight: 400"
+            >(only visible to you)</span
+          >
+        </div>
         <input
           type="text"
           class="modal-input"
@@ -751,6 +784,13 @@
           onclick="savePatientNotes()"
         >
           Save
+        </button>
+        <button
+          class="modal-close"
+          style="color: #e53935; border-color: #e53935"
+          onclick="deletePatientProfile()"
+        >
+          Delete Profile
         </button>
         <button class="modal-close" onclick="closePatientNotesModal()">
           Cancel
