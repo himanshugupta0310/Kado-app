@@ -123,6 +123,51 @@ async function sendPatientInvite() {
   btn.textContent = "Send invite on WhatsApp";
 }
 
+function openInviteDoctorSheet() {
+  document.getElementById("invite-doctor-name").value = "";
+  document.getElementById("invite-doctor-phone").value = "";
+  document.getElementById("invite-doctor-overlay").classList.add("open");
+}
+
+function closeInviteDoctorSheet() {
+  document.getElementById("invite-doctor-overlay").classList.remove("open");
+}
+
+async function sendDoctorInvite() {
+  const name = document.getElementById("invite-doctor-name").value.trim();
+  const phoneInput = document
+    .getElementById("invite-doctor-phone")
+    .value.trim()
+    .replace(/\s/g, "");
+  if (!name) {
+    document.getElementById("invite-doctor-name").focus();
+    return;
+  }
+  if (phoneInput.length < 10) {
+    document.getElementById("invite-doctor-phone").focus();
+    return;
+  }
+  const btn = document.getElementById("invite-doctor-btn");
+  btn.disabled = true;
+  btn.textContent = "Sending...";
+  try {
+    const data = await apiPost("/doctor/invite-doctor", {
+      name,
+      phone_number: "+91" + phoneInput,
+    });
+    if (data.success) {
+      closeInviteDoctorSheet();
+      alert("Invite sent!");
+    } else {
+      alert(data.error || "Could not send invite.");
+    }
+  } catch (e) {
+    alert("Could not send invite.");
+  }
+  btn.disabled = false;
+  btn.textContent = "Send invite on WhatsApp";
+}
+
 function selectDocInviteMethod(method) {
   docInviteMethod = method;
   const waBtn = document.getElementById("doc-invite-method-wa");

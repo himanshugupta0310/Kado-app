@@ -165,11 +165,7 @@
           </button>
         </div>
         <div class="nav-logo">kado<span>.</span>care</div>
-        <div
-          class="avatar"
-          id="avatar-main"
-          onclick="showScreen('doctor-profile')"
-        >
+        <div class="avatar" id="avatar-main" onclick="loadProfileScreen()">
           D
         </div>
       </div>
@@ -443,6 +439,30 @@
         </div>
         <div
           style="
+            background: #e8f5f0;
+            border: 1.5px solid #e8ede8;
+            border-radius: 18px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+          onclick="openInviteDoctorSheet()"
+        >
+          <div>
+            <div style="font-size: 14px; font-weight: 500; color: #1a2d22">
+              Invite a fellow doctor
+            </div>
+            <div style="font-size: 12px; color: #2d8a6a; margin-top: 2px">
+              Help them get started on Kado
+            </div>
+          </div>
+          <div style="font-size: 13px; color: #2d8a6a">&#8250;</div>
+        </div>
+        <div
+          style="
             background: white;
             border-radius: 18px;
             padding: 0 20px;
@@ -563,6 +583,7 @@
         </div>
         <button
           onclick="window.open('https://app.kado.care', '_blank')"
+          disabled
           style="
             background: #2d8a6a;
             color: white;
@@ -575,7 +596,8 @@
             font-family: &quot;DM Sans&quot;, sans-serif;
           "
         >
-          Open my health records
+          <!-- Open my health records -->
+          🔒 Coming soon...
         </button>
       </div>
     </div>
@@ -887,6 +909,49 @@
           Send invite on WhatsApp
         </button>
         <button class="sheet-cancel" onclick="closeInvitePatientSheet()">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- INVITE DOCTOR SHEET -->
+    <div
+      class="sheet-overlay"
+      id="invite-doctor-overlay"
+      onclick="closeInviteDoctorSheet()"
+    >
+      <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Invite a fellow doctor</div>
+        <div class="sheet-sub">
+          They will receive a WhatsApp invite to join Kado Care for Doctors
+        </div>
+        <div class="input-group" style="margin-bottom: 10px">
+          <input
+            type="text"
+            id="invite-doctor-name"
+            placeholder="Doctor's name *"
+            style="width: 100%"
+          />
+        </div>
+        <div class="input-group" style="margin-bottom: 16px">
+          <span class="input-prefix">+91</span>
+          <input
+            type="tel"
+            id="invite-doctor-phone"
+            placeholder="WhatsApp number *"
+            maxlength="10"
+            inputmode="numeric"
+          />
+        </div>
+        <button
+          class="primary-btn"
+          id="invite-doctor-btn"
+          onclick="sendDoctorInvite()"
+        >
+          Send invite on WhatsApp
+        </button>
+        <button class="sheet-cancel" onclick="closeInviteDoctorSheet()">
           Cancel
         </button>
       </div>

@@ -18,6 +18,19 @@ function showScreen(name) {
     uploadFab.style.display = name === "patient-detail" ? "block" : "none";
 }
 
+function loadProfileScreen() {
+  const name = currentDoctor?.name || "Doctor";
+  document.getElementById("profile-avatar-lg").textContent = name
+    .charAt(0)
+    .toUpperCase();
+  document.getElementById("profile-name-lg").textContent = "Dr. " + name;
+  document.getElementById("profile-spec-lg").textContent =
+    currentDoctor?.specialization || "";
+  document.getElementById("profile-phone-lg").textContent =
+    currentDoctor?.phone_number || "";
+  showScreen("doctor-profile");
+}
+
 function setMode(mode) {
   if (mode === "professional") {
     showScreen("patients");
