@@ -286,7 +286,7 @@ function renderRecordsBucket(bucket) {
           '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">' +
           "<button onclick=\"event.stopPropagation();openReportEditModal('" +
           r.id +
-          "')\" style=\"background:none;border:none;font-size:11px;color:#2D6BE4;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;\">Edit</button>" +
+          "')\" style=\"background:#EEF4FF;color:#2D6BE4;border:none;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;cursor:pointer;font-family:'DM Sans',sans-serif;\">Edit</button>" +
           '<span style="font-size:18px;color:#C0D0C0;">&#8250;</span>' +
           "</div></div>";
       });

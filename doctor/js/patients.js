@@ -115,7 +115,7 @@ async function loadPatients() {
             badge +
             '<button onclick="event.stopPropagation();openPatientNotesModalFromList(' +
             i +
-            ')" style="background:none;border:none;font-size:11px;color:#2D6BE4;cursor:pointer;font-family:\'DM Sans\',sans-serif;padding:0;">Edit</button>' +
+            ')" style="background:#E8F5F0;color:#2D8A6A;border:none;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Edit</button>' +
             "</div>" +
             '<div class="patient-arrow">&#8250;</div>' +
             "</div>"
