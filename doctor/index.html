@@ -463,6 +463,30 @@
         </div>
         <div
           style="
+            background: #fdebf1;
+            border: 1.5px solid #f6dde6;
+            border-radius: 18px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+          onclick="openInviteReceptionSheet()"
+        >
+          <div>
+            <div style="font-size: 14px; font-weight: 500; color: #1a2d22">
+              Invite reception
+            </div>
+            <div style="font-size: 12px; color: #c2548a; margin-top: 2px">
+              Give your reception staff access to Kado
+            </div>
+          </div>
+          <div style="font-size: 13px; color: #c2548a">&#8250;</div>
+        </div>
+        <div
+          style="
             background: white;
             border-radius: 18px;
             padding: 0 20px;
@@ -952,6 +976,47 @@
           Send invite on WhatsApp
         </button>
         <button class="sheet-cancel" onclick="closeInviteDoctorSheet()">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- INVITE RECEPTION SHEET -->
+    <div
+      class="sheet-overlay"
+      id="invite-reception-overlay"
+      onclick="closeInviteReceptionSheet()"
+    >
+      <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Invite reception</div>
+        <div class="sheet-sub">
+          They'll get an email with login details for doctor.kado.care/reception
+        </div>
+        <div class="input-group" style="margin-bottom: 10px">
+          <input
+            type="text"
+            id="invite-reception-name"
+            placeholder="Receptionist's name *"
+            style="width: 100%"
+          />
+        </div>
+        <div class="input-group" style="margin-bottom: 16px">
+          <input
+            type="email"
+            id="invite-reception-email"
+            placeholder="Email *"
+            style="width: 100%"
+          />
+        </div>
+        <button
+          class="primary-btn"
+          id="invite-reception-btn"
+          onclick="sendReceptionInvite()"
+        >
+          Send invite
+        </button>
+        <button class="sheet-cancel" onclick="closeInviteReceptionSheet()">
           Cancel
         </button>
       </div>

@@ -200,3 +200,42 @@ function selectDocInviteMethod(method) {
     sendBtn.textContent = "Send invite by email";
   }
 }
+
+function openInviteReceptionSheet() {
+  document.getElementById("invite-reception-name").value = "";
+  document.getElementById("invite-reception-email").value = "";
+  document.getElementById("invite-reception-overlay").classList.add("open");
+}
+
+function closeInviteReceptionSheet() {
+  document.getElementById("invite-reception-overlay").classList.remove("open");
+}
+
+async function sendReceptionInvite() {
+  const name = document.getElementById("invite-reception-name").value.trim();
+  const email = document.getElementById("invite-reception-email").value.trim();
+  if (!name) {
+    document.getElementById("invite-reception-name").focus();
+    return;
+  }
+  if (!email || !email.includes("@")) {
+    document.getElementById("invite-reception-email").focus();
+    return;
+  }
+  const btn = document.getElementById("invite-reception-btn");
+  btn.disabled = true;
+  btn.textContent = "Sending...";
+  try {
+    const data = await apiPost("/doctor/invite-reception", { name, email });
+    if (data.success) {
+      closeInviteReceptionSheet();
+      showToast("Invite sent!", "success");
+    } else {
+      showToast(data.error || "Could not send invite.", "error");
+    }
+  } catch (e) {
+    showToast("Could not send invite.", "error");
+  }
+  btn.disabled = false;
+  btn.textContent = "Send invite";
+}

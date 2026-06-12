@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kado Care — Reception</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <base href="/" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="/env.js" onerror="window.__KADO_API__ = undefined"></script>
+    <style>
+      #screen-login {
+        background: #f6dde6;
+      }
+      .login-tagline {
+        color: #c2548a;
+      }
+      .input-group:focus-within {
+        border-color: #c2548a;
+      }
+      .login-btn {
+        background: #c2548a;
+      }
+      .login-btn:disabled {
+        background: #ecbcd4;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="screen-login" style="display: flex">
+      <div class="login-logo">kado<span>.</span>care</div>
+      <div class="login-tagline">Reception login</div>
+      <div class="login-card">
+        <div class="login-title">Reception login</div>
+        <div class="login-sub">Enter your email and password</div>
+
+        <div class="input-group">
+          <input
+            type="email"
+            id="reception-email"
+            placeholder="Email"
+            style="width: 100%"
+          />
+        </div>
+        <div class="input-group">
+          <input
+            type="password"
+            id="reception-password"
+            placeholder="Password"
+            style="width: 100%"
+          />
+        </div>
+        <button
+          class="login-btn"
+          id="reception-login-btn"
+          onclick="handleReceptionLogin()"
+        >
+          Log in
+        </button>
+        <div class="login-error" id="login-error"></div>
+      </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+      function showErr(msg) {
+        const el = document.getElementById("login-error");
+        el.textContent = msg;
+        el.style.display = "block";
+      }
+      function clearErr() {
+        document.getElementById("login-error").style.display = "none";
+      }
+
+      async function handleReceptionLogin() {
+        const email = document.getElementById("reception-email").value.trim();
+        const password = document
+          .getElementById("reception-password")
+          .value.trim();
+        clearErr();
+        if (!email || !password) {
+          showErr("Enter email and password.");
+          return;
+        }
+        const btn = document.getElementById("reception-login-btn");
+        btn.disabled = true;
+        btn.textContent = "Logging in...";
+        try {
+          const data = await apiPost("/reception/auth/login", {
+            email,
+            password,
+          });
+          if (data.token && data.doctor) {
+            setToken(data.token);
+            localStorage.setItem("kado_doctor", JSON.stringify(data.doctor));
+            window.location.href = "/";
+            return;
+          }
+          showErr(data.error || "Invalid email or password.");
+        } catch (e) {
+          showErr("Something went wrong.");
+        }
+        btn.disabled = false;
+        btn.textContent = "Log in";
+      }
+
+      document
+        .getElementById("reception-password")
+        .addEventListener("keypress", (e) => {
+          if (e.key === "Enter") handleReceptionLogin();
+        });
+    </script>
+  </body>
+</html>
