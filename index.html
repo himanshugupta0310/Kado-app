@@ -176,30 +176,6 @@
         text-align: center;
         margin-top: 16px;
       }
-      .otp-inputs {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        margin-bottom: 16px;
-      }
-      .otp-inputs input {
-        width: 44px;
-        height: 52px;
-        text-align: center;
-        font-size: 22px;
-        font-weight: 600;
-        color: #1a2d22;
-        background: #f5f7f5;
-        border: 1.5px solid transparent;
-        border-radius: 12px;
-        outline: none;
-        font-family: "DM Sans", sans-serif;
-        transition: border 0.2s;
-      }
-      .otp-inputs input:focus {
-        border-color: #2d8a6a;
-        background: white;
-      }
       .login-back {
         display: flex;
         align-items: center;
@@ -1465,48 +1441,15 @@
           </div>
           <div class="login-title">Enter OTP</div>
           <div class="login-sub" id="otp-sub">Sent to your WhatsApp</div>
-          <div class="otp-inputs" id="otp-inputs">
+          <div class="input-group">
             <input
               type="tel"
-              maxlength="1"
+              id="otp-input"
+              placeholder="6-digit OTP"
+              maxlength="6"
               inputmode="numeric"
-              oninput="otpInput(this, 0)"
-              onkeydown="otpKey(event, 0)"
-            />
-            <input
-              type="tel"
-              maxlength="1"
-              inputmode="numeric"
-              oninput="otpInput(this, 1)"
-              onkeydown="otpKey(event, 1)"
-            />
-            <input
-              type="tel"
-              maxlength="1"
-              inputmode="numeric"
-              oninput="otpInput(this, 2)"
-              onkeydown="otpKey(event, 2)"
-            />
-            <input
-              type="tel"
-              maxlength="1"
-              inputmode="numeric"
-              oninput="otpInput(this, 3)"
-              onkeydown="otpKey(event, 3)"
-            />
-            <input
-              type="tel"
-              maxlength="1"
-              inputmode="numeric"
-              oninput="otpInput(this, 4)"
-              onkeydown="otpKey(event, 4)"
-            />
-            <input
-              type="tel"
-              maxlength="1"
-              inputmode="numeric"
-              oninput="otpInput(this, 5)"
-              onkeydown="otpKey(event, 5)"
+              style="width: 100%; letter-spacing: 4px; font-size: 18px"
+              onkeydown="if (event.key === 'Enter') verifyOtp();"
             />
           </div>
           <button class="login-btn" id="otp-btn" onclick="verifyOtp()">
@@ -1549,6 +1492,7 @@
           <div style="font-size: 22px">📋</div>
           <div class="stat-label">Summary</div>
         </div>
+        <!--
         <div class="stat stat-3" onclick="showScreen('coverage')">
           <div class="stat-fraction">
             <span class="stat-num" id="stat-essential">0</span
@@ -1556,6 +1500,18 @@
           </div>
           <div class="stat-label">Essential Biomarkers</div>
           <div class="explore-link">Advanced and more ›</div>
+        </div>
+        -->
+        <div
+          class="stat stat-3"
+          id="stat-prescription"
+          onclick="openLatestPrescription()"
+        >
+          <div style="font-size: 22px">💊</div>
+          <div class="stat-label" id="stat-prescription-label">
+            Latest Prescription
+          </div>
+          <div class="explore-link" id="stat-prescription-date"></div>
         </div>
       </div>
       <div id="records-list"></div>
@@ -2593,6 +2549,7 @@
         </svg>
         Ask Kado
       </div>
+      <!--
       <div class="nav-item" id="tab-kados" onclick="showScreen('kados')">
         <svg
           width="28"
@@ -2624,6 +2581,7 @@
         </svg>
         Kados
       </div>
+      -->
     </div>
 
     <script>
@@ -2706,9 +2664,9 @@
           document.getElementById("otp-error").style.display = "none";
           document.getElementById("otp-btn").disabled = false;
           document.getElementById("otp-btn").textContent = "Verify";
-          const otpBoxes = document.querySelectorAll("#otp-inputs input");
-          otpBoxes.forEach((b) => (b.value = ""));
-          otpBoxes[0].focus();
+          const otpInputEl = document.getElementById("otp-input");
+          otpInputEl.value = "";
+          otpInputEl.focus();
         } catch (e) {
           err.textContent = "Could not send OTP. Please try again.";
           err.style.display = "block";
@@ -2717,25 +2675,8 @@
         }
       }
 
-      function otpInput(el, idx) {
-        el.value = el.value.replace(/\D/g, "").slice(-1);
-        const boxes = document.querySelectorAll("#otp-inputs input");
-        if (el.value && idx < 5) boxes[idx + 1].focus();
-        if (idx === 5 && el.value) verifyOtp();
-      }
-
-      function otpKey(e, idx) {
-        const boxes = document.querySelectorAll("#otp-inputs input");
-        if (e.key === "Backspace" && !boxes[idx].value && idx > 0) {
-          boxes[idx - 1].focus();
-        }
-      }
-
       async function verifyOtp() {
-        const boxes = document.querySelectorAll("#otp-inputs input");
-        const otp = Array.from(boxes)
-          .map((b) => b.value)
-          .join("");
+        const otp = document.getElementById("otp-input").value.trim();
         const btn = document.getElementById("otp-btn");
         const err = document.getElementById("otp-error");
         err.style.display = "none";
@@ -2794,9 +2735,9 @@
               err.style.display = "none";
               err.style.color = "#c0392b";
             }, 3000);
-            const boxes = document.querySelectorAll("#otp-inputs input");
-            boxes.forEach((b) => (b.value = ""));
-            boxes[0].focus();
+            const otpInputEl = document.getElementById("otp-input");
+            otpInputEl.value = "";
+            otpInputEl.focus();
           }
         } catch {
           // silent
@@ -2836,9 +2777,6 @@
         updateAvatars();
         await Promise.all([loadRecords(), loadKados(), loadCoverage()]);
         showScreen("records");
-        if (allPatients && allPatients.length > 1) {
-          openSwitcher();
-        }
         await handlePendingInvite();
       }
 
@@ -3546,6 +3484,11 @@
         window.print();
       }
 
+      let _latestPrescriptionUrl = null;
+      function openLatestPrescription() {
+        if (_latestPrescriptionUrl)
+          window.open(_latestPrescriptionUrl, "_blank");
+      }
       async function loadRecords() {
         const pid = currentUser._patientId || null;
         const pidParam = pid
@@ -3556,14 +3499,39 @@
         const kados = await apiFetch(`/kados?${pidParam}`);
         const totalReports = reports ? reports.length : 0;
         const activeIssues = kados ? kados.length : 0;
-        const essentialTracked = biomarkers
-          ? [...new Set(biomarkers.map((b) => b.name))].length
-          : 0;
+        // const essentialTracked = biomarkers
+        //   ? [...new Set(biomarkers.map((b) => b.name))].length
+        //   : 0;
         document.getElementById("stat-total").textContent = totalReports;
         if (document.getElementById("stat-issues"))
           document.getElementById("stat-issues").textContent = activeIssues;
-        document.getElementById("stat-essential").textContent =
-          essentialTracked;
+        // document.getElementById("stat-essential").textContent =
+        //   essentialTracked;
+        const prescriptions = (reports || [])
+          .filter((r) =>
+            (r.report_type || "").toLowerCase().includes("prescription"),
+          )
+          .sort(
+            (a, b) =>
+              new Date(b.report_date || b.created_at) -
+              new Date(a.report_date || a.created_at),
+          );
+        const latestPrescription = prescriptions[0] || null;
+        _latestPrescriptionUrl = latestPrescription
+          ? latestPrescription.file_url
+          : null;
+        document.getElementById("stat-prescription-date").textContent =
+          latestPrescription
+            ? new Date(
+                latestPrescription.report_date
+                  ? latestPrescription.report_date + "T12:00:00"
+                  : latestPrescription.created_at,
+              ).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })
+            : "None yet";
         const lastUpdate =
           reports && reports.length > 0
             ? new Date(reports[0].created_at).toLocaleDateString("en-IN", {
