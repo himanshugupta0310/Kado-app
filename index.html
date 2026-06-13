@@ -1463,6 +1463,38 @@
       </div>
     </div>
 
+    <!-- ═══════════ MAGIC LINK LOADING SCREEN ═══════════ -->
+    <div
+      class="screen"
+      id="screen-magiclink"
+      style="
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 24px;
+        background: #fdf6ee;
+        min-height: 100vh;
+        text-align: center;
+      "
+    >
+      <div class="login-logo">kado<span>.</span>care</div>
+      <div class="spinner" style="margin: 24px 0 16px"></div>
+      <div
+        style="
+          font-family: &quot;Fraunces&quot;, serif;
+          font-size: 18px;
+          font-weight: 300;
+          color: #1a2d22;
+          margin-bottom: 6px;
+        "
+      >
+        Getting your records ready...
+      </div>
+      <div class="login-sub" style="margin-bottom: 0">
+        This will just take a moment. Please don't close this page.
+      </div>
+    </div>
+
     <!-- ═══════════ RECORDS SCREEN ═══════════ -->
     <div class="screen" id="screen-records">
       <div class="nav">
@@ -4020,7 +4052,8 @@
         });
         const el = document.getElementById(`screen-${name}`);
         el.classList.add("active");
-        el.style.display = name === "login" ? "flex" : "block";
+        el.style.display =
+          name === "login" || name === "magiclink" ? "flex" : "block";
 
         // Bottom nav active state
         document
@@ -4293,9 +4326,7 @@
 
         // Token-based magic link (from WhatsApp "Done" flow)
         if (urlToken) {
-          const btn = document.getElementById("login-btn");
-          btn.textContent = "Loading...";
-          btn.disabled = true;
+          showScreen("magiclink");
           try {
             localStorage.setItem("kado_token", urlToken);
             const res = await fetch(`${API}/auth/me`, {
@@ -4321,8 +4352,10 @@
             console.log("Token login failed:", e);
           }
           localStorage.removeItem("kado_token");
-          btn.textContent = "Send OTP";
-          btn.disabled = false;
+          showScreen("login");
+          document.getElementById("login-error").textContent =
+            "This link has expired. Please log in with your WhatsApp number.";
+          document.getElementById("login-error").style.display = "block";
         }
 
         const savedToken = localStorage.getItem("kado_token");
