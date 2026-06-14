@@ -1,13 +1,15 @@
-function showToast(msg, type) {
+function showToast(msg, type, persist) {
   const el = document.getElementById("kado-toast");
   if (!el) return;
   el.textContent = msg;
   el.style.background = type === "error" ? "#C0392B" : "#1A2D22";
   el.style.display = "block";
   clearTimeout(el._t);
-  el._t = setTimeout(() => {
-    el.style.display = "none";
-  }, 3000);
+  if (!persist) {
+    el._t = setTimeout(() => {
+      el.style.display = "none";
+    }, 3000);
+  }
 }
 
 function triggerTileUpload(patientId, event) {
@@ -21,7 +23,7 @@ async function doTileUpload(input) {
   if (!file) return;
   const patientId = window._tileUploadPatientId;
   if (!patientId) return;
-  showToast("Uploading...", "info");
+  showToast("Uploading...", "info", true);
   try {
     const formData = new FormData();
     formData.append("file", file);
