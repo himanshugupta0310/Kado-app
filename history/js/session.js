@@ -83,9 +83,8 @@ async function startSession() {
   }
 
   // ElevenLabs browser client — see https://www.npmjs.com/package/@elevenlabs/client
-  // NOTE: confirm the global name exposed by the UMD build at setup time.
-  const ConversationApi =
-    window.ElevenLabsClient?.Conversation || window.Conversation;
+  // UMD build exposes `window.client.Conversation`
+  const ConversationApi = window.client?.Conversation;
   if (!ConversationApi) {
     setStatus(
       "Voice module failed to load. Please refresh and try again.",
