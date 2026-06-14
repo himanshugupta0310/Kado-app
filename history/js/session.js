@@ -3,7 +3,37 @@ const API = window.__KADO_API__ || "https://api.kado.care";
 const titleEl = document.getElementById("title");
 const messageEl = document.getElementById("message");
 const startBtn = document.getElementById("start-btn");
+const endBtn = document.getElementById("end-btn");
 const statusEl = document.getElementById("status");
+const orbWrap = document.getElementById("orb-wrap");
+const orb = document.getElementById("orb");
+
+let activeConversation = null;
+let orbFrame = null;
+
+function startOrbAnimation(conversation) {
+  orbWrap.style.display = "block";
+
+  function tick() {
+    const mode = orb.classList.contains("speaking") ? "output" : "input";
+    const volume =
+      mode === "output"
+        ? conversation.getOutputVolume()
+        : conversation.getInputVolume();
+    const level = 0.85 + Math.min(1, volume * 3) * 0.35;
+    orb.style.setProperty("--level", level.toFixed(3));
+    orbFrame = requestAnimationFrame(tick);
+  }
+  orbFrame = requestAnimationFrame(tick);
+}
+
+function stopOrbAnimation() {
+  if (orbFrame) cancelAnimationFrame(orbFrame);
+  orbFrame = null;
+  orbWrap.style.display = "none";
+  orb.classList.remove("speaking", "listening");
+  orb.style.removeProperty("--level");
+}
 
 function getSessionId() {
   const params = new URLSearchParams(window.location.search);
@@ -95,23 +125,34 @@ async function startSession() {
   }
 
   try {
-    await ConversationApi.startSession({
+    activeConversation = await ConversationApi.startSession({
       signedUrl: tokenData.signedUrl,
       dynamicVariables: tokenData.dynamicVariables,
-      onConnect: () => setStatus("Connected — say hello!", "live"),
+      onConnect: () => {
+        setStatus("Connected — say hello!", "live");
+        endBtn.style.display = "block";
+        startOrbAnimation(activeConversation);
+      },
       onDisconnect: () => {
         setStatus("Session ended. Thank you!");
         titleEl.textContent = "All done!";
         messageEl.textContent =
           "Thanks for sharing — your responses have been sent to your doctor.";
         startBtn.style.display = "none";
+        endBtn.style.display = "none";
+        stopOrbAnimation();
+        activeConversation = null;
       },
       onModeChange: ({ mode }) => {
         setStatus(mode === "speaking" ? "Speaking…" : "Listening…", "live");
+        orb.classList.toggle("speaking", mode === "speaking");
+        orb.classList.toggle("listening", mode === "listening");
       },
       onError: () => {
         setStatus("Something went wrong during the session.", "error");
         startBtn.disabled = false;
+        endBtn.style.display = "none";
+        stopOrbAnimation();
       },
     });
     startBtn.style.display = "none";
@@ -120,5 +161,9 @@ async function startSession() {
     startBtn.disabled = false;
   }
 }
+
+endBtn.addEventListener("click", () => {
+  if (activeConversation) activeConversation.endSession();
+});
 
 init();
