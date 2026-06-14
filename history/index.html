@@ -90,49 +90,14 @@
       }
       .orb-wrap {
         display: none;
-        width: 140px;
-        height: 140px;
+        width: 180px;
+        height: 180px;
         margin: 4px auto 20px;
       }
-      .orb {
+      .orb-canvas {
+        position: relative;
         width: 100%;
         height: 100%;
-        border-radius: 50%;
-        background: radial-gradient(
-          circle at 35% 30%,
-          #8ff0d4,
-          #2d8a6a 60%,
-          #1a2d22 100%
-        );
-        box-shadow: 0 0 40px rgba(45, 138, 106, 0.35);
-        transform: scale(var(--level, 0.85));
-        transition:
-          transform 0.08s ease-out,
-          box-shadow 0.08s ease-out,
-          background 0.3s ease;
-        animation: orb-idle 3s ease-in-out infinite;
-      }
-      .orb.listening {
-        background: radial-gradient(
-          circle at 35% 30%,
-          #aee9ff,
-          #2d6fa0 60%,
-          #1a2d22 100%
-        );
-      }
-      .orb.speaking {
-        animation: none;
-        box-shadow: 0 0 calc(20px + 80px * var(--level, 0))
-          rgba(45, 138, 106, 0.55);
-      }
-      @keyframes orb-idle {
-        0%,
-        100% {
-          transform: scale(0.88);
-        }
-        50% {
-          transform: scale(1);
-        }
       }
       .end-btn {
         background: #c0392b;
@@ -146,7 +111,7 @@
       <h1 id="title">Loading…</h1>
       <p id="message"></p>
       <div class="orb-wrap" id="orb-wrap">
-        <div class="orb" id="orb"></div>
+        <div id="orb-root"></div>
       </div>
       <button id="start-btn" style="display: none">Start session</button>
       <button id="end-btn" class="end-btn" style="display: none">
@@ -155,6 +120,7 @@
       <div class="status" id="status"></div>
     </div>
 
+    <script type="module" src="js/orb/orb-widget.js"></script>
     <script src="js/session.js"></script>
   </body>
 </html>

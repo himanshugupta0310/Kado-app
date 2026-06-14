@@ -5,6 +5,7 @@
   "scripts": {
     "dev:patient": "node scripts/patient-dev-server.js",
     "dev:doctor": "node scripts/doctor-dev-server.js",
+    "build:orb": "npm --prefix history/orb-widget install && npm --prefix history/orb-widget run build",
     "format": "prettier --write \"**/*.js\" \"**/*.html\""
   },
   "devDependencies": {

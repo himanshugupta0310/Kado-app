@@ -6,33 +6,17 @@ const startBtn = document.getElementById("start-btn");
 const endBtn = document.getElementById("end-btn");
 const statusEl = document.getElementById("status");
 const orbWrap = document.getElementById("orb-wrap");
-const orb = document.getElementById("orb");
 
 let activeConversation = null;
-let orbFrame = null;
 
-function startOrbAnimation(conversation) {
+function startOrbAnimation() {
   orbWrap.style.display = "block";
-
-  function tick() {
-    const mode = orb.classList.contains("speaking") ? "output" : "input";
-    const volume =
-      mode === "output"
-        ? conversation.getOutputVolume()
-        : conversation.getInputVolume();
-    const level = 0.85 + Math.min(1, volume * 3) * 0.35;
-    orb.style.setProperty("--level", level.toFixed(3));
-    orbFrame = requestAnimationFrame(tick);
-  }
-  orbFrame = requestAnimationFrame(tick);
+  window.KadoOrb?.setAgentState(null);
 }
 
 function stopOrbAnimation() {
-  if (orbFrame) cancelAnimationFrame(orbFrame);
-  orbFrame = null;
   orbWrap.style.display = "none";
-  orb.classList.remove("speaking", "listening");
-  orb.style.removeProperty("--level");
+  window.KadoOrb?.setAgentState(null);
 }
 
 function getSessionId() {
@@ -131,7 +115,7 @@ async function startSession() {
       onConnect: () => {
         setStatus("Connected — say hello!", "live");
         endBtn.style.display = "block";
-        startOrbAnimation(activeConversation);
+        startOrbAnimation();
       },
       onDisconnect: () => {
         setStatus("Session ended. Thank you!");
@@ -145,8 +129,9 @@ async function startSession() {
       },
       onModeChange: ({ mode }) => {
         setStatus(mode === "speaking" ? "Speaking…" : "Listening…", "live");
-        orb.classList.toggle("speaking", mode === "speaking");
-        orb.classList.toggle("listening", mode === "listening");
+        window.KadoOrb?.setAgentState(
+          mode === "speaking" ? "talking" : "listening",
+        );
       },
       onError: () => {
         setStatus("Something went wrong during the session.", "error");
