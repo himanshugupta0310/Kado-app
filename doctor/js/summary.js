@@ -18,6 +18,17 @@ async function loadDoctorSummary() {
     const specLabel = currentDoctor.specialization
       ? currentDoctor.specialization + " Summary"
       : "Speciality Summary";
+
+    let historyHtml = "";
+    try {
+      const historyData = await apiFetch(
+        "/patients/" + currentPatient.id + "/history-sessions/latest",
+      );
+      if (historyData.collected_data) {
+        historyHtml = renderHistoryData(historyData.collected_data);
+      }
+    } catch (e) {}
+
     container.innerHTML =
       '<div style="padding:16px 20px;">' +
       staleNotice +
@@ -35,6 +46,7 @@ async function loadDoctorSummary() {
             summaryData.summary.biomarker_trends,
           )
         : "") +
+      historyHtml +
       "</div>";
   } catch (e) {
     container.innerHTML =
@@ -165,6 +177,16 @@ function renderDoctorSummary(content, trends) {
     "<div style=\"font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:#1A2D22;\">Clinical Summary</div>" +
     '<button onclick="printDoctorSummary()" style="background:none;border:1.5px solid #2D6BE4;border-radius:8px;padding:6px 12px;font-size:12px;color:#2D6BE4;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Share PDF</button>' +
     '</div><div id="doc-summary-content">' +
+    content +
+    "</div></div>"
+  );
+}
+
+function renderHistoryData(content) {
+  return (
+    '<div class="summary-result" style="background:white;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,0.05);margin-top:16px;">' +
+    "<div style=\"font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:#1A2D22;margin-bottom:12px;\">Historical Data (Collected Directly From Patient)</div>" +
+    '<div id="history-data-content">' +
     content +
     "</div></div>"
   );
