@@ -65,6 +65,7 @@ async function uploadPrescription(input) {
     formData.append("document_type", "prescription");
     const res = await fetch(API + "/doctor/upload-report", {
       method: "POST",
+      headers: authHeaders(),
       body: formData,
     });
     const data = await res.json();
