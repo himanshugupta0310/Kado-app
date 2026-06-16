@@ -185,7 +185,6 @@ function renderDoctorSummary(content, trends) {
 function renderHistoryData(content) {
   return (
     '<div class="summary-result" style="background:white;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,0.05);margin-top:16px;">' +
-    "<div style=\"font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:#1A2D22;margin-bottom:12px;\">Historical Data (Collected Directly From Patient)</div>" +
     '<div id="history-data-content">' +
     content +
     "</div></div>"

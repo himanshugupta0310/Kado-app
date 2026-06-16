@@ -234,7 +234,7 @@
           Patient
         </div>
         <button
-          onclick="openPatientNotesModal()"
+          onclick="openPatientActionSheetForCurrent()"
           style="
             background: none;
             border: none;
@@ -244,7 +244,7 @@
             font-family: &quot;DM Sans&quot;, sans-serif;
           "
         >
-          Edit
+          Action
         </button>
       </div>
       <div
@@ -731,6 +731,73 @@
       </div>
     </div>
 
+    <!-- PATIENT ACTION SHEET -->
+    <div
+      class="sheet-overlay"
+      id="patient-action-overlay"
+      onclick="closePatientActionSheet()"
+    >
+      <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Patient actions</div>
+        <div class="sheet-option-card" onclick="openTriggerAgentSheet()">
+          <div class="sheet-option-icon">&#129302;</div>
+          <div>
+            <div class="sheet-option-title">Trigger an Agent</div>
+            <div class="sheet-option-sub">Run an AI agent for this patient</div>
+          </div>
+        </div>
+        <div class="sheet-option-card" onclick="openEditPatientFromAction()">
+          <div class="sheet-option-icon">&#128100;</div>
+          <div>
+            <div class="sheet-option-title">Edit Patient Profile</div>
+            <div class="sheet-option-sub">Update patient details and notes</div>
+          </div>
+        </div>
+        <button class="sheet-cancel" onclick="closePatientActionSheet()">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- TRIGGER AGENT SHEET -->
+    <div
+      class="sheet-overlay"
+      id="trigger-agent-overlay"
+      onclick="closeTriggerAgentSheet()"
+    >
+      <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Trigger an agent</div>
+        <div class="sheet-option-card" onclick="triggerPreconsultAgent()">
+          <div class="sheet-option-icon">&#128203;</div>
+          <div>
+            <div class="sheet-option-title">Preconsult Agent</div>
+            <div class="sheet-option-sub">
+              Your patient will receive a call from an AI agent trained on the
+              patient's uploaded reports to collect their medical history and
+              reason for consultation.
+            </div>
+          </div>
+        </div>
+        <div class="sheet-option-card disabled">
+          <div class="sheet-option-icon">&#128221;</div>
+          <div>
+            <div class="sheet-option-title">
+              Post Consult Agent
+              <span class="coming-soon-badge">Coming soon</span>
+            </div>
+            <div class="sheet-option-sub">
+              This agent will do post consultation followup on behalf of you
+            </div>
+          </div>
+        </div>
+        <button class="sheet-cancel" onclick="closeTriggerAgentSheet()">
+          Cancel
+        </button>
+      </div>
+    </div>
+
     <!-- ADD PATIENT FORM SHEET -->
     <div
       class="sheet-overlay"
@@ -1037,8 +1104,17 @@
           class="modal-input"
           id="edit-patient-name"
           placeholder="Patient name"
+          oninput="_checkPatientFormDirty()"
         />
-        <div style="display: flex; gap: 10px">
+        <div class="modal-label" style="margin-top: 12px">Phone Number</div>
+        <input
+          type="tel"
+          class="modal-input"
+          id="edit-patient-phone"
+          placeholder="e.g. 9876543210"
+          oninput="_checkPatientFormDirty()"
+        />
+        <div style="display: flex; gap: 10px; margin-top: 12px">
           <div style="flex: 1">
             <div class="modal-label">Age</div>
             <input
@@ -1048,11 +1124,16 @@
               placeholder="e.g. 35"
               min="0"
               max="120"
+              oninput="_checkPatientFormDirty()"
             />
           </div>
           <div style="flex: 1">
             <div class="modal-label">Gender</div>
-            <select class="modal-input" id="edit-patient-gender">
+            <select
+              class="modal-input"
+              id="edit-patient-gender"
+              onchange="_checkPatientFormDirty()"
+            >
               <option value="">Select</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
@@ -1071,6 +1152,7 @@
           class="modal-input"
           id="notes-diagnosis"
           placeholder="e.g. Type 2 Diabetes, Hypertension"
+          oninput="_checkPatientFormDirty()"
         />
         <div class="modal-label">Procedure</div>
         <input
@@ -1078,17 +1160,21 @@
           class="modal-input"
           id="notes-procedure"
           placeholder="e.g. Knee replacement, Appendectomy"
+          oninput="_checkPatientFormDirty()"
         />
         <div class="modal-label">Note</div>
         <textarea
           class="modal-textarea"
           id="notes-note"
           placeholder="e.g. Teenage boy with epilepsy, referred by Dr. Sharma"
+          oninput="_checkPatientFormDirty()"
         ></textarea>
         <button
           class="primary-btn"
+          id="patient-notes-save-btn"
           style="margin-top: 16px"
           onclick="savePatientNotes()"
+          disabled
         >
           Save
         </button>

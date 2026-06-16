@@ -27,7 +27,33 @@ function renderPatientDetailBars() {
   }
 }
 
-function openPatientNotesModal() {
+function _getPatientFormValues() {
+  return {
+    name: document.getElementById("edit-patient-name").value.trim(),
+    age: document.getElementById("edit-patient-age").value.trim(),
+    gender: document.getElementById("edit-patient-gender").value,
+    phone: document.getElementById("edit-patient-phone").value.trim(),
+    diagnosis: document.getElementById("notes-diagnosis").value.trim(),
+    procedure: document.getElementById("notes-procedure").value.trim(),
+    note: document.getElementById("notes-note").value.trim(),
+  };
+}
+
+function _checkPatientFormDirty() {
+  const cur = _getPatientFormValues();
+  const o = window._originalPatientFormValues;
+  const dirty =
+    cur.name !== o.name ||
+    cur.age !== o.age ||
+    cur.gender !== o.gender ||
+    cur.phone !== o.phone ||
+    cur.diagnosis !== o.diagnosis ||
+    cur.procedure !== o.procedure ||
+    cur.note !== o.note;
+  document.getElementById("patient-notes-save-btn").disabled = !dirty;
+}
+
+async function openPatientNotesModal() {
   document.getElementById("notes-modal-title").textContent =
     "Edit " + (currentPatient?.name || "Patient");
   document.getElementById("edit-patient-name").value =
@@ -35,12 +61,32 @@ function openPatientNotesModal() {
   document.getElementById("edit-patient-age").value = currentPatient?.age || "";
   document.getElementById("edit-patient-gender").value =
     currentPatient?.gender || "";
+  window._originalPatientPhone = "";
+  document.getElementById("edit-patient-phone").value = "";
   document.getElementById("notes-diagnosis").value =
     currentPatientNotes.diagnosis || "";
   document.getElementById("notes-procedure").value =
     currentPatientNotes.procedure || "";
   document.getElementById("notes-note").value = currentPatientNotes.note || "";
+
+  window._originalPatientFormValues = _getPatientFormValues();
+  document.getElementById("patient-notes-save-btn").disabled = true;
+
   document.getElementById("patient-notes-modal").classList.add("open");
+
+  try {
+    const caregivers = await apiFetch(
+      "/patients/" + currentPatient.id + "/caregivers",
+    );
+    const owner = (caregivers || []).find((c) => c.role === "owner");
+    if (owner?.phone_number) {
+      const display = owner.phone_number.replace("+91", "");
+      document.getElementById("edit-patient-phone").value = display;
+      window._originalPatientPhone = display;
+      window._originalPatientFormValues.phone = display;
+      _checkPatientFormDirty();
+    }
+  } catch (e) {}
 }
 
 function openPatientNotesModalFromList(i) {
@@ -55,15 +101,88 @@ function closePatientNotesModal() {
   document.getElementById("patient-notes-modal").classList.remove("open");
 }
 
+function openPatientActionSheetForCurrent() {
+  const i = window._patients
+    ? window._patients.findIndex((p) => p.id === currentPatient?.id)
+    : -1;
+  openPatientActionSheet(i >= 0 ? i : window._actionPatientIndex);
+}
+
+function openPatientActionSheet(i) {
+  window._actionPatientIndex = i;
+  document.getElementById("patient-action-overlay").classList.add("open");
+}
+
+function closePatientActionSheet() {
+  document.getElementById("patient-action-overlay").classList.remove("open");
+}
+
+function openEditPatientFromAction() {
+  closePatientActionSheet();
+  openPatientNotesModalFromList(window._actionPatientIndex);
+}
+
+function openTriggerAgentSheet() {
+  closePatientActionSheet();
+  document.getElementById("trigger-agent-overlay").classList.add("open");
+}
+
+function closeTriggerAgentSheet() {
+  document.getElementById("trigger-agent-overlay").classList.remove("open");
+}
+
+async function triggerPreconsultAgent() {
+  const patient = window._patients
+    ? window._patients[window._actionPatientIndex]
+    : currentPatient;
+  if (!patient) return;
+
+  closeTriggerAgentSheet();
+
+  const btn = document.querySelector(
+    "#trigger-agent-overlay .sheet-option-card:first-of-type",
+  );
+  if (btn) {
+    btn.style.opacity = "0.6";
+    btn.style.pointerEvents = "none";
+  }
+
+  try {
+    const res = await fetch(API + "/patients/" + patient.id + "/preconsult", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ doctor_id: currentDoctor.id }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || "Could not trigger agent.");
+      return;
+    }
+    alert(
+      "Agent triggered! WhatsApp message sent to " +
+        (patient.name || "patient") +
+        ".",
+    );
+  } catch (e) {
+    alert("Could not trigger agent. Please try again.");
+  } finally {
+    if (btn) {
+      btn.style.opacity = "";
+      btn.style.pointerEvents = "";
+    }
+  }
+}
+
 async function savePatientNotes() {
   const name = document.getElementById("edit-patient-name").value.trim();
   const age = document.getElementById("edit-patient-age").value.trim();
   const gender = document.getElementById("edit-patient-gender").value;
+  const phone = document.getElementById("edit-patient-phone").value.trim();
   const diagnosis = document.getElementById("notes-diagnosis").value.trim();
   const procedure = document.getElementById("notes-procedure").value.trim();
   const note = document.getElementById("notes-note").value.trim();
   try {
-    await Promise.all([
+    const requests = [
       fetch(API + "/patients/" + currentPatient.id, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -79,7 +198,17 @@ async function savePatientNotes() {
           note,
         }),
       }),
-    ]);
+    ];
+    if (phone && phone !== window._originalPatientPhone) {
+      requests.push(
+        fetch(API + "/patients/" + currentPatient.id + "/phone", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone_number: phone }),
+        }),
+      );
+    }
+    await Promise.all(requests);
     currentPatient = {
       ...currentPatient,
       name,

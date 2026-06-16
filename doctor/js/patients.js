@@ -113,9 +113,9 @@ async function loadPatients() {
             "</div>" +
             '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px;flex-shrink:0;">' +
             badge +
-            '<button onclick="event.stopPropagation();openPatientNotesModalFromList(' +
+            '<button onclick="event.stopPropagation();openPatientActionSheet(' +
             i +
-            ')" style="background:#E8F5F0;color:#2D8A6A;border:none;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Edit</button>' +
+            ')" style="background:#E8F5F0;color:#2D8A6A;border:none;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Action</button>' +
             "</div>" +
             '<div class="patient-arrow">&#8250;</div>' +
             "</div>"
