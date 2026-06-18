@@ -1,5 +1,6 @@
 {
   "rewrites": [
-    { "source": "/history/:id", "destination": "/history/index.html" }
+    { "source": "/history/:id", "destination": "/history/index.html" },
+    { "source": "/postconsult/:id", "destination": "/postconsult/index.html" }
   ]
 }
