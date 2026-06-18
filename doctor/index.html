@@ -262,7 +262,7 @@
           Records
         </div>
         <div class="tab" id="tab-recs" onclick="switchTab('recs')">
-          My Prescriptions
+          My Consultations
         </div>
         <div class="tab" id="tab-summary" onclick="switchTab('summary')">
           Summary
@@ -271,6 +271,7 @@
       <div id="tab-content-records"></div>
       <div id="tab-content-recs" style="display: none">
         <div style="padding: 16px 20px">
+          <!-- Post-consult report -->
           <div
             style="
               font-size: 11px;
@@ -278,6 +279,21 @@
               text-transform: uppercase;
               letter-spacing: 0.5px;
               margin-bottom: 12px;
+            "
+          >
+            Post Consult Report
+          </div>
+          <div id="postconsult-report"></div>
+
+          <!-- Add Prescription -->
+          <div
+            style="
+              font-size: 11px;
+              color: #7a9a7a;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 12px;
+              margin-top: 20px;
             "
           >
             Add Prescription
@@ -345,6 +361,8 @@
           >
             Uploading...
           </div>
+
+          <!-- Prescriptions carousel -->
           <div
             style="
               font-size: 11px;
@@ -355,9 +373,19 @@
               margin-top: 8px;
             "
           >
-            My Previous Prescriptions
+            My Prescriptions
           </div>
-          <div id="rx-list"></div>
+          <div
+            id="rx-carousel"
+            style="
+              display: flex;
+              gap: 10px;
+              overflow-x: auto;
+              padding-bottom: 8px;
+              scrollbar-width: none;
+              -ms-overflow-style: none;
+            "
+          ></div>
         </div>
       </div>
       <div id="tab-content-summary" style="display: none"></div>
@@ -780,15 +808,13 @@
             </div>
           </div>
         </div>
-        <div class="sheet-option-card disabled">
+        <div class="sheet-option-card" onclick="triggerPostConsultAgent()">
           <div class="sheet-option-icon">&#128221;</div>
           <div>
-            <div class="sheet-option-title">
-              Post Consult Agent
-              <span class="coming-soon-badge">Coming soon</span>
-            </div>
+            <div class="sheet-option-title">Post Consult Agent</div>
             <div class="sheet-option-sub">
-              This agent will do post consultation followup on behalf of you
+              Check in with your patient after consultation — covers medication,
+              tests, lifestyle, referrals, monitoring and follow-up.
             </div>
           </div>
         </div>

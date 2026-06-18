@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kado Care — Post Consultation Check-in</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="/env.js" onerror="window.__KADO_API__ = undefined"></script>
+    <script src="https://cdn.jsdelivr.net/npm/livekit-client@2/dist/livekit-client.umd.min.js"></script>
+    <script>
+      window.livekitClient = window.LivekitClient;
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@elevenlabs/client@latest/dist/lib.umd.js"></script>
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: #f5f7f5;
+        font-family: "DM Sans", sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .card {
+        background: white;
+        border-radius: 20px;
+        padding: 32px 24px;
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+      }
+      .logo {
+        font-family: "Fraunces", serif;
+        font-size: 20px;
+        color: #1a2d22;
+        margin-bottom: 24px;
+      }
+      .logo span {
+        color: #e8866a;
+      }
+      h1 {
+        font-family: "Fraunces", serif;
+        font-size: 22px;
+        color: #1a2d22;
+        margin-bottom: 12px;
+      }
+      p {
+        color: #5a6b60;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 24px;
+      }
+      button {
+        background: #2d8a6a;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 14px 28px;
+        font-size: 15px;
+        font-weight: 500;
+        font-family: "DM Sans", sans-serif;
+        cursor: pointer;
+        width: 100%;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .status {
+        margin-top: 20px;
+        font-size: 13px;
+        color: #5a6b60;
+      }
+      .status.live {
+        color: #2d8a6a;
+        font-weight: 500;
+      }
+      .status.error {
+        color: #c0392b;
+      }
+      .orb-wrap {
+        display: none;
+        width: 180px;
+        height: 180px;
+        margin: 4px auto 20px;
+      }
+      .end-btn {
+        background: #c0392b;
+        margin-top: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="logo">kado<span>.</span>care</div>
+      <h1 id="title">Loading…</h1>
+      <p id="message"></p>
+      <div class="orb-wrap" id="orb-wrap">
+        <div id="orb-root"></div>
+      </div>
+      <button id="start-btn" style="display: none">Start check-in</button>
+      <button id="end-btn" class="end-btn" style="display: none">
+        End call
+      </button>
+      <div class="status" id="status"></div>
+    </div>
+
+    <script src="js/session.js"></script>
+  </body>
+</html>

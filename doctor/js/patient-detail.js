@@ -131,6 +131,48 @@ function closeTriggerAgentSheet() {
   document.getElementById("trigger-agent-overlay").classList.remove("open");
 }
 
+async function triggerPostConsultAgent() {
+  const patient = window._patients
+    ? window._patients[window._actionPatientIndex]
+    : currentPatient;
+  if (!patient) return;
+
+  closeTriggerAgentSheet();
+
+  const card = document.querySelector(
+    "#trigger-agent-overlay .sheet-option-card:nth-of-type(2)",
+  );
+  if (card) {
+    card.style.opacity = "0.6";
+    card.style.pointerEvents = "none";
+  }
+
+  try {
+    const res = await fetch(API + "/patients/" + patient.id + "/postconsult", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ doctor_id: currentDoctor.id }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || "Could not trigger agent.");
+      return;
+    }
+    alert(
+      "Post consult agent triggered! WhatsApp message sent to " +
+        (patient.name || "patient") +
+        ".",
+    );
+  } catch (e) {
+    alert("Could not trigger agent. Please try again.");
+  } finally {
+    if (card) {
+      card.style.opacity = "";
+      card.style.pointerEvents = "";
+    }
+  }
+}
+
 async function triggerPreconsultAgent() {
   const patient = window._patients
     ? window._patients[window._actionPatientIndex]
@@ -267,6 +309,6 @@ function switchTab(tab) {
       t === tab ? "block" : "none";
   });
   if (tab === "records") loadPatientRecords();
-  if (tab === "recs") loadPrescriptions();
+  if (tab === "recs") loadConsultationsTab();
   if (tab === "summary") loadDoctorSummary();
 }

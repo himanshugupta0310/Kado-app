@@ -73,7 +73,7 @@ async function uploadPrescription(input) {
       status.textContent = "Uploaded!";
       setTimeout(() => {
         status.style.display = "none";
-        loadPrescriptions();
+        loadConsultationsTab();
       }, 2000);
     } else if (res.status === 409) {
       status.style.background = "#FFF0F0";
@@ -92,9 +92,143 @@ async function uploadPrescription(input) {
   input.value = "";
 }
 
-async function loadPrescriptions() {
-  const container = document.getElementById("rx-list");
-  if (!container) return;
+function _complianceBadge(level) {
+  const colors = {
+    high: { bg: "#E8F5F0", text: "#2D8A6A" },
+    medium: { bg: "#FFF4E8", text: "#B86A1A" },
+    low: { bg: "#FFF0F0", text: "#C0392B" },
+    done: { bg: "#E8F5F0", text: "#2D8A6A" },
+    not_done: { bg: "#FFF0F0", text: "#C0392B" },
+    partial: { bg: "#FFF4E8", text: "#B86A1A" },
+  };
+  const c = colors[level] || { bg: "#F0F2F0", text: "#7A9A7A" };
+  const label = level ? level.replace("_", " ") : "—";
+  return (
+    '<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;background:' +
+    c.bg +
+    ";color:" +
+    c.text +
+    ';">' +
+    label.charAt(0).toUpperCase() +
+    label.slice(1) +
+    "</span>"
+  );
+}
+
+function renderPostConsultReport(reportData, completedAt) {
+  const r = reportData;
+  const date = completedAt
+    ? new Date(completedAt).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "";
+
+  const rows = [
+    {
+      label: "Medication",
+      badge: _complianceBadge(r.medication?.compliance),
+      notes: r.medication?.notes || "",
+    },
+    {
+      label: "Investigations",
+      badge: _complianceBadge(r.investigations?.status),
+      notes: r.investigations?.notes || "",
+    },
+    {
+      label: "Monitoring",
+      badge: _complianceBadge(r.monitoring?.compliance),
+      notes: r.monitoring?.notes || "",
+    },
+    {
+      label: "Lifestyle",
+      badge: _complianceBadge(r.lifestyle?.quality),
+      notes: r.lifestyle?.notes || "",
+    },
+    {
+      label: "Referral",
+      badge: _complianceBadge(r.referral?.done ? "done" : "not_done"),
+      notes: r.referral?.notes || "",
+    },
+  ];
+
+  const followup = r.followup || {};
+  const followupNote = followup.within_7_days
+    ? (followup.notes || "") +
+      " — within 7 days, ask patient to send booking link to Kado on WhatsApp."
+    : followup.date
+      ? "Scheduled: " +
+        followup.date +
+        (followup.notes ? " — " + followup.notes : "")
+      : followup.notes || "—";
+
+  return (
+    '<div style="background:white;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,0.05);margin-bottom:4px;">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
+    "<div style=\"font-family:'Fraunces',serif;font-size:15px;font-weight:300;color:#1A2D22;\">Post Consult Check-in</div>" +
+    '<div style="font-size:11px;color:#7A9A7A;">' +
+    date +
+    "</div></div>" +
+    (r.overall?.summary
+      ? '<div style="font-size:13px;color:#5A6B60;line-height:1.6;margin-bottom:14px;padding:10px;background:#F5F7F5;border-radius:10px;">' +
+        r.overall.summary +
+        "</div>"
+      : "") +
+    rows
+      .map(
+        (row) =>
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #F0F2F0;">' +
+          '<div style="flex:1;">' +
+          '<div style="font-size:12px;font-weight:500;color:#1A2D22;margin-bottom:3px;">' +
+          row.label +
+          "</div>" +
+          (row.notes
+            ? '<div style="font-size:11px;color:#7A9A7A;">' +
+              row.notes +
+              "</div>"
+            : "") +
+          "</div>" +
+          '<div style="margin-left:12px;flex-shrink:0;">' +
+          row.badge +
+          "</div></div>",
+      )
+      .join("") +
+    '<div style="padding:8px 0;">' +
+    '<div style="font-size:12px;font-weight:500;color:#1A2D22;margin-bottom:3px;">Follow-up</div>' +
+    '<div style="font-size:11px;color:#7A9A7A;">' +
+    followupNote +
+    "</div></div>" +
+    "</div>"
+  );
+}
+
+async function loadConsultationsTab() {
+  // Load post-consult report
+  const reportEl = document.getElementById("postconsult-report");
+  if (reportEl) {
+    try {
+      const data = await apiFetch(
+        "/patients/" + currentPatient.id + "/postconsult-sessions/latest",
+      );
+      if (data.report_data) {
+        reportEl.innerHTML = renderPostConsultReport(
+          data.report_data,
+          data.completed_at,
+        );
+      } else {
+        reportEl.innerHTML =
+          '<div style="font-size:13px;color:#7A9A7A;padding:8px 0 16px;">No post-consult check-in yet. Trigger the Post Consult Agent to start.</div>';
+      }
+    } catch (e) {
+      reportEl.innerHTML =
+        '<div style="font-size:13px;color:#7A9A7A;padding:8px 0 16px;">Could not load report.</div>';
+    }
+  }
+
+  // Load prescriptions carousel
+  const carousel = document.getElementById("rx-carousel");
+  if (!carousel) return;
   try {
     const reports = await apiFetch("/records?patient_id=" + currentPatient.id);
     const prescriptions = (reports || []).filter((r) => {
@@ -108,11 +242,11 @@ async function loadPrescriptions() {
       return isRx && byMe;
     });
     if (prescriptions.length === 0) {
-      container.innerHTML =
+      carousel.innerHTML =
         '<div style="font-size:13px;color:#7A9A7A;padding:8px 0;">No prescriptions from you yet.</div>';
       return;
     }
-    container.innerHTML = prescriptions
+    carousel.innerHTML = prescriptions
       .map((r) => {
         const date = r.report_date
           ? new Date(r.report_date + "T12:00:00").toLocaleDateString("en-IN", {
@@ -122,19 +256,19 @@ async function loadPrescriptions() {
             })
           : "Date unknown";
         return (
-          '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F0F2F0;cursor:pointer;" onclick="window.open(\'' +
+          "<div onclick=\"window.open('" +
           r.file_url +
-          "', '_blank')\">" +
-          '<div style="width:36px;height:36px;border-radius:10px;background:#FFF4E8;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">&#128203;</div>' +
-          '<div style="flex:1;"><div style="font-size:13px;font-weight:500;color:#1A2D22;">Prescription</div><div style="font-size:11px;color:#7A9A7A;">' +
+          "', '_blank')\" style=\"flex-shrink:0;width:130px;background:white;border-radius:14px;padding:14px 12px;box-shadow:0 1px 6px rgba(0,0,0,0.06);cursor:pointer;text-align:center;\">" +
+          '<div style="font-size:28px;margin-bottom:8px;">&#128203;</div>' +
+          '<div style="font-size:12px;font-weight:500;color:#1A2D22;margin-bottom:4px;">Prescription</div>' +
+          '<div style="font-size:11px;color:#7A9A7A;">' +
           date +
-          "</div></div>" +
-          '<div style="font-size:18px;color:#C0D0C0;">&#8250;</div></div>'
+          "</div></div>"
         );
       })
       .join("");
   } catch (e) {
-    container.innerHTML =
+    carousel.innerHTML =
       '<div style="font-size:13px;color:#7A9A7A;">Could not load.</div>';
   }
 }
