@@ -11,10 +11,12 @@ let activeConversation = null;
 
 function startOrbAnimation() {
   orbWrap.style.display = "block";
+  window.KadoOrb?.setAgentState(null);
 }
 
 function stopOrbAnimation() {
   orbWrap.style.display = "none";
+  window.KadoOrb?.setAgentState(null);
 }
 
 function getSessionId() {
@@ -125,6 +127,9 @@ async function startSession() {
       },
       onModeChange: ({ mode }) => {
         setStatus(mode === "speaking" ? "Speaking…" : "Listening…", "live");
+        window.KadoOrb?.setAgentState(
+          mode === "speaking" ? "talking" : "listening",
+        );
       },
       onError: () => {
         setStatus("Something went wrong during the session.", "error");
