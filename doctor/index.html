@@ -267,27 +267,26 @@
       <div class="nav">
         <button
           style="
+            position: absolute;
+            left: 16px;
             background: none;
             border: none;
-            font-size: 22px;
+            font-size: 26px;
             cursor: pointer;
             color: #1a2d22;
             padding: 0;
+            line-height: 1;
           "
           onclick="showScreen('patients')"
         >
           &#8249;
         </button>
-        <div
-          class="nav-logo"
-          id="detail-patient-name"
-          style="position: absolute; left: 50%; transform: translateX(-50%)"
-        >
-          Patient
-        </div>
+        <div class="nav-logo" id="detail-patient-name">Patient</div>
         <button
           onclick="openPatientActionSheetForCurrent()"
           style="
+            position: absolute;
+            right: 16px;
             background: none;
             border: none;
             font-size: 13px;
