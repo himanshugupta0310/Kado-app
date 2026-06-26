@@ -7,6 +7,7 @@ window.addEventListener("load", async () => {
       if (payload.exp && payload.exp * 1000 > Date.now()) {
         currentDoctor = JSON.parse(saved);
         await loadPatientsScreen();
+        startNotificationPolling();
         return;
       }
     } catch {}

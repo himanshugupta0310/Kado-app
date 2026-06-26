@@ -57,6 +57,7 @@ async function handleVerifyPasscode() {
       currentDoctor = data.doctor;
       localStorage.setItem("kado_doctor", JSON.stringify(data.doctor));
       await loadPatientsScreen();
+      startNotificationPolling();
       return;
     }
     if (data.error === "Doctor not found. Please register first.") {
@@ -115,9 +116,14 @@ async function handleRegister() {
 
 async function continueAfterReveal() {
   await loadPatientsScreen();
+  startNotificationPolling();
 }
 
 function logoutDoctor() {
+  if (_notifPollInterval) {
+    clearInterval(_notifPollInterval);
+    _notifPollInterval = null;
+  }
   currentDoctor = null;
   clearToken();
   localStorage.removeItem("kado_doctor");
