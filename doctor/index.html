@@ -39,18 +39,22 @@
               inputmode="numeric"
             />
           </div>
-          <button class="login-btn" id="send-otp-btn" onclick="handleSendOtp()">
-            Send OTP
+          <button
+            class="login-btn"
+            id="send-otp-btn"
+            onclick="handlePhoneContinue()"
+          >
+            Continue
           </button>
         </div>
 
-        <!-- Step 2: OTP -->
-        <div id="step-otp" style="display: none">
+        <!-- Step 2: passcode -->
+        <div id="step-passcode" style="display: none">
           <div class="input-group">
             <input
               type="tel"
-              id="otp-input"
-              placeholder="6-digit OTP"
+              id="passcode-input"
+              placeholder="6-digit passcode"
               maxlength="6"
               inputmode="numeric"
               style="width: 100%; letter-spacing: 4px; font-size: 18px"
@@ -58,10 +62,10 @@
           </div>
           <button
             class="login-btn"
-            id="verify-otp-btn"
-            onclick="handleVerifyOtp()"
+            id="verify-passcode-btn"
+            onclick="handleVerifyPasscode()"
           >
-            Verify OTP
+            Login
           </button>
           <div style="text-align: center; margin-top: 10px">
             <button
@@ -76,22 +80,6 @@
               "
             >
               ← Change number
-            </button>
-            <span style="color: #c0d0c0; margin: 0 8px">·</span>
-            <button
-              id="resend-btn"
-              onclick="handleResendOtp()"
-              disabled
-              style="
-                background: none;
-                border: none;
-                font-size: 12px;
-                color: #c0d0c0;
-                cursor: pointer;
-                font-family: &quot;DM Sans&quot;, sans-serif;
-              "
-            >
-              Resend in 30s
             </button>
           </div>
         </div>
@@ -136,6 +124,57 @@
               ← Change number
             </button>
           </div>
+        </div>
+
+        <!-- Step 4: passcode reveal (after registration) -->
+        <div id="step-reveal" style="display: none">
+          <div
+            style="
+              background: #e8f5f0;
+              border-radius: 14px;
+              padding: 20px;
+              text-align: center;
+              margin-bottom: 16px;
+            "
+          >
+            <div
+              style="
+                font-size: 12px;
+                color: #2d8a6a;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 8px;
+              "
+            >
+              Your passcode
+            </div>
+            <div
+              id="reveal-passcode"
+              style="
+                font-size: 32px;
+                font-weight: 600;
+                letter-spacing: 8px;
+                color: #1a2d22;
+                font-family: &quot;DM Sans&quot;, sans-serif;
+              "
+            >
+              ——————
+            </div>
+            <div
+              style="
+                font-size: 12px;
+                color: #7a9a7a;
+                margin-top: 10px;
+                line-height: 1.5;
+              "
+            >
+              Save this passcode — you will need it every time you log in.<br />
+              It was also sent to you on WhatsApp.
+            </div>
+          </div>
+          <button class="login-btn" onclick="continueAfterReveal()">
+            Continue to Kado
+          </button>
         </div>
 
         <div class="login-error" id="login-error"></div>

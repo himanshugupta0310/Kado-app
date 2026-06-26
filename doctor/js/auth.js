@@ -1,5 +1,4 @@
 let loginPhone = "";
-let _resendTimer = null;
 
 function showErr(msg) {
   const el = document.getElementById("login-error");
@@ -11,40 +10,16 @@ function clearErr() {
 }
 
 function backToPhone() {
-  clearInterval(_resendTimer);
   document.getElementById("step-phone").style.display = "block";
-  document.getElementById("step-otp").style.display = "none";
+  document.getElementById("step-passcode").style.display = "none";
   document.getElementById("step-register").style.display = "none";
+  document.getElementById("step-reveal").style.display = "none";
   document.getElementById("login-sub-text").textContent =
     "Enter your WhatsApp number";
-  const btn = document.getElementById("resend-btn");
-  btn.disabled = true;
-  btn.style.color = "#C0D0C0";
-  btn.textContent = "Resend in 30s";
   clearErr();
 }
 
-function startResendCountdown(seconds = 30) {
-  const btn = document.getElementById("resend-btn");
-  btn.disabled = true;
-  btn.style.color = "#C0D0C0";
-  let remaining = seconds;
-  btn.textContent = `Resend in ${remaining}s`;
-  clearInterval(_resendTimer);
-  _resendTimer = setInterval(() => {
-    remaining--;
-    if (remaining <= 0) {
-      clearInterval(_resendTimer);
-      btn.disabled = false;
-      btn.style.color = "#2D6BE4";
-      btn.textContent = "Resend OTP";
-    } else {
-      btn.textContent = `Resend in ${remaining}s`;
-    }
-  }, 1000);
-}
-
-async function handleSendOtp() {
+function handlePhoneContinue() {
   const input = document
     .getElementById("phone-input")
     .value.trim()
@@ -55,54 +30,27 @@ async function handleSendOtp() {
     return;
   }
   loginPhone = "+91" + input;
-  const btn = document.getElementById("send-otp-btn");
-  btn.disabled = true;
-  btn.textContent = "Sending OTP...";
-  try {
-    const data = await apiPost("/doctor/auth/send-otp", {
-      phone_number: loginPhone,
-    });
-    if (data.success) {
-      document.getElementById("step-phone").style.display = "none";
-      document.getElementById("step-otp").style.display = "block";
-      document.getElementById("login-sub-text").textContent =
-        `OTP sent to ${loginPhone} on WhatsApp`;
-      document.getElementById("otp-input").focus();
-      startResendCountdown(30);
-    } else {
-      showErr(data.error || "Could not send OTP.");
-    }
-  } catch (e) {
-    showErr("Something went wrong. Please try again.");
-  }
-  btn.disabled = false;
-  btn.textContent = "Send OTP";
+  document.getElementById("step-phone").style.display = "none";
+  document.getElementById("step-passcode").style.display = "block";
+  document.getElementById("login-sub-text").textContent =
+    "Enter your 6-digit passcode";
+  document.getElementById("passcode-input").focus();
 }
 
-async function handleResendOtp() {
-  const btn = document.getElementById("resend-btn");
-  btn.disabled = true;
-  btn.textContent = "Sending...";
-  try {
-    await apiPost("/doctor/auth/send-otp", { phone_number: loginPhone });
-  } catch {}
-  startResendCountdown(30);
-}
-
-async function handleVerifyOtp() {
-  const otp = document.getElementById("otp-input").value.trim();
+async function handleVerifyPasscode() {
+  const passcode = document.getElementById("passcode-input").value.trim();
   clearErr();
-  if (otp.length < 6) {
-    showErr("Enter the 6-digit OTP.");
+  if (passcode.length < 6) {
+    showErr("Enter your 6-digit passcode.");
     return;
   }
-  const btn = document.getElementById("verify-otp-btn");
+  const btn = document.getElementById("verify-passcode-btn");
   btn.disabled = true;
   btn.textContent = "Verifying...";
   try {
-    const data = await apiPost("/doctor/auth/verify-otp", {
+    const data = await apiPost("/doctor/auth/verify-passcode", {
       phone_number: loginPhone,
-      otp,
+      passcode,
     });
     if (data.token && data.doctor) {
       setToken(data.token);
@@ -112,21 +60,21 @@ async function handleVerifyOtp() {
       return;
     }
     if (data.error === "Doctor not found. Please register first.") {
-      document.getElementById("step-otp").style.display = "none";
+      document.getElementById("step-passcode").style.display = "none";
       document.getElementById("step-register").style.display = "block";
       document.getElementById("login-sub-text").textContent =
         "Create your doctor profile";
       clearErr();
       btn.disabled = false;
-      btn.textContent = "Verify OTP";
+      btn.textContent = "Login";
       return;
     }
-    showErr(data.error || "Invalid OTP. Please try again.");
+    showErr(data.error || "Incorrect passcode. Please try again.");
   } catch (e) {
     showErr("Something went wrong.");
   }
   btn.disabled = false;
-  btn.textContent = "Verify OTP";
+  btn.textContent = "Login";
 }
 
 async function handleRegister() {
@@ -150,7 +98,11 @@ async function handleRegister() {
       setToken(data.token);
       currentDoctor = data;
       localStorage.setItem("kado_doctor", JSON.stringify(data));
-      await loadPatientsScreen();
+      document.getElementById("step-register").style.display = "none";
+      document.getElementById("step-reveal").style.display = "block";
+      document.getElementById("reveal-passcode").textContent =
+        data.passcode || "—";
+      document.getElementById("login-sub-text").textContent = "Your passcode";
     } else {
       showErr(data.error || "Could not create account.");
     }
@@ -159,6 +111,10 @@ async function handleRegister() {
   }
   btn.disabled = false;
   btn.textContent = "Create account";
+}
+
+async function continueAfterReveal() {
+  await loadPatientsScreen();
 }
 
 function logoutDoctor() {
