@@ -31,15 +31,36 @@ function loadProfileScreen() {
   showScreen("doctor-profile");
 }
 
-function setMode(mode) {
-  if (mode === "professional") {
-    showScreen("patients");
-    document.getElementById("invite-fab").style.display = "block";
-  } else {
-    showScreen("personal");
-    document.getElementById("invite-fab").style.display = "none";
+function toggleNotifications() {
+  const dropdown = document.getElementById("notif-dropdown");
+  const isOpen = dropdown.style.display !== "none";
+  if (isOpen) {
+    dropdown.style.display = "none";
+    return;
   }
+  dropdown.style.display = "block";
+  apiPatch("/doctor/notifications/read-all", {})
+    .then(() => {
+      document.getElementById("notif-badge").style.display = "none";
+      document
+        .querySelectorAll(".notif-item")
+        .forEach((el) => el.classList.remove("unread"));
+    })
+    .catch(() => {});
 }
+
+document.addEventListener("click", (e) => {
+  const dropdown = document.getElementById("notif-dropdown");
+  const bell = document.getElementById("notif-bell");
+  if (
+    dropdown &&
+    bell &&
+    !dropdown.contains(e.target) &&
+    !bell.contains(e.target)
+  ) {
+    dropdown.style.display = "none";
+  }
+});
 
 function getReportIcon(type) {
   if (!type) return "📋";
