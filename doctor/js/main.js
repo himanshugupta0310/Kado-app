@@ -16,9 +16,9 @@ window.addEventListener("load", async () => {
 });
 
 document.getElementById("phone-input").addEventListener("keypress", (e) => {
-  if (e.key === "Enter") handleSendOtp();
+  if (e.key === "Enter") handlePhoneContinue();
 });
 
-document.getElementById("otp-input").addEventListener("keypress", (e) => {
-  if (e.key === "Enter") handleVerifyOtp();
+document.getElementById("passcode-input").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") handleVerifyPasscode();
 });
