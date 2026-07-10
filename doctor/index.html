@@ -774,7 +774,10 @@
       <div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-handle"></div>
         <div class="sheet-title">Trigger an agent</div>
-        <div class="sheet-option-card" onclick="triggerPreconsultAgent()">
+        <div
+          class="sheet-option-card"
+          onclick="toggleAgentAdvicePanel('preconsult')"
+        >
           <div class="sheet-option-icon">&#128203;</div>
           <div>
             <div class="sheet-option-title">Preconsult Agent</div>
@@ -785,7 +788,25 @@
             </div>
           </div>
         </div>
-        <div class="sheet-option-card" onclick="triggerPostConsultAgent()">
+        <div
+          class="agent-advice-panel"
+          id="preconsult-advice-panel"
+          style="display: none"
+          onclick="event.stopPropagation()"
+        >
+          <textarea
+            class="modal-textarea"
+            id="preconsult-advice-input"
+            placeholder="Agent advice (optional) — anything you want the agent to focus on for this patient"
+          ></textarea>
+          <button class="primary-btn" onclick="triggerPreconsultAgent()">
+            Start agent
+          </button>
+        </div>
+        <div
+          class="sheet-option-card"
+          onclick="toggleAgentAdvicePanel('postconsult')"
+        >
           <div class="sheet-option-icon">&#128221;</div>
           <div>
             <div class="sheet-option-title">Post Consult Agent</div>
@@ -794,6 +815,21 @@
               tests, lifestyle, referrals, monitoring and follow-up.
             </div>
           </div>
+        </div>
+        <div
+          class="agent-advice-panel"
+          id="postconsult-advice-panel"
+          style="display: none"
+          onclick="event.stopPropagation()"
+        >
+          <textarea
+            class="modal-textarea"
+            id="postconsult-advice-input"
+            placeholder="Agent advice (optional) — anything you want the agent to focus on for this patient"
+          ></textarea>
+          <button class="primary-btn" onclick="triggerPostConsultAgent()">
+            Start agent
+          </button>
         </div>
         <button class="sheet-cancel" onclick="closeTriggerAgentSheet()">
           Cancel

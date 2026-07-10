@@ -124,11 +124,29 @@ function openEditPatientFromAction() {
 
 function openTriggerAgentSheet() {
   closePatientActionSheet();
+  const patient = window._patients
+    ? window._patients[window._actionPatientIndex]
+    : currentPatient;
+  const notes =
+    (window._patientNotes &&
+      window._patientNotes[window._actionPatientIndex]) ||
+    {};
+  document.getElementById("preconsult-advice-input").value =
+    notes.preconsult_agent_advice || "";
+  document.getElementById("postconsult-advice-input").value =
+    notes.postconsult_agent_advice || "";
+  document.getElementById("preconsult-advice-panel").style.display = "none";
+  document.getElementById("postconsult-advice-panel").style.display = "none";
   document.getElementById("trigger-agent-overlay").classList.add("open");
 }
 
 function closeTriggerAgentSheet() {
   document.getElementById("trigger-agent-overlay").classList.remove("open");
+}
+
+function toggleAgentAdvicePanel(kind) {
+  const panel = document.getElementById(kind + "-advice-panel");
+  panel.style.display = panel.style.display === "none" ? "block" : "none";
 }
 
 async function triggerPostConsultAgent() {
@@ -137,26 +155,33 @@ async function triggerPostConsultAgent() {
     : currentPatient;
   if (!patient) return;
 
-  closeTriggerAgentSheet();
+  const agentAdvice = document
+    .getElementById("postconsult-advice-input")
+    .value.trim();
 
-  const card = document.querySelector(
-    "#trigger-agent-overlay .sheet-option-card:nth-of-type(2)",
-  );
-  if (card) {
-    card.style.opacity = "0.6";
-    card.style.pointerEvents = "none";
-  }
+  closeTriggerAgentSheet();
 
   try {
     const res = await fetch(API + "/patients/" + patient.id + "/postconsult", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ doctor_id: currentDoctor.id }),
+      body: JSON.stringify({
+        doctor_id: currentDoctor.id,
+        agent_advice: agentAdvice,
+      }),
     });
     const data = await res.json();
     if (!res.ok) {
       alert(data.error || "Could not trigger agent.");
       return;
+    }
+    if (
+      window._patientNotes &&
+      window._patientNotes[window._actionPatientIndex]
+    ) {
+      window._patientNotes[
+        window._actionPatientIndex
+      ].postconsult_agent_advice = agentAdvice;
     }
     alert(
       "Post consult agent triggered! WhatsApp message sent to " +
@@ -165,11 +190,6 @@ async function triggerPostConsultAgent() {
     );
   } catch (e) {
     alert("Could not trigger agent. Please try again.");
-  } finally {
-    if (card) {
-      card.style.opacity = "";
-      card.style.pointerEvents = "";
-    }
   }
 }
 
@@ -179,26 +199,32 @@ async function triggerPreconsultAgent() {
     : currentPatient;
   if (!patient) return;
 
-  closeTriggerAgentSheet();
+  const agentAdvice = document
+    .getElementById("preconsult-advice-input")
+    .value.trim();
 
-  const btn = document.querySelector(
-    "#trigger-agent-overlay .sheet-option-card:first-of-type",
-  );
-  if (btn) {
-    btn.style.opacity = "0.6";
-    btn.style.pointerEvents = "none";
-  }
+  closeTriggerAgentSheet();
 
   try {
     const res = await fetch(API + "/patients/" + patient.id + "/preconsult", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ doctor_id: currentDoctor.id }),
+      body: JSON.stringify({
+        doctor_id: currentDoctor.id,
+        agent_advice: agentAdvice,
+      }),
     });
     const data = await res.json();
     if (!res.ok) {
       alert(data.error || "Could not trigger agent.");
       return;
+    }
+    if (
+      window._patientNotes &&
+      window._patientNotes[window._actionPatientIndex]
+    ) {
+      window._patientNotes[window._actionPatientIndex].preconsult_agent_advice =
+        agentAdvice;
     }
     alert(
       "Agent triggered! WhatsApp message sent to " +
@@ -207,11 +233,6 @@ async function triggerPreconsultAgent() {
     );
   } catch (e) {
     alert("Could not trigger agent. Please try again.");
-  } finally {
-    if (btn) {
-      btn.style.opacity = "";
-      btn.style.pointerEvents = "";
-    }
   }
 }
 

@@ -25,7 +25,9 @@ async function loadDoctorSummary() {
         "/patients/" + currentPatient.id + "/history-sessions/latest",
       );
       if (historyData.collected_data) {
-        historyHtml = renderHistoryData(historyData.collected_data);
+        historyHtml =
+          renderHistoryData(historyData.collected_data) +
+          renderAgentFeedbackForm();
       }
     } catch (e) {}
 
@@ -48,6 +50,10 @@ async function loadDoctorSummary() {
         : "") +
       historyHtml +
       "</div>";
+    if (historyHtml) {
+      agentFeedbackScope = "patient";
+      loadAgentFeedbackList();
+    }
   } catch (e) {
     container.innerHTML =
       '<div class="empty-state"><div class="empty-state-icon">&#9888;&#65039;</div><div class="empty-state-title">Could not load summary</div></div>';
@@ -180,6 +186,95 @@ function renderDoctorSummary(content, trends) {
     content +
     "</div></div>"
   );
+}
+
+function renderAgentFeedbackForm() {
+  return (
+    '<div class="summary-result" style="background:white;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,0.05);margin-top:16px;">' +
+    "<div style=\"font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:#1A2D22;margin-bottom:10px;\">Feedback for the agent</div>" +
+    '<textarea class="modal-textarea" id="agent-feedback-input" placeholder="How should the agent behave differently?" style="margin-bottom:10px;"></textarea>' +
+    '<div style="display:flex;gap:8px;margin-bottom:12px;">' +
+    '<button class="summary-type-btn active" id="feedback-scope-patient" onclick="selectAgentFeedbackScope(\'patient\')">This patient only</button>' +
+    '<button class="summary-type-btn" id="feedback-scope-global" onclick="selectAgentFeedbackScope(\'global\')">All my patients</button>' +
+    "</div>" +
+    '<button onclick="submitAgentFeedback()" id="agent-feedback-submit-btn" style="width:100%;background:#2D6BE4;color:white;border:none;padding:14px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Save Feedback</button>' +
+    '<div id="agent-feedback-list" style="margin-top:14px;"></div>' +
+    "</div>"
+  );
+}
+
+function selectAgentFeedbackScope(scope) {
+  agentFeedbackScope = scope;
+  document
+    .getElementById("feedback-scope-patient")
+    .classList.toggle("active", scope === "patient");
+  document
+    .getElementById("feedback-scope-global")
+    .classList.toggle("active", scope === "global");
+}
+
+async function submitAgentFeedback() {
+  const input = document.getElementById("agent-feedback-input");
+  const feedback = input.value.trim();
+  if (!feedback) return;
+  const btn = document.getElementById("agent-feedback-submit-btn");
+  btn.disabled = true;
+  try {
+    const res = await fetch(
+      API + "/patients/" + currentPatient.id + "/agent-feedback",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          doctor_id: currentDoctor.id,
+          feedback,
+          scope: agentFeedbackScope,
+        }),
+      },
+    );
+    if (!res.ok) throw new Error("Failed");
+    input.value = "";
+    await loadAgentFeedbackList();
+  } catch (e) {
+    alert("Could not save feedback.");
+  }
+  btn.disabled = false;
+}
+
+async function loadAgentFeedbackList() {
+  const listEl = document.getElementById("agent-feedback-list");
+  if (!listEl) return;
+  try {
+    const entries = await apiFetch(
+      "/patients/" + currentPatient.id + "/agent-feedback",
+    );
+    listEl.innerHTML = renderAgentFeedbackList(entries || []);
+  } catch (e) {}
+}
+
+function renderAgentFeedbackList(entries) {
+  if (!entries.length) return "";
+  return entries
+    .map((e) => {
+      const date = new Date(e.created_at).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+      const scopeLabel = e.scope === "global" ? "All patients" : "This patient";
+      return (
+        '<div style="border-top:1px solid #EEF0EE;padding:10px 0;">' +
+        '<div style="font-size:11px;color:#7A9A7A;margin-bottom:3px;">' +
+        date +
+        " &middot; " +
+        scopeLabel +
+        "</div>" +
+        '<div style="font-size:13px;color:#1A2D22;">' +
+        e.feedback +
+        "</div></div>"
+      );
+    })
+    .join("");
 }
 
 function renderHistoryData(content) {

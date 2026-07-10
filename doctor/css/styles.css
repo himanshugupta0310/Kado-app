@@ -612,6 +612,13 @@ body {
   font-size: 12px;
   color: #7a9a7a;
 }
+.agent-advice-panel {
+  margin: -4px 0 14px;
+  padding: 0 2px;
+}
+.agent-advice-panel .modal-textarea {
+  margin-bottom: 10px;
+}
 .coming-soon-badge {
   background: #fff3e0;
   color: #e08a2d;

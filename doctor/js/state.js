@@ -11,3 +11,4 @@ let allReports = [];
 let currentEditReport = null;
 let _reportPatientSelected = null;
 let docInviteMethod = "whatsapp";
+let agentFeedbackScope = "patient";
