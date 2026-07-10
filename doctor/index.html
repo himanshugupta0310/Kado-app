@@ -1286,36 +1286,6 @@
       </div>
     </div>
 
-    <!-- SPECIALITY MODAL -->
-    <div
-      class="modal-overlay"
-      id="speciality-modal"
-      onclick="closeSpecialityModal()"
-    >
-      <div class="modal" onclick="event.stopPropagation()">
-        <div class="modal-handle"></div>
-        <div class="modal-title">Your speciality</div>
-        <div class="modal-sub">
-          Enter your medical speciality for a focused summary
-        </div>
-        <input
-          type="text"
-          id="speciality-modal-input"
-          class="modal-input"
-          placeholder="e.g. Cardiologist, Neurologist..."
-        />
-        <button
-          class="primary-btn"
-          onclick="saveAndGenerateSpecialitySummary()"
-        >
-          Generate Summary
-        </button>
-        <button class="modal-close" onclick="closeSpecialityModal()">
-          Cancel
-        </button>
-      </div>
-    </div>
-
     <!-- VET MODAL -->
     <div class="modal-overlay" id="vet-modal" onclick="closeVetModal()">
       <div class="modal" onclick="event.stopPropagation()">

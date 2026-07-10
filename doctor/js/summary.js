@@ -15,42 +15,50 @@ async function loadDoctorSummary() {
             summaryData.summary.report_count) +
           " new report(s) since last summary.</div>"
         : "";
-    const specLabel = currentDoctor.specialization
-      ? currentDoctor.specialization + " Summary"
-      : "Speciality Summary";
 
-    let historyHtml = "";
+    let agentHtml = "";
+    let hasHistoryData = false;
     try {
       const historyData = await apiFetch(
         "/patients/" + currentPatient.id + "/history-sessions/latest",
       );
       if (historyData.collected_data) {
-        historyHtml =
+        hasHistoryData = true;
+        agentHtml =
           renderHistoryData(historyData.collected_data) +
           renderAgentFeedbackForm();
       }
     } catch (e) {}
+    if (!hasHistoryData) {
+      agentHtml =
+        '<div class="empty-state" style="padding:30px 0;"><div class="empty-state-title">No preconsult session completed yet</div></div>';
+    }
 
-    container.innerHTML =
-      '<div style="padding:16px 20px;">' +
+    const generalHtml =
       staleNotice +
-      '<div style="font-size:11px;color:#7A9A7A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Summary type</div>' +
-      '<div style="display:flex;gap:8px;margin-bottom:20px;">' +
-      '<button class="summary-type-btn active" id="summary-type-general" onclick="selectSummaryType(\'general\')">General Summary</button>' +
-      '<button class="summary-type-btn" id="summary-type-speciality" onclick="selectSummaryType(\'speciality\')">' +
-      specLabel +
-      "</button>" +
-      "</div>" +
       '<button onclick="generateDoctorSummary()" id="doc-summary-btn" style="width:100%;background:#2D6BE4;color:white;border:none;padding:14px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:\'DM Sans\',sans-serif;margin-bottom:16px;">Generate Clinical Summary</button>' +
       (summaryData.summary && !summaryData.is_stale
         ? renderDoctorSummary(
             summaryData.summary.content,
             summaryData.summary.biomarker_trends,
           )
-        : "") +
-      historyHtml +
+        : "");
+
+    container.innerHTML =
+      '<div style="padding:16px 20px;">' +
+      '<div style="font-size:11px;color:#7A9A7A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Summary type</div>' +
+      '<div style="display:flex;gap:8px;margin-bottom:20px;">' +
+      '<button class="summary-type-btn active" id="summary-type-general" onclick="selectSummaryType(\'general\')">General Summary</button>' +
+      '<button class="summary-type-btn" id="summary-type-agent" onclick="selectSummaryType(\'agent\')">Agent Summary</button>' +
+      "</div>" +
+      '<div id="summary-panel-general">' +
+      generalHtml +
+      "</div>" +
+      '<div id="summary-panel-agent" style="display:none">' +
+      agentHtml +
+      "</div>" +
       "</div>";
-    if (historyHtml) {
+    if (hasHistoryData) {
       agentFeedbackScope = "patient";
       loadAgentFeedbackList();
     }
@@ -66,53 +74,15 @@ function selectSummaryType(type) {
     .getElementById("summary-type-general")
     .classList.toggle("active", type === "general");
   document
-    .getElementById("summary-type-speciality")
-    .classList.toggle("active", type === "speciality");
-  if (type === "speciality" && !currentDoctor.specialization) {
-    document.getElementById("speciality-modal-input").value = "";
-    document.getElementById("speciality-modal").classList.add("open");
-  }
-}
-
-function closeSpecialityModal() {
-  document.getElementById("speciality-modal").classList.remove("open");
-}
-
-async function saveAndGenerateSpecialitySummary() {
-  const spec = document.getElementById("speciality-modal-input").value.trim();
-  if (!spec) return;
-  try {
-    await fetch(API + "/doctor/update-profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        doctor_id: currentDoctor.id,
-        specialization: spec,
-      }),
-    });
-    currentDoctor.specialization = spec;
-    localStorage.setItem("kado_doctor", JSON.stringify(currentDoctor));
-  } catch (e) {}
-  closeSpecialityModal();
-  doctorSummarySpeciality = spec;
-  await triggerSummaryGeneration();
+    .getElementById("summary-type-agent")
+    .classList.toggle("active", type === "agent");
+  document.getElementById("summary-panel-general").style.display =
+    type === "general" ? "block" : "none";
+  document.getElementById("summary-panel-agent").style.display =
+    type === "agent" ? "block" : "none";
 }
 
 async function generateDoctorSummary() {
-  if (doctorSummaryType === "speciality") {
-    if (!currentDoctor.specialization) {
-      document.getElementById("speciality-modal-input").value = "";
-      document.getElementById("speciality-modal").classList.add("open");
-      return;
-    }
-    doctorSummarySpeciality = currentDoctor.specialization;
-  } else {
-    doctorSummarySpeciality = "general";
-  }
-  await triggerSummaryGeneration();
-}
-
-async function triggerSummaryGeneration() {
   const btn = document.getElementById("doc-summary-btn");
   if (btn) {
     btn.disabled = true;
@@ -122,22 +92,19 @@ async function triggerSummaryGeneration() {
     const cached = await apiFetch(
       "/patients/" +
         currentPatient.id +
-        "/summary?type=doctor&speciality=" +
-        doctorSummarySpeciality,
+        "/summary?type=doctor&speciality=general",
     );
     if (cached.summary && !cached.is_stale) {
-      const container = document.getElementById("tab-content-summary");
-      const existing = container.querySelector(".summary-result");
+      const panel = document.getElementById("summary-panel-general");
+      const existing = panel.querySelector(".summary-result");
       if (existing) existing.remove();
-      container
-        .querySelector("div")
-        .insertAdjacentHTML(
-          "beforeend",
-          renderDoctorSummary(
-            cached.summary.content,
-            cached.summary.biomarker_trends,
-          ),
-        );
+      panel.insertAdjacentHTML(
+        "beforeend",
+        renderDoctorSummary(
+          cached.summary.content,
+          cached.summary.biomarker_trends,
+        ),
+      );
       if (btn) {
         btn.disabled = false;
         btn.textContent = "Generate Clinical Summary";
@@ -151,21 +118,19 @@ async function triggerSummaryGeneration() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: "doctor",
-          speciality: doctorSummarySpeciality,
+          speciality: "general",
         }),
       },
     );
     const data = await res.json();
     if (data.success) {
-      const container = document.getElementById("tab-content-summary");
-      const existing = container.querySelector(".summary-result");
+      const panel = document.getElementById("summary-panel-general");
+      const existing = panel.querySelector(".summary-result");
       if (existing) existing.remove();
-      container
-        .querySelector("div")
-        .insertAdjacentHTML(
-          "beforeend",
-          renderDoctorSummary(data.content, data.trends),
-        );
+      panel.insertAdjacentHTML(
+        "beforeend",
+        renderDoctorSummary(data.content, data.trends),
+      );
     }
   } catch (e) {
     alert("Could not generate summary.");
@@ -277,11 +242,215 @@ function renderAgentFeedbackList(entries) {
     .join("");
 }
 
+function _hdSection(title, innerHtml) {
+  if (!innerHtml) return "";
+  return (
+    '<div style="margin-bottom:16px;">' +
+    "<div style=\"font-family:'Fraunces',serif;font-size:14px;font-weight:500;color:#1A2D22;margin-bottom:6px;\">" +
+    title +
+    "</div>" +
+    innerHtml +
+    "</div>"
+  );
+}
+
+function _hdList(items) {
+  if (!items || !items.length) return "";
+  return (
+    '<ul style="margin:0;padding-left:18px;font-size:13px;color:#3A4A3E;line-height:1.6;">' +
+    items.map((i) => "<li>" + i + "</li>").join("") +
+    "</ul>"
+  );
+}
+
+function _hdRow(label, value) {
+  if (value === null || value === undefined || value === "") return "";
+  return (
+    '<div style="font-size:13px;color:#3A4A3E;line-height:1.6;"><strong style="color:#1A2D22;">' +
+    label +
+    ":</strong> " +
+    value +
+    "</div>"
+  );
+}
+
 function renderHistoryData(content) {
+  let data = content;
+  if (typeof content === "string") {
+    try {
+      data = JSON.parse(content);
+    } catch (e) {
+      data = null;
+    }
+  }
+
+  if (!data || typeof data !== "object") {
+    return (
+      '<div class="summary-result" style="background:white;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,0.05);margin-top:16px;">' +
+      '<div id="history-data-content" style="white-space:pre-wrap;font-size:12px;color:#3A4A3E;">' +
+      content +
+      "</div></div>"
+    );
+  }
+
+  if (data.raw) {
+    return (
+      '<div class="summary-result" style="background:white;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,0.05);margin-top:16px;">' +
+      "<div style=\"font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:#1A2D22;margin-bottom:10px;\">Preconsult History</div>" +
+      '<div id="history-data-content" style="white-space:pre-wrap;font-size:12px;color:#3A4A3E;">' +
+      data.raw +
+      "</div></div>"
+    );
+  }
+
+  let body = "";
+
+  const meta = [];
+  if (data.call_date) meta.push(data.call_date);
+  if (data.call_duration_minutes)
+    meta.push(data.call_duration_minutes + " min");
+  if (meta.length) {
+    body +=
+      '<div style="font-size:12px;color:#7A9A7A;margin-bottom:12px;">' +
+      meta.join(" &middot; ") +
+      "</div>";
+  }
+
+  if (data.reason_for_visit && data.reason_for_visit.reason) {
+    body += _hdSection(
+      "Reason for Visit",
+      _hdRow("Reason", data.reason_for_visit.reason) +
+        _hdRow("Visit type", data.reason_for_visit.visit_type),
+    );
+  }
+
+  if (data.current_symptoms && data.current_symptoms.length) {
+    body += _hdSection(
+      "Current Symptoms",
+      data.current_symptoms
+        .map(
+          (s) =>
+            '<div style="border-top:1px solid #EEF0EE;padding:8px 0;">' +
+            '<div style="font-size:13px;font-weight:500;color:#1A2D22;">' +
+            (s.symptom || "Symptom") +
+            "</div>" +
+            _hdRow("Onset", s.onset) +
+            _hdRow("Duration", s.duration) +
+            _hdRow("Severity", s.severity) +
+            _hdRow("Frequency", s.frequency) +
+            _hdRow(
+              "Aggravating factors",
+              s.aggravating_factors && s.aggravating_factors.length
+                ? s.aggravating_factors.join(", ")
+                : null,
+            ) +
+            _hdRow(
+              "Relieving factors",
+              s.relieving_factors && s.relieving_factors.length
+                ? s.relieving_factors.join(", ")
+                : null,
+            ) +
+            _hdRow("Prior episodes", s.prior_episodes) +
+            (s.patient_description
+              ? '<div style="font-size:12px;color:#7A9A7A;font-style:italic;margin-top:4px;">"' +
+                s.patient_description +
+                '"</div>'
+              : "") +
+            "</div>",
+        )
+        .join(""),
+    );
+  }
+
+  if (data.medication_update) {
+    const m = data.medication_update;
+    body += _hdSection(
+      "Medication Update",
+      _hdRow("Taking as prescribed", m.taking_as_prescribed) +
+        _hdRow(
+          "Additional medications",
+          m.additional_medications && m.additional_medications.length
+            ? m.additional_medications.join(", ")
+            : null,
+        ) +
+        _hdRow(
+          "Stopped medications",
+          m.stopped_medications && m.stopped_medications.length
+            ? m.stopped_medications.join(", ")
+            : null,
+        ) +
+        _hdRow("Patient comment", m.patient_comment),
+    );
+  }
+
+  if (data.family_history && data.family_history.length) {
+    body += _hdSection(
+      "Family History",
+      _hdList(
+        data.family_history.map(
+          (f) => (f.condition || "") + " (" + (f.relation || "") + ")",
+        ),
+      ),
+    );
+  }
+
+  if (data.lifestyle) {
+    const l = data.lifestyle;
+    body += _hdSection(
+      "Lifestyle",
+      _hdRow("Diet", l.diet) +
+        _hdRow("Sleep", l.sleep) +
+        _hdRow("Exercise", l.exercise) +
+        _hdRow("Smoking", l.smoking) +
+        _hdRow("Alcohol", l.alcohol) +
+        _hdRow("Other", l.other),
+    );
+  }
+
+  if (data.additional_concerns && data.additional_concerns.length) {
+    body += _hdSection(
+      "Additional Concerns",
+      _hdList(data.additional_concerns),
+    );
+  }
+
+  if (data.history_conflicts && data.history_conflicts.length) {
+    body += _hdSection(
+      "History Conflicts",
+      data.history_conflicts
+        .map(
+          (c) =>
+            '<div style="border-top:1px solid #EEF0EE;padding:8px 0;">' +
+            '<div style="font-size:11px;color:#B84040;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">' +
+            (c.flag_type || "").replace(/_/g, " ") +
+            "</div>" +
+            _hdRow("Topic", c.topic) +
+            _hdRow("MS-Doctor says", c.ms_doctor_says) +
+            _hdRow("Patient says", c.patient_says) +
+            "</div>",
+        )
+        .join(""),
+    );
+  }
+
+  if (data.call_quality) {
+    body += _hdSection(
+      "Call Quality",
+      _hdRow("Completeness", data.call_quality.completeness) +
+        _hdRow("Notes", data.call_quality.notes),
+    );
+  }
+
+  if (!body) {
+    body =
+      '<div style="font-size:13px;color:#7A9A7A;">No structured data extracted from this session.</div>';
+  }
+
   return (
     '<div class="summary-result" style="background:white;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,0.05);margin-top:16px;">' +
+    "<div style=\"font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:#1A2D22;margin-bottom:10px;\">Preconsult History</div>" +
     '<div id="history-data-content">' +
-    content +
+    body +
     "</div></div>"
   );
 }
