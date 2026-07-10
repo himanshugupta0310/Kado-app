@@ -17,6 +17,31 @@
     <script src="/env.js" onerror="window.__KADO_API__ = undefined"></script>
   </head>
   <body>
+    <!-- MSG91 OTP widget: loads early so window.sendOtp/verifyOtp/retryOtp
+         are ready by the time the doctor reaches the login screen. -->
+    <script type="text/javascript">
+      var configuration = {
+        widgetId: "REPLACE_WITH_MSG91_WIDGET_ID",
+        tokenAuth: "REPLACE_WITH_MSG91_TOKEN_AUTH",
+        exposeMethods: true,
+        captchaRenderId: "msg91-captcha",
+        success: (data) => {
+          // Real success handling lives in verifyOtp's own callback
+          // (js/auth.js handleVerifyOtp) — this is log-only to avoid
+          // duplicate events per MSG91's docs.
+          console.log("msg91 widget success", data);
+        },
+        failure: (error) => {
+          console.log("msg91 widget failure", error);
+        },
+      };
+    </script>
+    <script
+      type="text/javascript"
+      onload="initSendOTP(configuration)"
+      src="https://verify.msg91.com/otp-provider.js"
+    ></script>
+
     <!-- LOGIN -->
     <div class="screen active" id="screen-login" style="padding-bottom: 0">
       <div class="login-logo">kado<span>.</span>care</div>
@@ -24,7 +49,7 @@
       <div class="login-card">
         <div class="login-title">Doctor login</div>
         <div class="login-sub" id="login-sub-text">
-          Enter your WhatsApp number
+          Enter your mobile number
         </div>
 
         <!-- Step 1: phone -->
@@ -34,11 +59,12 @@
             <input
               type="tel"
               id="phone-input"
-              placeholder="WhatsApp number"
+              placeholder="Mobile number"
               maxlength="10"
               inputmode="numeric"
             />
           </div>
+          <div id="msg91-captcha"></div>
           <button
             class="login-btn"
             id="send-otp-btn"
@@ -48,13 +74,13 @@
           </button>
         </div>
 
-        <!-- Step 2: passcode -->
-        <div id="step-passcode" style="display: none">
+        <!-- Step 2: OTP -->
+        <div id="step-otp" style="display: none">
           <div class="input-group">
             <input
               type="tel"
-              id="passcode-input"
-              placeholder="6-digit passcode"
+              id="otp-input"
+              placeholder="6-digit OTP"
               maxlength="6"
               inputmode="numeric"
               style="width: 100%; letter-spacing: 4px; font-size: 18px"
@@ -62,12 +88,26 @@
           </div>
           <button
             class="login-btn"
-            id="verify-passcode-btn"
-            onclick="handleVerifyPasscode()"
+            id="verify-otp-btn"
+            onclick="handleVerifyOtp()"
           >
             Login
           </button>
           <div style="text-align: center; margin-top: 10px">
+            <button
+              onclick="handleResendOtp()"
+              style="
+                background: none;
+                border: none;
+                font-size: 12px;
+                color: #7a9a7a;
+                cursor: pointer;
+                font-family: &quot;DM Sans&quot;, sans-serif;
+              "
+            >
+              Resend OTP
+            </button>
+            ·
             <button
               onclick="backToPhone()"
               style="
@@ -84,7 +124,7 @@
           </div>
         </div>
 
-        <!-- Step 3: register (new doctor) -->
+        <!-- Step 3: complete profile (new doctor, after OTP verify) -->
         <div id="step-register" style="display: none">
           <div class="input-group">
             <input
@@ -105,75 +145,9 @@
           <button
             class="login-btn"
             id="register-btn"
-            onclick="handleRegister()"
+            onclick="handleCompleteProfile()"
           >
-            Create account
-          </button>
-          <div style="text-align: center; margin-top: 10px">
-            <button
-              onclick="backToPhone()"
-              style="
-                background: none;
-                border: none;
-                font-size: 12px;
-                color: #7a9a7a;
-                cursor: pointer;
-                font-family: &quot;DM Sans&quot;, sans-serif;
-              "
-            >
-              ← Change number
-            </button>
-          </div>
-        </div>
-
-        <!-- Step 4: passcode reveal (after registration) -->
-        <div id="step-reveal" style="display: none">
-          <div
-            style="
-              background: #e8f5f0;
-              border-radius: 14px;
-              padding: 20px;
-              text-align: center;
-              margin-bottom: 16px;
-            "
-          >
-            <div
-              style="
-                font-size: 12px;
-                color: #2d8a6a;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                margin-bottom: 8px;
-              "
-            >
-              Your passcode
-            </div>
-            <div
-              id="reveal-passcode"
-              style="
-                font-size: 32px;
-                font-weight: 600;
-                letter-spacing: 8px;
-                color: #1a2d22;
-                font-family: &quot;DM Sans&quot;, sans-serif;
-              "
-            >
-              ——————
-            </div>
-            <div
-              style="
-                font-size: 12px;
-                color: #7a9a7a;
-                margin-top: 10px;
-                line-height: 1.5;
-              "
-            >
-              Save this passcode — you will need it every time you log in.<br />
-              It was also sent to you on WhatsApp.
-            </div>
-          </div>
-          <button class="login-btn" onclick="continueAfterReveal()">
-            Continue to Kado
+            Continue
           </button>
         </div>
 

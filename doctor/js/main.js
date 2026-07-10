@@ -20,6 +20,6 @@ document.getElementById("phone-input").addEventListener("keypress", (e) => {
   if (e.key === "Enter") handlePhoneContinue();
 });
 
-document.getElementById("passcode-input").addEventListener("keypress", (e) => {
-  if (e.key === "Enter") handleVerifyPasscode();
+document.getElementById("otp-input").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") handleVerifyOtp();
 });
