@@ -846,6 +846,23 @@
       <div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-handle"></div>
         <div class="sheet-title">Call recording</div>
+        <div
+          id="recording-loading"
+          class="loading"
+          style="display: none; padding: 24px 0"
+        >
+          <div class="spinner"></div>
+          <div class="loading-text">Loading recording...</div>
+        </div>
+        <div
+          id="recording-error"
+          style="
+            display: none;
+            font-size: 13px;
+            color: #c0392b;
+            margin-bottom: 16px;
+          "
+        ></div>
         <audio
           id="recording-audio-player"
           controls

@@ -33,8 +33,14 @@ let _recordingObjectUrl = null;
 async function openRecordingSheet({ apiPath, transcript }) {
   const overlay = document.getElementById("recording-overlay");
   const audio = document.getElementById("recording-audio-player");
+  const loading = document.getElementById("recording-loading");
+  const errorEl = document.getElementById("recording-error");
+
   overlay.classList.add("open");
   audio.removeAttribute("src");
+  audio.style.display = "none";
+  errorEl.style.display = "none";
+  loading.style.display = "block";
   renderRecordingTranscript(transcript);
 
   try {
@@ -44,8 +50,13 @@ async function openRecordingSheet({ apiPath, transcript }) {
     if (_recordingObjectUrl) URL.revokeObjectURL(_recordingObjectUrl);
     _recordingObjectUrl = URL.createObjectURL(blob);
     audio.src = _recordingObjectUrl;
+    audio.style.display = "block";
   } catch (err) {
     console.error("Could not load recording:", err.message);
+    errorEl.textContent = "Could not load recording.";
+    errorEl.style.display = "block";
+  } finally {
+    loading.style.display = "none";
   }
 }
 
