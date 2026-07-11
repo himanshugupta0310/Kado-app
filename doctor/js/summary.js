@@ -25,7 +25,7 @@ async function loadDoctorSummary() {
       if (historyData.collected_data) {
         hasHistoryData = true;
         agentHtml =
-          renderHistoryData(historyData.collected_data) +
+          renderHistoryData(historyData.collected_data, historyData) +
           renderAgentFeedbackForm();
       }
     } catch (e) {}
@@ -274,7 +274,24 @@ function _hdRow(label, value) {
   );
 }
 
-function renderHistoryData(content) {
+function _escAttr(str) {
+  return String(str).replace(/'/g, "&#39;");
+}
+
+function _recordingButtonHtml(session) {
+  if (!session || !session.conversation_id) return "";
+  return (
+    "<button onclick='openRecordingSheet({apiPath: \"/patients/" +
+    currentPatient.id +
+    "/history-sessions/" +
+    session.session_id +
+    '/recording", transcript: ' +
+    _escAttr(JSON.stringify(session.transcript || [])) +
+    "})' style=\"background:#F0F5F0;color:#2D8A6A;border:none;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:12px;\">&#127911; Listen to recording</button>"
+  );
+}
+
+function renderHistoryData(content, session) {
   let data = content;
   if (typeof content === "string") {
     try {
@@ -297,6 +314,7 @@ function renderHistoryData(content) {
     return (
       '<div class="summary-result" style="background:white;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,0.05);margin-top:16px;">' +
       "<div style=\"font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:#1A2D22;margin-bottom:10px;\">Preconsult History</div>" +
+      _recordingButtonHtml(session) +
       '<div id="history-data-content" style="white-space:pre-wrap;font-size:12px;color:#3A4A3E;">' +
       data.raw +
       "</div></div>"
@@ -449,6 +467,7 @@ function renderHistoryData(content) {
   return (
     '<div class="summary-result" style="background:white;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,0.05);margin-top:16px;">' +
     "<div style=\"font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:#1A2D22;margin-bottom:10px;\">Preconsult History</div>" +
+    _recordingButtonHtml(session) +
     '<div id="history-data-content">' +
     body +
     "</div></div>"

@@ -115,7 +115,24 @@ function _complianceBadge(level) {
   );
 }
 
-function renderPostConsultReport(reportData, completedAt) {
+function _escAttr(str) {
+  return String(str).replace(/'/g, "&#39;");
+}
+
+function _postconsultRecordingButtonHtml(session) {
+  if (!session || !session.conversation_id) return "";
+  return (
+    "<button onclick='openRecordingSheet({apiPath: \"/patients/" +
+    currentPatient.id +
+    "/postconsult-sessions/" +
+    session.session_id +
+    '/recording", transcript: ' +
+    _escAttr(JSON.stringify(session.transcript || [])) +
+    "})' style=\"background:#F0F5F0;color:#2D8A6A;border:none;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;\">&#127911; Listen</button>"
+  );
+}
+
+function renderPostConsultReport(reportData, completedAt, session) {
   const r = reportData;
   const date = completedAt
     ? new Date(completedAt).toLocaleDateString("en-IN", {
@@ -167,9 +184,11 @@ function renderPostConsultReport(reportData, completedAt) {
     '<div style="background:white;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,0.05);margin-bottom:4px;">' +
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
     "<div style=\"font-family:'Fraunces',serif;font-size:15px;font-weight:300;color:#1A2D22;\">Post Consult Check-in</div>" +
+    '<div style="display:flex;align-items:center;gap:8px;">' +
+    _postconsultRecordingButtonHtml(session) +
     '<div style="font-size:11px;color:#7A9A7A;">' +
     date +
-    "</div></div>" +
+    "</div></div></div>" +
     (r.overall?.summary
       ? '<div style="font-size:13px;color:#5A6B60;line-height:1.6;margin-bottom:14px;padding:10px;background:#F5F7F5;border-radius:10px;">' +
         r.overall.summary +
@@ -215,6 +234,7 @@ async function loadConsultationsTab() {
         reportEl.innerHTML = renderPostConsultReport(
           data.report_data,
           data.completed_at,
+          data,
         );
       } else {
         reportEl.innerHTML =

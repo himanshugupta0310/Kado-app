@@ -837,6 +837,30 @@
       </div>
     </div>
 
+    <!-- CALL RECORDING SHEET -->
+    <div
+      class="sheet-overlay"
+      id="recording-overlay"
+      onclick="closeRecordingSheet()"
+    >
+      <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Call recording</div>
+        <audio
+          id="recording-audio-player"
+          controls
+          style="width: 100%; margin-bottom: 16px"
+        ></audio>
+        <div
+          id="recording-transcript"
+          style="max-height: 40vh; overflow-y: auto"
+        ></div>
+        <button class="sheet-cancel" onclick="closeRecordingSheet()">
+          Close
+        </button>
+      </div>
+    </div>
+
     <!-- ADD PATIENT FORM SHEET -->
     <div
       class="sheet-overlay"
@@ -1366,6 +1390,7 @@
     <script src="js/patient-detail.js"></script>
     <script src="js/records.js"></script>
     <script src="js/summary.js"></script>
+    <script src="js/recording.js"></script>
     <script src="js/review.js"></script>
     <script src="js/invite.js"></script>
     <script src="js/main.js"></script>
