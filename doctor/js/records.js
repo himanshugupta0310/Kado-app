@@ -536,3 +536,18 @@ async function saveReportEdit() {
     alert("Could not save report.");
   }
 }
+
+async function deleteReportEdit() {
+  if (!currentEditReport) return;
+  if (!confirm("Delete this report? This cannot be undone.")) return;
+  try {
+    const res = await fetch(API + "/reports/" + currentEditReport.id, {
+      method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Delete failed");
+    closeReportEditModal();
+    loadPatientRecords();
+  } catch (e) {
+    alert("Could not delete report.");
+  }
+}
