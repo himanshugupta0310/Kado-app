@@ -145,8 +145,8 @@ function renderPostConsultReport(reportData, completedAt, session) {
   const rows = [
     {
       label: "Medication",
-      badge: _complianceBadge(r.medication?.compliance),
-      notes: r.medication?.notes || "",
+      badge: _complianceBadge(r.medications?.compliance),
+      notes: r.medications?.notes || "",
     },
     {
       label: "Investigations",
@@ -160,17 +160,17 @@ function renderPostConsultReport(reportData, completedAt, session) {
     },
     {
       label: "Lifestyle",
-      badge: _complianceBadge(r.lifestyle?.quality),
+      badge: _complianceBadge(r.lifestyle?.compliance),
       notes: r.lifestyle?.notes || "",
     },
     {
       label: "Referral",
-      badge: _complianceBadge(r.referral?.done ? "done" : "not_done"),
+      badge: _complianceBadge(r.referral?.status),
       notes: r.referral?.notes || "",
     },
   ];
 
-  const followup = r.followup || {};
+  const followup = r.follow_up || {};
   const followupNote = followup.within_7_days
     ? (followup.notes || "") +
       " — within 7 days, ask patient to send booking link to Kado on WhatsApp."
