@@ -160,6 +160,11 @@ async function triggerPostConsultAgent() {
     .value.trim();
 
   closeTriggerAgentSheet();
+  alert(
+    "Post consult agent triggered! WhatsApp message sent to " +
+      (patient.name || "patient") +
+      ".",
+  );
 
   try {
     const res = await fetch(API + "/patients/" + patient.id + "/postconsult", {
@@ -172,7 +177,7 @@ async function triggerPostConsultAgent() {
     });
     const data = await res.json();
     if (!res.ok) {
-      alert(data.error || "Could not trigger agent.");
+      alert(data.error || "Agent failed to trigger. Please try again.");
       return;
     }
     if (
@@ -183,13 +188,8 @@ async function triggerPostConsultAgent() {
         window._actionPatientIndex
       ].postconsult_agent_advice = agentAdvice;
     }
-    alert(
-      "Post consult agent triggered! WhatsApp message sent to " +
-        (patient.name || "patient") +
-        ".",
-    );
   } catch (e) {
-    alert("Could not trigger agent. Please try again.");
+    alert("Agent failed to trigger. Please try again.");
   }
 }
 
@@ -204,6 +204,11 @@ async function triggerPreconsultAgent() {
     .value.trim();
 
   closeTriggerAgentSheet();
+  alert(
+    "Agent triggered! WhatsApp message sent to " +
+      (patient.name || "patient") +
+      ".",
+  );
 
   try {
     const res = await fetch(API + "/patients/" + patient.id + "/preconsult", {
@@ -216,7 +221,7 @@ async function triggerPreconsultAgent() {
     });
     const data = await res.json();
     if (!res.ok) {
-      alert(data.error || "Could not trigger agent.");
+      alert(data.error || "Agent failed to trigger. Please try again.");
       return;
     }
     if (
@@ -226,13 +231,8 @@ async function triggerPreconsultAgent() {
       window._patientNotes[window._actionPatientIndex].preconsult_agent_advice =
         agentAdvice;
     }
-    alert(
-      "Agent triggered! WhatsApp message sent to " +
-        (patient.name || "patient") +
-        ".",
-    );
   } catch (e) {
-    alert("Could not trigger agent. Please try again.");
+    alert("Agent failed to trigger. Please try again.");
   }
 }
 
