@@ -1,0 +1,2035 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Relevant Clinical Context — Thalamus Whitepaper — Kado</title>
+    <meta
+      name="description"
+      content="How Thalamus turns a photographed hospital file into deterministic, cited clinical context a voice agent can safely act on."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #e4e8ee;
+        --ink-soft: #b8c0cc;
+        --paper: #0b0f16;
+        --panel: #131922;
+        --panel-2: #1a2129;
+        --rule: #262f3a;
+        --rule-soft: #1d2530;
+        --muted: #8b95a3;
+        --signal: #e9705a;
+        --signal-bg: #251712;
+        --verified: #4fb49f;
+        --verified-bg: #0f211d;
+        --serif: "Spectral", Georgia, "Times New Roman", serif;
+        --sans: "Archivo", "Helvetica Neue", Arial, sans-serif;
+        --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+        --col: 700px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 16px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        color: inherit;
+      }
+      .wrap {
+        max-width: var(--col);
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ---------- nav ---------- */
+      nav.top {
+        border-bottom: 1px solid var(--rule);
+        padding: 22px 0;
+      }
+      nav.top .wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 920px;
+      }
+      nav.top .back {
+        font-family: var(--mono);
+        font-size: 0.8125rem;
+        color: var(--muted);
+        text-decoration: none;
+        letter-spacing: 0.02em;
+      }
+      nav.top .back:hover {
+        color: var(--ink);
+      }
+      nav.top .brand {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      nav.top .brand em {
+        color: var(--signal);
+        font-style: normal;
+      }
+
+      /* ---------- hero ---------- */
+      header.hero {
+        padding: 64px 0 40px;
+        border-bottom: 1px solid var(--rule);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--signal);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin: 0 0 22px;
+      }
+      h1 {
+        font-family: var(--serif);
+        font-weight: 600;
+        font-size: 2.5rem;
+        line-height: 1.14;
+        margin: 0 0 24px;
+        letter-spacing: -0.01em;
+      }
+      .standfirst {
+        font-family: var(--serif);
+        font-size: 1.1875rem;
+        line-height: 1.6;
+        color: var(--ink-soft);
+        margin: 0 0 34px;
+      }
+      .standfirst em {
+        color: var(--ink);
+        font-style: italic;
+      }
+
+      .stat-strip {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px 20px;
+        border-top: 1px solid var(--rule-soft);
+        padding-top: 24px;
+      }
+      @media (max-width: 560px) {
+        .stat-strip {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      .stat-strip dt {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 0 0 4px;
+      }
+      .stat-strip dd {
+        font-family: var(--serif);
+        font-size: 1.0625rem;
+        margin: 0;
+        color: var(--ink);
+      }
+
+      /* ---------- toc ---------- */
+      .toc {
+        padding: 36px 0;
+        border-bottom: 1px solid var(--rule);
+      }
+      .toc p.lbl {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin: 0 0 14px;
+      }
+      .toc ol {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+      }
+      .toc a {
+        text-decoration: none;
+        display: flex;
+        gap: 14px;
+        font-size: 0.9375rem;
+        color: var(--ink-soft);
+      }
+      .toc a:hover {
+        color: var(--signal);
+      }
+      .toc .no {
+        font-family: var(--mono);
+        color: var(--muted);
+        font-size: 0.8125rem;
+        padding-top: 2px;
+        flex-shrink: 0;
+        width: 16px;
+      }
+
+      /* ---------- article body ---------- */
+      main {
+        padding-bottom: 40px;
+      }
+      section.act {
+        padding: 64px 0;
+        border-bottom: 1px solid var(--rule);
+      }
+      section.act:last-of-type {
+        border-bottom: 0;
+      }
+      .act-no {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--signal);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin: 0 0 12px;
+      }
+      h2 {
+        font-family: var(--serif);
+        font-weight: 600;
+        font-size: 1.75rem;
+        line-height: 1.25;
+        margin: 0 0 26px;
+        letter-spacing: -0.005em;
+      }
+      h3 {
+        font-family: var(--serif);
+        font-weight: 600;
+        font-size: 1.25rem;
+        margin: 40px 0 14px;
+      }
+      h4 {
+        font-family: var(--sans);
+        font-weight: 600;
+        font-size: 0.9375rem;
+        margin: 0 0 8px;
+      }
+
+      p {
+        margin: 0 0 18px;
+        font-size: 1.0625rem;
+        line-height: 1.72;
+        color: var(--ink-soft);
+      }
+      p.lede {
+        font-family: var(--serif);
+        font-size: 1.1875rem;
+        line-height: 1.6;
+        color: var(--ink);
+        font-weight: 400;
+      }
+      p em,
+      .standfirst em,
+      p.lede em {
+        font-style: italic;
+        color: var(--ink);
+      }
+      code {
+        font-family: var(--mono);
+        font-size: 0.875em;
+        background: var(--panel-2);
+        padding: 1px 5px;
+        border-radius: 3px;
+        color: var(--ink);
+      }
+
+      /* ---------- exhibit wrapper ---------- */
+      .exhibit {
+        margin: 34px 0;
+      }
+      .exhibit-cap {
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+        margin-bottom: 14px;
+        font-family: var(--mono);
+        font-size: 0.8125rem;
+      }
+      .exhibit-cap .lbl {
+        color: var(--signal);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        flex-shrink: 0;
+      }
+      .exhibit-cap .txt {
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      /* ---------- tables ---------- */
+      .tblwrap {
+        overflow-x: auto;
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        background: var(--panel);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+      }
+      th {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        text-align: left;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--rule);
+        white-space: nowrap;
+      }
+      td {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--rule-soft);
+        color: var(--ink-soft);
+        vertical-align: top;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      td.n {
+        font-family: var(--mono);
+        color: var(--muted);
+        font-size: 0.8125rem;
+      }
+      td code {
+        white-space: nowrap;
+      }
+
+      /* ---------- doc chips ---------- */
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .chip {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        padding: 2px 7px;
+        border-radius: 3px;
+        border: 1px solid var(--rule);
+        color: var(--muted);
+      }
+      .chip.hot {
+        color: var(--signal);
+        border-color: rgba(233, 112, 90, 0.35);
+        background: var(--signal-bg);
+      }
+
+      /* ---------- callout panels ---------- */
+      .panel {
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        background: var(--panel);
+        padding: 20px 22px;
+        margin: 26px 0;
+      }
+      .panel.signal {
+        border-left: 3px solid var(--signal);
+      }
+      .panel.verify {
+        border-left: 3px solid var(--verified);
+      }
+      .panel-lbl {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--signal);
+        margin: 0 0 10px;
+      }
+      .panel.verify .panel-lbl {
+        color: var(--verified);
+      }
+      .panel p {
+        font-size: 0.9375rem;
+        margin: 0 0 10px;
+        color: var(--ink-soft);
+      }
+      .panel p:last-child {
+        margin-bottom: 0;
+      }
+      .panel p.fine {
+        font-size: 0.875rem;
+      }
+
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        margin: 26px 0;
+      }
+      @media (max-width: 640px) {
+        .grid2 {
+          grid-template-columns: 1fr;
+        }
+      }
+      .grid2 .panel {
+        margin: 0;
+      }
+
+      /* ---------- definition/anatomy list ---------- */
+      .anatomy {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        overflow: hidden;
+        margin: 22px 0;
+      }
+      .anatomy div {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 14px;
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--rule-soft);
+        background: var(--panel);
+      }
+      .anatomy div:last-child {
+        border-bottom: 0;
+      }
+      .anatomy .k {
+        font-family: var(--mono);
+        font-size: 0.8125rem;
+        color: var(--signal);
+      }
+      .anatomy .v {
+        font-size: 0.875rem;
+        color: var(--ink-soft);
+      }
+      @media (max-width: 560px) {
+        .anatomy div {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ---------- schema ---------- */
+      .schema {
+        margin: 22px 0;
+      }
+      .schema-core {
+        border: 1px solid var(--signal);
+        background: var(--signal-bg);
+        border-radius: 6px;
+        padding: 16px 18px;
+        margin-bottom: 10px;
+      }
+      .schema-core .t {
+        font-family: var(--mono);
+        font-weight: 600;
+        color: var(--signal);
+        font-size: 0.9375rem;
+        margin: 0;
+      }
+      .schema-sats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      @media (max-width: 560px) {
+        .schema-sats {
+          grid-template-columns: 1fr;
+        }
+      }
+      .sat {
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        padding: 12px 16px;
+        background: var(--panel);
+      }
+      .sat .t {
+        font-family: var(--mono);
+        font-size: 0.8125rem;
+        color: var(--ink);
+        display: block;
+        margin-bottom: 4px;
+      }
+      .sat .d {
+        font-size: 0.8125rem;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      /* ---------- details ---------- */
+      details {
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        background: var(--panel);
+        margin: 16px 0;
+        padding: 14px 18px;
+      }
+      details[open] {
+        padding-bottom: 18px;
+      }
+      summary {
+        cursor: pointer;
+        font-family: var(--mono);
+        font-size: 0.875rem;
+        color: var(--ink);
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      summary::-webkit-details-marker {
+        display: none;
+      }
+      summary::before {
+        content: "+";
+        color: var(--signal);
+        font-weight: 600;
+        width: 14px;
+      }
+      details[open] summary::before {
+        content: "–";
+      }
+      .details-body {
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid var(--rule-soft);
+      }
+      .details-body p {
+        font-size: 0.9375rem;
+      }
+      ul.clean {
+        margin: 14px 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      ul.clean li {
+        padding-left: 18px;
+        position: relative;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        color: var(--ink-soft);
+      }
+      ul.clean li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.65em;
+        width: 7px;
+        height: 1px;
+        background: var(--signal);
+      }
+      ul.clean li strong {
+        color: var(--ink);
+      }
+
+      /* ---------- code block ---------- */
+      pre {
+        font-family: var(--mono);
+        font-size: 0.8125rem;
+        line-height: 1.65;
+        color: var(--ink-soft);
+        background: var(--panel);
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        padding: 20px 22px;
+        overflow-x: auto;
+        margin: 22px 0;
+      }
+      pre .c {
+        color: var(--muted);
+      }
+      pre .k {
+        color: var(--signal);
+      }
+      pre .s {
+        color: var(--verified);
+      }
+      pre .p {
+        color: var(--muted);
+      }
+
+      /* ---------- transcript ---------- */
+      .talk {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .turn {
+        display: grid;
+        grid-template-columns: 78px 1fr;
+        gap: 14px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--rule-soft);
+      }
+      .turn:last-child {
+        border-bottom: 0;
+      }
+      @media (max-width: 520px) {
+        .turn {
+          grid-template-columns: 1fr;
+          gap: 4px;
+        }
+      }
+      .turn .who {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--muted);
+        padding-top: 3px;
+      }
+      .turn.agent .who {
+        color: var(--signal);
+      }
+      .turn .say {
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        color: var(--ink-soft);
+      }
+      .turn .why {
+        display: block;
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 8px;
+        padding-left: 12px;
+        border-left: 1px solid var(--rule);
+        line-height: 1.55;
+      }
+
+      /* ---------- roadmap ---------- */
+      .stage-list {
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        overflow: hidden;
+        margin: 22px 0;
+      }
+      .stage {
+        display: grid;
+        grid-template-columns: 28px 1fr 104px;
+        gap: 14px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--rule-soft);
+        align-items: start;
+        background: var(--panel);
+      }
+      .stage:last-child {
+        border-bottom: 0;
+      }
+      @media (max-width: 600px) {
+        .stage {
+          grid-template-columns: 22px 1fr;
+        }
+        .stage .st {
+          grid-column: 2;
+          margin-top: 6px;
+        }
+      }
+      .stage .no {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--muted);
+        padding-top: 2px;
+      }
+      .stage .nm {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--ink);
+      }
+      .stage .ds {
+        font-size: 0.8125rem;
+        color: var(--muted);
+        line-height: 1.55;
+        margin-top: 4px;
+      }
+      .st {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        padding: 2px 7px;
+        border: 1px solid;
+        justify-self: start;
+        white-space: nowrap;
+        height: fit-content;
+      }
+      .st.built {
+        color: var(--verified);
+        border-color: var(--verified);
+        background: var(--verified-bg);
+      }
+      .st.wip {
+        color: var(--signal);
+        border-color: var(--signal);
+        background: var(--signal-bg);
+      }
+      .st.next {
+        color: var(--muted);
+        border-color: var(--rule);
+      }
+
+      /* ---------- pull quote / bet ---------- */
+      .pullquote {
+        border-left: 3px solid var(--signal);
+        padding: 4px 0 4px 22px;
+        margin: 34px 0;
+      }
+      .pullquote p {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 1.1875rem;
+        line-height: 1.6;
+        color: var(--ink);
+        margin: 0;
+      }
+
+      footer.foot {
+        border-top: 1px solid var(--rule);
+        padding: 44px 0 70px;
+      }
+      footer.foot .fam {
+        font-family: var(--serif);
+        font-size: 1.1875rem;
+        display: block;
+        margin-bottom: 12px;
+      }
+      footer.foot p {
+        font-size: 0.8125rem;
+        color: var(--muted);
+        margin: 0;
+      }
+      footer.foot a.home {
+        display: inline-block;
+        margin-top: 20px;
+        font-family: var(--mono);
+        font-size: 0.8125rem;
+        color: var(--signal);
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="top">
+      <div class="wrap">
+        <a class="back" href="/">&larr; doctor.kado.care</a>
+        <span class="brand">Kado &middot; <em>Thalamus</em></span>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="wrap">
+        <p class="eyebrow">Thalamus &middot; Whitepaper &middot; August 2026</p>
+        <h1>
+          Turning a photographed hospital file into context an agent can act on
+        </h1>
+        <p class="standfirst">
+          This brief follows one real patient record end to end. Two files a
+          patient handed over. Six clinical documents hiding inside them, from
+          four asserters across two cities. One hundred and eleven atomic
+          clinical data points out the other side &mdash; each one traceable to
+          the sentence it came from. Then it sets out how those points become
+          <em>Relevant Clinical Context</em>: the task-scoped state a vertical
+          voice agent speaks from.
+        </p>
+
+        <dl class="stat-strip">
+          <div>
+            <dt>Patient record</dt>
+            <dd>Sonisha K., 26F</dd>
+          </div>
+          <div>
+            <dt>Files in</dt>
+            <dd>2</dd>
+          </div>
+          <div>
+            <dt>Documents found</dt>
+            <dd>6</dd>
+          </div>
+          <div>
+            <dt>ACDPs out</dt>
+            <dd>111</dd>
+          </div>
+          <div>
+            <dt>Flagged for review</dt>
+            <dd>5</dd>
+          </div>
+          <div>
+            <dt>Broken references</dt>
+            <dd>0</dd>
+          </div>
+        </dl>
+      </div>
+    </header>
+
+    <div class="toc">
+      <div class="wrap">
+        <p class="lbl">On this page</p>
+        <ol>
+          <li>
+            <a href="#unstructured"
+              ><span class="no">I</span> What unstructured medical data actually
+              looks like</a
+            >
+          </li>
+          <li>
+            <a href="#acdp"
+              ><span class="no">II</span> The unit of work: an atomic clinical
+              data point</a
+            >
+          </li>
+          <li>
+            <a href="#findings"
+              ><span class="no">III</span> What the structure buys that a
+              summary cannot</a
+            >
+          </li>
+          <li>
+            <a href="#rcc"
+              ><span class="no">IV</span> Relevant Clinical Context</a
+            >
+          </li>
+          <li>
+            <a href="#roadmap"
+              ><span class="no">V</span> Where we are, and how RCC gets built</a
+            >
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <main class="wrap">
+      <!-- ============================ ACT I ============================ -->
+      <section class="act" id="unstructured">
+        <p class="act-no">I</p>
+        <h2>What unstructured medical data actually looks like</h2>
+
+        <p class="lede">
+          Sonisha handed over two files. A JPEG of a teleconsultation
+          prescription, and an eleven-megabyte PDF she photographed page by page
+          under a desk lamp.
+        </p>
+        <p>
+          That PDF is not a document. It is five unrelated clinical documents,
+          from three different signatories, stacked into one file with no table
+          of contents, no separator, and no shared layout. One page is printed
+          on ECG graph paper and arrives rotated ninety degrees. Another has her
+          thumb in the frame. None of the six pages contains a single character
+          of embedded text &mdash; every word on this page of evidence exists
+          only as pixels.
+        </p>
+        <p>
+          This is the ordinary case, not the hard case. It is what a health
+          record looks like before anybody has done anything to it.
+        </p>
+
+        <div class="exhibit">
+          <div class="exhibit-cap">
+            <span class="lbl">Exhibit A</span>
+            <span class="txt"
+              >The complete input corpus &mdash; 2 files, 6 logical documents, 0
+              characters of machine-readable text.</span
+            >
+          </div>
+          <div class="tblwrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Document</th>
+                  <th>Source</th>
+                  <th>Date</th>
+                  <th>Flags</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong style="color: var(--ink)"
+                      >Teleconsultation prescription</strong
+                    >
+                  </td>
+                  <td>
+                    HealthPil &middot; Dr Rahul Chawla, Neurologist, Delhi
+                  </td>
+                  <td class="n">23 May 2026</td>
+                  <td>
+                    <span class="chips"
+                      ><span class="chip">native_digital</span
+                      ><span class="chip">watermark over text</span
+                      ><span class="chip hot">brand + salt names</span></span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong style="color: var(--ink)">MRI brain report</strong>
+                  </td>
+                  <td>
+                    Manipal Hospitals, Bengaluru &middot; Dr Ullas Acharya,
+                    Radiologist
+                  </td>
+                  <td class="n">studied 01 Nov, reported 03 Nov 2025</td>
+                  <td>
+                    <span class="chips"
+                      ><span class="chip hot">thumb in frame</span
+                      ><span class="chip">page curl / skew</span
+                      ><span class="chip">handwritten signature</span></span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong style="color: var(--ink)">EEG test report</strong>
+                  </td>
+                  <td>
+                    Manipal Institute of Neurological Disorders &middot; Dr
+                    Pramod Krishnan
+                  </td>
+                  <td class="n">01 Nov 2025</td>
+                  <td>
+                    <span class="chips"
+                      ><span class="chip">rotated / keystoned</span
+                      ><span class="chip">overlapping stamp</span
+                      ><span class="chip hot">nested table layout</span></span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong style="color: var(--ink)">Outpatient record</strong>
+                  </td>
+                  <td>
+                    Manipal Hospitals &middot; Dr Pramod Krishnan, Neurology
+                  </td>
+                  <td class="n">07 Nov 2025</td>
+                  <td>
+                    <span class="chips"
+                      ><span class="chip hot">quotes another report</span
+                      ><span class="chip">barcode + URN</span
+                      ><span class="chip hot"
+                        >drug switch buried in advice</span
+                      ></span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong style="color: var(--ink)">12-lead ECG</strong>
+                  </td>
+                  <td>MH Bangalore &middot; unsigned</td>
+                  <td class="n">01 Nov 2025, 12:39</td>
+                  <td>
+                    <span class="chips"
+                      ><span class="chip hot">rotated 90&deg;</span
+                      ><span class="chip">graph paper</span
+                      ><span class="chip hot">no signatory</span></span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong style="color: var(--ink)">Discharge summary</strong>
+                  </td>
+                  <td>
+                    Manipal Hospitals, Neurology &middot; Dr Pramod Krishnan
+                  </td>
+                  <td class="n">admitted 01 Nov, discharged 02 Nov 2025</td>
+                  <td>
+                    <span class="chips"
+                      ><span class="chip">dense prose narrative</span
+                      ><span class="chip hot">contains a stale claim</span
+                      ><span class="chip">insurer / ward metadata</span></span
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel signal">
+          <p class="panel-lbl">Why this defeats a single model call</p>
+          <p>
+            Handing all six pages to a model and asking for JSON produces
+            something plausible on the first run and something subtly different
+            on the second. Identifiers drift. The same doctor becomes two
+            doctors. A finding quoted in one report gets silently merged with
+            the report that first stated it, and the trail back to the paper is
+            gone. For a spreadsheet of restaurant reviews that is a nuisance.
+            For a medication list it is a safety problem.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================ ACT II ============================ -->
+      <section class="act" id="acdp">
+        <p class="act-no">II</p>
+        <h2>The unit of work: an atomic clinical data point</h2>
+
+        <p class="lede">
+          An ACDP is one discrete clinical fact, written as a single
+          self-contained sentence, classified against a closed vocabulary, and
+          bound by foreign key to the medication, biomarker, person and document
+          behind it.
+        </p>
+        <p>
+          Atomic is the operative word. &ldquo;Avoid alcohol, avoid products
+          containing eucalyptus oil, camphor, essential oils&rdquo; is one line
+          on a prescription and four separate clinical instructions. Split
+          apart, each becomes independently retrievable, independently
+          checkable, and independently attributable to the doctor who gave it.
+        </p>
+
+        <div class="exhibit">
+          <div class="exhibit-cap">
+            <span class="lbl">Exhibit B</span>
+            <span class="txt"
+              >One document in, its ACDPs out &mdash; rows 1&ndash;27 of the
+              workbook, all sourced to the teleconsultation above.</span
+            >
+          </div>
+          <div class="tblwrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>id</th>
+                  <th>Atomic clinical data point</th>
+                  <th>category</th>
+                  <th>fk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="n">1</td>
+                  <td>The patient has a provisional diagnosis of epilepsy.</td>
+                  <td>provisional diagnosis</td>
+                  <td class="n">a101 s1</td>
+                </tr>
+                <tr>
+                  <td class="n">2</td>
+                  <td>The patient has B/L MTS.</td>
+                  <td>diagnosis</td>
+                  <td class="n">a101 s1</td>
+                </tr>
+                <tr>
+                  <td class="n">3</td>
+                  <td>
+                    The patient experiences recurrent seizures in the form of
+                    epigastric aura.
+                  </td>
+                  <td>complaints</td>
+                  <td class="n">a101 s1</td>
+                </tr>
+                <tr>
+                  <td class="n">7</td>
+                  <td>
+                    The patient has mood changes, including anxiety, since 13
+                    years of age.
+                  </td>
+                  <td>complaints</td>
+                  <td class="n">a101 s1</td>
+                </tr>
+                <tr>
+                  <td class="n">9</td>
+                  <td>The patient is advised to avoid swimming.</td>
+                  <td>lifestyle_advice</td>
+                  <td class="n">a101 s1</td>
+                </tr>
+                <tr>
+                  <td class="n">10</td>
+                  <td>The patient is advised to avoid driving.</td>
+                  <td>lifestyle_advice</td>
+                  <td class="n">a101 s1</td>
+                </tr>
+                <tr>
+                  <td class="n">15</td>
+                  <td>
+                    The patient is already on TAB LTG 25 MG HS as advised by a
+                    psychiatrist for mood stabilization.
+                  </td>
+                  <td>medication</td>
+                  <td class="n">m004 a101 s1</td>
+                </tr>
+                <tr>
+                  <td class="n">20</td>
+                  <td>
+                    The patient is prescribed TAB BRIVANEXT (Brivaracetam) 50
+                    MG, 1 Tab twice a day for 4 weeks.
+                  </td>
+                  <td>medication</td>
+                  <td class="n">m001 a101 s1</td>
+                </tr>
+                <tr>
+                  <td class="n">22</td>
+                  <td>
+                    TAB CLOBA MT is prescribed to be taken SOS if there is
+                    recurrence of seizure (bilateral tonic clonic/gtcs).
+                  </td>
+                  <td>medication</td>
+                  <td class="n">m002 a101 s1</td>
+                </tr>
+                <tr>
+                  <td class="n">23</td>
+                  <td>
+                    An EEG with induction is planned to rule out co-existing
+                    PNES.
+                  </td>
+                  <td>investigations_ordered</td>
+                  <td class="n">a101 s1</td>
+                </tr>
+                <tr>
+                  <td class="n">24</td>
+                  <td>
+                    The patient is instructed to maintain a seizure diary.
+                  </td>
+                  <td>monitoring</td>
+                  <td class="n">a101 s1</td>
+                </tr>
+                <tr>
+                  <td class="n">26</td>
+                  <td>
+                    There is a plan to escalate ASM after getting the EEG done
+                    (with induction).
+                  </td>
+                  <td>potential_treatment_advice</td>
+                  <td class="n">a101 s1</td>
+                </tr>
+                <tr>
+                  <td class="n">27</td>
+                  <td>
+                    The follow-up appointment is scheduled for 06 Jun 2026
+                    (Saturday).
+                  </td>
+                  <td>followup</td>
+                  <td class="n">a101 s1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h3>Anatomy of one row</h3>
+        <p>
+          Every ACDP carries the same fields, whatever kind of document it came
+          from. Four of them are foreign keys into detail sheets; two are closed
+          enumerations; one is the verbatim evidence.
+        </p>
+
+        <div class="anatomy">
+          <div>
+            <span class="k">acdp</span
+            ><span class="v">The self-contained clinical statement</span>
+          </div>
+          <div>
+            <span class="k">category</span
+            ><span class="v"
+              >One of 16 fixed values &mdash; diagnosis, complaints, medication,
+              lifestyle_advice&hellip;</span
+            >
+          </div>
+          <div>
+            <span class="k">body_system</span
+            ><span class="v"
+              >One of 19 &mdash; classifies the content, not the author's
+              speciality</span
+            >
+          </div>
+          <div>
+            <span class="k">source_span</span
+            ><span class="v"
+              >Verbatim text from the page that substantiates it</span
+            >
+          </div>
+          <div>
+            <span class="k">asserter_id</span
+            ><span class="v"
+              >Who said it &mdash; resolved per page, not per file</span
+            >
+          </div>
+          <div>
+            <span class="k">source_id</span
+            ><span class="v">Which document it came from</span>
+          </div>
+          <div>
+            <span class="k">medication_id</span
+            ><span class="v"
+              >The specific drug row, when the point is about a drug</span
+            >
+          </div>
+          <div>
+            <span class="k">biomarker_id</span
+            ><span class="v"
+              >The specific measurement row, when the point is a value</span
+            >
+          </div>
+        </div>
+
+        <h3>Six sheets, one graph</h3>
+        <p>
+          The workbook is not a flat list. ACDP is the fact table; everything
+          else hangs off it by key, so the same medication referenced by three
+          separate statements is one row, and every statement about it still
+          points somewhere real.
+        </p>
+
+        <div class="schema">
+          <div class="schema-core">
+            <p class="t">ACDP &mdash; 111 rows</p>
+          </div>
+          <div class="schema-sats">
+            <div class="sat">
+              <span class="t">Data_Sources &mdash; 2</span>
+              <div class="d">
+                The files the patient gave us, with category and digitisation
+                route
+              </div>
+            </div>
+            <div class="sat">
+              <span class="t">Asserter_details &mdash; 4</span>
+              <div class="d">
+                Who asserted it: 3 named clinicians and 1 honest
+                <code>unknown</code>
+              </div>
+            </div>
+            <div class="sat">
+              <span class="t">Medication_details &mdash; 6</span>
+              <div class="d">
+                Salt, brand, form, dose, frequency, route, duration
+              </div>
+            </div>
+            <div class="sat">
+              <span class="t">Biomarker_details &mdash; 5</span>
+              <div class="d">
+                Name, value, unit, date &mdash; all five read off the rotated
+                ECG
+              </div>
+            </div>
+            <div class="sat">
+              <span class="t">Overview &mdash; 7</span>
+              <div class="d">
+                Patient identity, voted across documents rather than taken from
+                one
+              </div>
+            </div>
+            <div class="sat">
+              <span class="t">review.json</span>
+              <div class="d">Everything the run was not fully sure about</div>
+            </div>
+          </div>
+        </div>
+
+        <details>
+          <summary>
+            How determinism is enforced &mdash; the model proposes content, code
+            assigns identity
+          </summary>
+          <div class="details-body">
+            <p>
+              The language model is never allowed to decide what anything
+              <em>is</em>. It transcribes a page and proposes candidate facts
+              through a forced tool-use schema. Everything that could drift
+              between runs is done afterwards in ordinary Python:
+            </p>
+            <ul class="clean">
+              <li>
+                <strong>Identity.</strong> Every <code>acdp_id</code>,
+                <code>m001</code>, <code>b001</code> and asserter number is
+                assigned by a counter in <code>link.py</code>, walking documents
+                in a fixed sort order. The model never emits an ID.
+              </li>
+              <li>
+                <strong>Person resolution.</strong> Asserters are merged on a
+                normalised name key only. &ldquo;DR. PRAMOD KRISHNAN&rdquo; on
+                the EEG and &ldquo;Dr Pramod Krishnan&rdquo; on the discharge
+                summary collapse to one person, even though their printed
+                specialities differ. An unnamed asserter is never merged with
+                another unnamed one &mdash; there is no identity signal to merge
+                on, so the ECG gets its own <code>unknown</code> row rather than
+                being quietly attributed to the neurologist.
+              </li>
+              <li>
+                <strong>Page-level attribution.</strong> A five-page bundle is
+                split into five units before extraction and each ACDP is
+                attributed to whoever signed <em>its</em> page. That is why the
+                ECG's five biomarkers sit under asserter 104 and not under the
+                doctor who signed page three.
+              </li>
+              <li>
+                <strong>Dedup.</strong> Repeated header lines reprinted on every
+                page of one document collapse to a single row. The identical
+                sentence appearing in two <em>different</em> documents is never
+                collapsed &mdash; that is a second assertion by a second author,
+                and the distinction is the whole point.
+              </li>
+            </ul>
+            <p>Same folder in, same workbook out, byte for byte.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            How hallucination is caught &mdash; verbatim grounding on every
+            single row
+          </summary>
+          <div class="details-body">
+            <p>
+              Each proposed ACDP must carry a <code>source_span</code>: the
+              exact stretch of document text that substantiates it. After
+              linking, every span is fuzzy-matched back against the page
+              transcript it claims to come from. Anything scoring below 85 on a
+              partial-ratio match is written into the review report rather than
+              trusted.
+            </p>
+            <p>
+              If the model asserts something the page does not say, the span
+              either cannot be produced or does not match. There is nowhere for
+              an invented fact to hide.
+            </p>
+            <p>
+              Sonisha's run flagged five rows out of 111 &mdash; all five the
+              benign failure mode where a fact genuinely on the page is split
+              across table cells, so the reconstructed span does not read back
+              as one contiguous string:
+            </p>
+            <div class="tblwrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>acdp</th>
+                    <th>score</th>
+                    <th>span it claimed</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="n">20</td>
+                    <td class="n">75.3</td>
+                    <td>
+                      <code
+                        >TAB BRIVANEXT (50 MG) (6 1. strips) Brivaracetam
+                        Frequency 1 Tab twice a day Duration 4 weeks</code
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="n">21</td>
+                    <td class="n">72.4</td>
+                    <td>
+                      <code
+                        >TAB CLOBA MT (10 MG) (1 2. strip) Clobazam Frequency 1
+                        Tab as required * to be taken sub lingually</code
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="n">72</td>
+                    <td class="n">61.9</td>
+                    <td><code>QT/QTc-Baz 356/423 ms</code></td>
+                  </tr>
+                  <tr>
+                    <td class="n">73</td>
+                    <td class="n">68.4</td>
+                    <td><code>P-R-T axes 55 63 48</code></td>
+                  </tr>
+                  <tr>
+                    <td class="n">88</td>
+                    <td class="n">83.7</td>
+                    <td>
+                      <code
+                        >she had history of epilepsy at the age of 7 years</code
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="fine" style="margin-top: 12px; font-size: 0.875rem">
+              Rows 20 and 21 stitch a prescription table back into a sentence.
+              Rows 72 and 73 read values off a rotated ECG corner block. Row 88
+              fails by 1.3 points on a pronoun change. A human reviewer clears
+              all five in under a minute &mdash; and crucially, the system
+              flagged them itself rather than presenting them as certain.
+            </p>
+          </div>
+        </details>
+
+        <details>
+          <summary>What stops a bad run from shipping</summary>
+          <div class="details-body">
+            <p>
+              Two classes of problem, handled differently.
+              <strong>Blocking</strong> failures raise and the run produces no
+              workbook at all: any foreign key that does not resolve to a real
+              row, any empty ACDP text. There is no partial or best-effort
+              output.
+            </p>
+            <p>
+              <strong>Non-blocking</strong> uncertainty is collected and written
+              beside the workbook as <code>review.json</code> &mdash; weak
+              grounding, dates that would not parse, a category or body system
+              the model could not commit to, a medication or biomarker extracted
+              but never referenced by any statement. Nothing is silently dropped
+              and nothing is silently guessed.
+            </p>
+            <p>
+              Sonisha's run: 111 rows, zero broken references, zero unparseable
+              dates, zero orphaned medications or biomarkers, five grounding
+              flags.
+            </p>
+          </div>
+        </details>
+      </section>
+
+      <!-- ============================ ACT III ============================ -->
+      <section class="act" id="findings">
+        <p class="act-no">III</p>
+        <h2>What the structure buys that a summary cannot</h2>
+
+        <p class="lede">
+          Once the record is a graph of attributed facts rather than a stack of
+          prose, things become visible that are not stated anywhere in any
+          single document.
+        </p>
+        <p>
+          Each of the four findings below was produced by comparing ACDP rows to
+          each other. None of them can be read off a page. All four matter to
+          anyone treating this patient.
+        </p>
+
+        <div class="grid2">
+          <div class="panel verify">
+            <p class="panel-lbl">Finding 1 &middot; Corroboration</p>
+            <h4>The same MRI finding, asserted three times by three routes</h4>
+            <p class="fine">
+              The bilateral hippocampal FLAIR hyperintensity appears as
+              <code>acdp 29, 30</code> from the radiologist who read the scan,
+              as <code>acdp 48, 49</code> where the neurologist quotes it into
+              an outpatient note, and as <code>acdp 18, 19</code> where a Delhi
+              teleconsultant restates it second-hand six months later.
+            </p>
+            <p class="fine">
+              Three rows, one truth, and the ACDP layer preserves which is
+              primary. A summariser would have merged them into one sentence and
+              lost the ability to tell the radiologist's read from hearsay about
+              it.
+            </p>
+          </div>
+
+          <div class="panel signal">
+            <p class="panel-lbl">Finding 2 &middot; Contradiction</p>
+            <h4>
+              The discharge summary is wrong, and the timestamps explain why
+            </h4>
+            <p class="fine">
+              <code>acdp 95</code> &mdash; from the discharge summary &mdash;
+              states the MRI &ldquo;showed no significant intracranial
+              abnormality.&rdquo; <code>acdp 29, 30</code> &mdash; from the MRI
+              report itself &mdash; describe subtle FLAIR hyperintensity in both
+              hippocampi with mild atrophy.
+            </p>
+            <p class="fine">
+              Both are faithfully extracted. Both are in her file. The metadata
+              resolves it: the scan was performed 01 Nov and
+              <em>reported</em> 03 Nov at 13:12. She was discharged 02 Nov at
+              14:00. The discharge summary was written before the radiologist
+              finished reading the scan, and nobody went back to amend it.
+            </p>
+          </div>
+
+          <div class="panel signal">
+            <p class="panel-lbl">Finding 3 &middot; Drug safety</p>
+            <h4>A documented intolerance that no single document declares</h4>
+            <p class="fine">
+              <code>acdp 50&ndash;53</code> record four adverse effects after
+              starting LEV &mdash; sleep disturbance, anxiety, shortness of
+              breath, mixing up of words &mdash; and the pipeline correctly
+              routed them to three different body systems. The word
+              &ldquo;intolerance&rdquo; appears nowhere.
+            </p>
+            <p class="fine">
+              Pair those four rows with the medication timeline and the picture
+              is unambiguous: she was discharged on levetiracetam on 02 Nov, and
+              five days later that had been replaced. Any agent touching this
+              patient needs that as a hard rule, not as a paragraph it might
+              read carefully enough.
+            </p>
+          </div>
+
+          <div class="panel">
+            <p class="panel-lbl" style="color: var(--muted)">
+              Finding 4 &middot; A gap we are being explicit about
+            </p>
+            <h4>One molecule, three rows, two brand names</h4>
+            <p class="fine">
+              <code>m001</code> BRIVANEXT, <code>m003</code> BREVIPIL and
+              <code>m005</code> BREVIPIL are all brivaracetam 50&nbsp;mg twice
+              daily, recorded by three different prescribers. The workbook keeps
+              them as three rows.
+            </p>
+            <p class="fine">
+              That is deliberate at this layer &mdash; the ACDP sheet stays
+              faithful to what each document actually said, and does not invent
+              a merge it cannot prove. Collapsing them into one therapy with a
+              start date is a resolution problem, and resolution is the next
+              layer's job &mdash; which is what the rest of this brief is about.
+            </p>
+          </div>
+        </div>
+
+        <div class="exhibit">
+          <div class="exhibit-cap">
+            <span class="lbl">Exhibit C</span>
+            <span class="txt"
+              >The medication history, reassembled by walking ACDP rows in date
+              order across four prescribers.</span
+            >
+          </div>
+          <div class="tblwrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Document</th>
+                  <th>Drug as written</th>
+                  <th>Molecule</th>
+                  <th>What changed</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="n">02 Nov 2025</td>
+                  <td>Discharge summary</td>
+                  <td><code>TAB LEVIPIL 500 MG 1-0-1</code></td>
+                  <td>Levetiracetam</td>
+                  <td>Discharged on it</td>
+                </tr>
+                <tr>
+                  <td class="n">07 Nov 2025</td>
+                  <td>Outpatient record</td>
+                  <td><code>Tab. BREVIPIL 50 MG 1-0-1</code></td>
+                  <td>Brivaracetam</td>
+                  <td style="color: var(--signal)">
+                    Switched after 4 adverse effects
+                  </td>
+                </tr>
+                <tr>
+                  <td class="n">23 May 2026</td>
+                  <td>Teleconsultation</td>
+                  <td><code>BREVIPIL 50 MG BD</code></td>
+                  <td>Brivaracetam</td>
+                  <td>Noted as ongoing, &ldquo;no fresh seizures&rdquo;</td>
+                </tr>
+                <tr>
+                  <td class="n">23 May 2026</td>
+                  <td>Teleconsultation</td>
+                  <td><code>TAB BRIVANEXT 50 MG</code></td>
+                  <td>Brivaracetam</td>
+                  <td>Re-prescribed, 4 weeks</td>
+                </tr>
+                <tr>
+                  <td class="n">23 May 2026</td>
+                  <td>Teleconsultation</td>
+                  <td><code>TAB CLOBA MT 10 MG SL</code></td>
+                  <td>Clobazam</td>
+                  <td>Added as rescue, SOS</td>
+                </tr>
+                <tr>
+                  <td class="n">23 May 2026</td>
+                  <td>Teleconsultation</td>
+                  <td><code>TAB LTG 25 MG HS</code></td>
+                  <td>Lamotrigine</td>
+                  <td>Pre-existing, psychiatry, mood</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin-top: 12px; font-size: 0.875rem; color: var(--muted)">
+            Six medication rows across four documents, two hospitals and two
+            cities, ordered into one therapy history. Nowhere in her file does
+            this table exist.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================ ACT IV ============================ -->
+      <section class="act" id="rcc">
+        <p class="act-no">IV</p>
+        <h2>Relevant Clinical Context</h2>
+
+        <p class="lede">
+          RCC is a task-scoped, deterministic projection of the ACDP graph,
+          compiled for exactly one vertical agent and nothing else.
+        </p>
+        <p>
+          It is not a summary of the patient, and it is not a retrieval index
+          over her documents. It is the working state a narrow agent needs in
+          order to hold one specific conversation safely: what is true right
+          now, what it must ask, what it must never say, and what should end the
+          call and page a human.
+        </p>
+        <p>
+          The vertical matters. An agent that calls epilepsy patients between
+          neurology visits to track seizure frequency and antiseizure-medication
+          adherence needs a different projection from one booking appointments
+          or one reconciling insurance. Building context for &ldquo;a healthcare
+          assistant&rdquo; in general means building it for no task in
+          particular &mdash; which is how agents end up confidently wrong. RCC
+          is compiled per agent, per task, from the same underlying graph.
+        </p>
+
+        <div class="exhibit">
+          <div class="exhibit-cap">
+            <span class="lbl">Exhibit D</span>
+            <span class="txt"
+              >Design target &mdash; the RCC object compiled for
+              <code>epilepsy_followup_v1</code> from Sonisha's 111 ACDPs.</span
+            >
+          </div>
+          <pre><span class="c">// every field carries the acdp_ids it was derived from — nothing here is un-cited</span>
+{
+  <span class="k">"agent"</span>: <span class="s">"epilepsy_followup_v1"</span>,
+  <span class="k">"compiled_from"</span>: { <span class="k">"acdps"</span>: 111, <span class="k">"documents"</span>: 6, <span class="k">"through"</span>: <span class="s">"2026-05-23"</span> },
+
+  <span class="k">"active_problems"</span>: [
+    { <span class="k">"label"</span>: <span class="s">"Focal epilepsy with preserved awareness, with bilateral tonic-clonic seizures"</span>,
+      <span class="k">"status"</span>: <span class="s">"active"</span>, <span class="k">"since"</span>: <span class="s">"age 13"</span>, <span class="k">"from"</span>: [<span class="p">54</span>, <span class="p">1</span>, <span class="p">5</span>, <span class="p">6</span>] },
+    { <span class="k">"label"</span>: <span class="s">"Bilateral mesial temporal sclerosis"</span>,
+      <span class="k">"status"</span>: <span class="s">"active"</span>, <span class="k">"imaging_backed"</span>: <span class="p">true</span>, <span class="k">"from"</span>: [<span class="p">2</span>, <span class="p">29</span>, <span class="p">30</span>] },
+    { <span class="k">"label"</span>: <span class="s">"Bronchial asthma, on regular inhaler therapy"</span>,
+      <span class="k">"status"</span>: <span class="s">"active"</span>, <span class="k">"relevance"</span>: <span class="s">"confounds new breathlessness"</span>, <span class="k">"from"</span>: [<span class="p">74</span>, <span class="p">75</span>] }
+  ],
+
+  <span class="k">"current_therapy"</span>: [
+    { <span class="k">"molecule"</span>: <span class="s">"Brivaracetam"</span>, <span class="k">"dose"</span>: <span class="s">"50 mg"</span>, <span class="k">"freq"</span>: <span class="s">"BD"</span>,
+      <span class="k">"known_to_patient_as"</span>: [<span class="s">"BREVIPIL"</span>, <span class="s">"BRIVANEXT"</span>],   <span class="c">// 3 source rows, one therapy</span>
+      <span class="k">"since"</span>: <span class="s">"2025-11-07"</span>, <span class="k">"from"</span>: [<span class="p">20</span>, <span class="p">13</span>, <span class="p">55</span>] },
+    { <span class="k">"molecule"</span>: <span class="s">"Clobazam"</span>, <span class="k">"dose"</span>: <span class="s">"10 mg"</span>, <span class="k">"route"</span>: <span class="s">"sublingual"</span>,
+      <span class="k">"use"</span>: <span class="s">"rescue, SOS on tonic-clonic recurrence"</span>, <span class="k">"from"</span>: [<span class="p">21</span>, <span class="p">22</span>] },
+    { <span class="k">"molecule"</span>: <span class="s">"Lamotrigine"</span>, <span class="k">"dose"</span>: <span class="s">"25 mg"</span>, <span class="k">"freq"</span>: <span class="s">"HS"</span>,
+      <span class="k">"prescriber"</span>: <span class="s">"psychiatry"</span>, <span class="k">"indication"</span>: <span class="s">"mood stabilisation"</span>, <span class="k">"from"</span>: [<span class="p">15</span>] }
+  ],
+
+  <span class="k">"do_not_reintroduce"</span>: [
+    { <span class="k">"molecule"</span>: <span class="s">"Levetiracetam"</span>,
+      <span class="k">"reason"</span>: <span class="s">"sleep disturbance, anxiety, breathlessness, word-finding difficulty"</span>,
+      <span class="k">"stopped"</span>: <span class="s">"2025-11-07"</span>, <span class="k">"from"</span>: [<span class="p">50</span>, <span class="p">51</span>, <span class="p">52</span>, <span class="p">53</span>, <span class="p">110</span>, <span class="p">55</span>] }
+  ],
+
+  <span class="k">"ask_this_call"</span>: [
+    { <span class="k">"q"</span>: <span class="s">"seizure count since last contact"</span>,     <span class="k">"because"</span>: [<span class="p">24</span>, <span class="p">16</span>] },
+    { <span class="k">"q"</span>: <span class="s">"seizure diary maintained?"</span>,            <span class="k">"because"</span>: [<span class="p">24</span>, <span class="p">25</span>] },
+    { <span class="k">"q"</span>: <span class="s">"rescue clobazam used, how many times?"</span>, <span class="k">"because"</span>: [<span class="p">22</span>] },
+    { <span class="k">"q"</span>: <span class="s">"hours slept, any deprivation"</span>,         <span class="k">"because"</span>: [<span class="p">56</span>, <span class="p">105</span>, <span class="p">106</span>] },
+    { <span class="k">"q"</span>: <span class="s">"blank staring spells, still stress-linked?"</span>, <span class="k">"because"</span>: [<span class="p">16</span>, <span class="p">17</span>] }
+  ],
+
+  <span class="k">"escalate_if"</span>: [
+    { <span class="k">"trigger"</span>: <span class="s">"any bilateral tonic-clonic seizure"</span>,        <span class="k">"action"</span>: <span class="s">"page neurology"</span>, <span class="k">"from"</span>: [<span class="p">22</span>, <span class="p">54</span>] },
+    { <span class="k">"trigger"</span>: <span class="s">"new or worsening adverse effect"</span>,          <span class="k">"action"</span>: <span class="s">"page neurology"</span>, <span class="k">"from"</span>: [<span class="p">65</span>] },
+    { <span class="k">"trigger"</span>: <span class="s">"missed doses &gt; 2 in a week"</span>,             <span class="k">"action"</span>: <span class="s">"flag adherence"</span>, <span class="k">"from"</span>: [<span class="p">11</span>] }
+  ],
+
+  <span class="k">"do_not_say"</span>: [
+    <span class="s">"do not clear the patient to drive or swim — standing restriction"</span>,   <span class="c">// [9, 10, 58, 59]</span>
+    <span class="s">"do not adjust any ASM dose — escalation is gated on EEG with induction"</span>, <span class="c">// [26, 23]</span>
+    <span class="s">"do not state the MRI was normal — the discharge summary predates the read"</span> <span class="c">// [95, 29, 30]</span>
+  ],
+
+  <span class="k">"open_loops"</span>: [
+    { <span class="k">"item"</span>: <span class="s">"EEG with induction, to rule out co-existing PNES"</span>, <span class="k">"ordered"</span>: <span class="s">"2026-05-23"</span>, <span class="k">"from"</span>: [<span class="p">23</span>] },
+    { <span class="k">"item"</span>: <span class="s">"neurology review"</span>, <span class="k">"due"</span>: <span class="s">"2026-06-06"</span>, <span class="k">"from"</span>: [<span class="p">27</span>] }
+  ]
+}</pre>
+          <p style="margin-top: -6px; font-size: 0.875rem; color: var(--muted)">
+            Roughly sixty lines. Small enough to sit in an agent's system prompt
+            on every turn, specific enough that the agent never has to reason
+            its way to a safety rule mid-sentence.
+          </p>
+        </div>
+
+        <h3>Why this is compiled, not retrieved</h3>
+        <p>
+          The obvious alternative is to chunk her six documents into a vector
+          store and let the agent retrieve. On this record, that fails in a way
+          that is easy to demonstrate.
+        </p>
+
+        <div class="grid2">
+          <div class="panel signal">
+            <p class="panel-lbl">Retrieval over documents</p>
+            <p class="fine">
+              Ask &ldquo;what antiseizure medication is she on?&rdquo; The
+              discharge summary is the longest, most authoritative-looking, most
+              quotable chunk in the corpus. It says
+              <code>TAB LEVIPIL 500 MG 1-0-1 CONTINUE</code>.
+            </p>
+            <p class="fine">
+              The agent tells a patient with a documented levetiracetam
+              intolerance to keep taking levetiracetam. Every word of that
+              answer is grounded in a real document. It is still wrong, because
+              the document is eight months stale and the retriever has no notion
+              of supersession.
+            </p>
+          </div>
+          <div class="panel verify">
+            <p class="panel-lbl">Compiled RCC</p>
+            <p class="fine">
+              The compiler walks medication ACDPs in date order, applies
+              supersession, resolves three brand strings to one molecule, and
+              reads rows 50&ndash;53 as a stop reason.
+            </p>
+            <p class="fine">
+              Levetiracetam does not appear in <code>current_therapy</code> at
+              all. It appears once, in <code>do_not_reintroduce</code>, with its
+              reason and the five rows that prove it. The wrong answer is not
+              something the agent has to be smart enough to avoid &mdash; it is
+              not in the context it was given.
+            </p>
+          </div>
+        </div>
+
+        <div class="exhibit">
+          <div class="exhibit-cap">
+            <span class="lbl">Exhibit E</span>
+            <span class="txt"
+              >Design target &mdash; a follow-up call driven by the object
+              above. Grey notes show which RCC field produced each turn.</span
+            >
+          </div>
+          <div class="panel" style="padding: 6px 22px 14px">
+            <div class="talk">
+              <div class="turn agent">
+                <span class="who">Agent</span>
+                <span class="say"
+                  >Hi Sonisha, calling from Dr Krishnan's neurology follow-up.
+                  Quick check-in on the brivaracetam &mdash; you might know it
+                  as Brevipil or Brivanext. Have you had any seizures since we
+                  last spoke?
+                  <span class="why"
+                    >current_therapy[0].known_to_patient_as &mdash; the agent
+                    leads with the brand she actually holds, not the molecule
+                    &middot; ask_this_call[0]</span
+                  ></span
+                >
+              </div>
+              <div class="turn">
+                <span class="who">Patient</span>
+                <span class="say"
+                  >Two of the staring ones, I think. Both after a bad week at
+                  work.</span
+                >
+              </div>
+              <div class="turn agent">
+                <span class="who">Agent</span>
+                <span class="say"
+                  >That matches the pattern in your notes &mdash; those tend to
+                  come with stress. Did you write them in the seizure diary, and
+                  did you need the Cloba under the tongue for either?
+                  <span class="why"
+                    >ask_this_call[1], [2] &middot; corroborated by acdp 17,
+                    &ldquo;usually triggered by stressful events&rdquo;</span
+                  ></span
+                >
+              </div>
+              <div class="turn">
+                <span class="who">Patient</span>
+                <span class="say"
+                  >No Cloba. And honestly I've been sleeping about five hours.
+                  Should I just go back up on the dose?</span
+                >
+              </div>
+              <div class="turn agent">
+                <span class="who">Agent</span>
+                <span class="say"
+                  >I can't change any dose &mdash; Dr Krishnan wants the EEG
+                  with induction done before adjusting anything, and that's
+                  still pending. Five hours is worth fixing though; short sleep
+                  is one of your documented triggers. I'll log both spells and
+                  the sleep, and flag the EEG as still open.
+                  <span class="why"
+                    >do_not_say[1] blocks the dose question outright &middot;
+                    open_loops[0] &middot; ask_this_call[3]</span
+                  ></span
+                >
+              </div>
+              <div class="turn">
+                <span class="who">Patient</span>
+                <span class="say"
+                  >Also I've been a bit breathless in the evenings.</span
+                >
+              </div>
+              <div class="turn agent">
+                <span class="who">Agent</span>
+                <span class="say"
+                  >Thanks for telling me &mdash; I'm passing that to the
+                  neurology team today rather than handling it here. You have
+                  asthma on record and breathlessness was also one of the
+                  effects that made you stop the earlier medicine, so it needs a
+                  clinician, not me.
+                  <span class="why"
+                    >escalate_if[1] fires &middot; disambiguated against
+                    active_problems[2] asthma and do_not_reintroduce[0] &mdash;
+                    both plausible causes, neither one the agent is allowed to
+                    settle</span
+                  ></span
+                >
+              </div>
+            </div>
+          </div>
+          <p style="margin-top: 12px; font-size: 0.875rem; color: var(--muted)">
+            Note what the agent never does: reason about her record live. It
+            reads a compiled object. The clinical judgement was made once,
+            deterministically, at compile time &mdash; where it can be reviewed,
+            versioned and tested &mdash; instead of being re-derived from raw
+            documents on every call.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================ ACT V ============================ -->
+      <section class="act" id="roadmap">
+        <p class="act-no">V</p>
+        <h2>Where we are, and how RCC gets built</h2>
+
+        <p class="lede">
+          Everything through the workbook is running today on real patient
+          folders. Everything from resolution upward is designed and not yet
+          shipped. The stages below are marked honestly.
+        </p>
+
+        <div class="stage-list">
+          <div class="stage">
+            <span class="no">01</span>
+            <div>
+              <div class="nm">Intake and page splitting</div>
+              <div class="ds">
+                Content-sniffed file typing by magic bytes rather than
+                extension. Every PDF is split to one unit per page, because one
+                file is routinely five unrelated reports.
+              </div>
+            </div>
+            <span class="st built">Shipped</span>
+          </div>
+          <div class="stage">
+            <span class="no">02</span>
+            <div>
+              <div class="nm">Two-phase extraction</div>
+              <div class="ds">
+                A header pass transcribes the page and pulls document metadata,
+                medications and biomarkers. A second pass proposes ACDPs against
+                that transcript through a forced schema, chunked so a long
+                document cannot truncate its own fact list. Provider-agnostic
+                across Vertex, Anthropic and OpenAI.
+              </div>
+            </div>
+            <span class="st built">Shipped</span>
+          </div>
+          <div class="stage">
+            <span class="no">03</span>
+            <div>
+              <div class="nm">Deterministic linking</div>
+              <div class="ds">
+                Code assigns every identifier, merges continuation pages,
+                resolves asserters on a normalised name key, attributes each
+                fact to the page it came from, and votes patient identity across
+                documents rather than trusting one header.
+              </div>
+            </div>
+            <span class="st built">Shipped</span>
+          </div>
+          <div class="stage">
+            <span class="no">04</span>
+            <div>
+              <div class="nm">Validation and review report</div>
+              <div class="ds">
+                Blocking foreign-key integrity, verbatim grounding at threshold
+                85, date normalisation, orphan detection. Uncertainty is written
+                out for a human instead of being resolved silently.
+              </div>
+            </div>
+            <span class="st built">Shipped</span>
+          </div>
+          <div class="stage">
+            <span class="no">05</span>
+            <div>
+              <div class="nm">Clinical coding</div>
+              <div class="ds">
+                SNOMED CT and ICD-11 columns exist in the workbook and are empty
+                today. Coding is what lets a rule say &ldquo;any antiseizure
+                medication&rdquo; rather than matching on strings, and it is the
+                precondition for most of what follows.
+              </div>
+            </div>
+            <span class="st wip">In progress</span>
+          </div>
+          <div class="stage">
+            <span class="no">06</span>
+            <div>
+              <div class="nm">Entity resolution across documents</div>
+              <div class="ds">
+                Collapse brand and salt variants of one molecule into a single
+                therapy with a start date and, where it exists, a stop reason.
+                Today the workbook keeps BREVIPIL, BRIVANEXT and Brivaracetam as
+                three rows on purpose; resolving them belongs here, above the
+                faithful layer, not inside it.
+              </div>
+            </div>
+            <span class="st next">Next</span>
+          </div>
+          <div class="stage">
+            <span class="no">07</span>
+            <div>
+              <div class="nm">Temporal resolution</div>
+              <div class="ds">
+                Give every fact an event date and an assertion date, so
+                supersession is computable. This is what turns the
+                discharge-summary contradiction from a conflict into a resolved
+                sequence: reported 03 Nov beats written 02 Nov.
+              </div>
+            </div>
+            <span class="st next">Next</span>
+          </div>
+          <div class="stage">
+            <span class="no">08</span>
+            <div>
+              <div class="nm">Problem-oriented rollup</div>
+              <div class="ds">
+                Group the resolved facts into active problems with their
+                supporting evidence, current therapy, resolved history, and open
+                loops. One patient-level graph, still agent-agnostic.
+              </div>
+            </div>
+            <span class="st next">Next</span>
+          </div>
+          <div class="stage">
+            <span class="no">09</span>
+            <div>
+              <div class="nm">RCC projection per vertical</div>
+              <div class="ds">
+                A declarative spec per agent selects from the graph and compiles
+                the object in Exhibit D &mdash; including its guardrails.
+                Deterministic, versioned, diffable between runs, and re-compiled
+                whenever a new document lands.
+              </div>
+            </div>
+            <span class="st next">Next</span>
+          </div>
+          <div class="stage">
+            <span class="no">10</span>
+            <div>
+              <div class="nm">Evaluation harness</div>
+              <div class="ds">
+                Clinician-labelled gold RCCs per vertical, scored on the things
+                that matter: is any current medication missing, is any
+                contraindication absent, does any guardrail fail to fire. A
+                projection is only shippable once it passes its own suite.
+              </div>
+            </div>
+            <span class="st next">Next</span>
+          </div>
+        </div>
+
+        <h3>What is true today, stated plainly</h3>
+
+        <div class="grid2">
+          <div class="panel verify">
+            <p class="panel-lbl">Working</p>
+            <ul class="clean" style="margin-top: 0">
+              <li>
+                A command-line pipeline that takes a patient folder and returns
+                a six-sheet workbook plus a review report.
+              </li>
+              <li>
+                Photographed, rotated, skewed and native-digital documents, all
+                handled through the same path.
+              </li>
+              <li>
+                Deterministic identity, references and dedup &mdash; same folder
+                in, same workbook out.
+              </li>
+              <li>
+                Verbatim source grounding on every row, with sub-threshold
+                matches surfaced rather than buried.
+              </li>
+              <li>
+                Swappable model provider, so quality and cost can be tuned
+                without touching the schema.
+              </li>
+            </ul>
+          </div>
+          <div class="panel">
+            <p class="panel-lbl" style="color: var(--muted)">Not yet</p>
+            <ul class="clean" style="margin-top: 0">
+              <li>
+                RCC itself. Exhibits D and E are the design target, compiled by
+                hand from the real workbook for this brief.
+              </li>
+              <li>
+                Clinical coding &mdash; the SNOMED and ICD-11 columns are empty.
+              </li>
+              <li>
+                Cross-document medication resolution, as described in Finding 4.
+              </li>
+              <li>
+                Bundled-PDF metadata &mdash; a five-report file currently takes
+                its category and date from its first page.
+              </li>
+              <li>
+                Review is a JSON file, not an interface. One patient per run, no
+                database behind it, not yet wired into the consumer app.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="pullquote">
+          <p class="panel-lbl" style="margin-bottom: 10px">The bet</p>
+          <p>
+            The hard part of clinical AI is not generating fluent medical
+            language. It is knowing, with proof, what is actually true about one
+            patient right now &mdash; and being able to show where each piece of
+            that came from when someone asks. Thalamus builds that layer first,
+            deterministically, and treats everything an agent says as a
+            projection of it rather than an inference over raw paper.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <div class="wrap">
+        <span class="fam">Thalamus</span>
+        <p>
+          Every ACDP identifier, medication row, review flag and document
+          referenced in this brief is taken unaltered from a real pipeline run
+          over the record described in Exhibit A. Exhibits D and E are design
+          targets, compiled by hand from that run's output.
+        </p>
+        <a class="home" href="/">&larr; Back to Kado Doctor</a>
+      </div>
+    </footer>
+  </body>
+</html>
