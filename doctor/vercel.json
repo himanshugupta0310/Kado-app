@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/thalamus/view/:patient",
+      "destination": "/thalamus/view/index.html"
+    }
+  ]
+}
