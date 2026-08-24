@@ -35257,6 +35257,7 @@ function Ch(e) {
                 source_subcategory: vh(e.source_subcategory),
                 source_digitization: vh(e.source_digitization),
                 source_date: vh(e.source_date),
+                source_file: vh(e.source_file),
               },
             ];
       }),
@@ -36175,19 +36176,25 @@ async function hg() {
   return cg({ l2: a, l3: o, label: e ?? `Demo record` });
 }
 function gg(e) {
+  if (!e) return null;
+  let t = encodeURIComponent(e),
+    n = dg();
+  return n ? pg(n, `sources/${t}`) : `/thalamus/view/demo/sources/${t}`;
+}
+function _g(e) {
   return new Promise((t, n) => {
     ((e.oncomplete = e.onsuccess = () => t(e.result)),
       (e.onabort = e.onerror = () => n(e.error)));
   });
 }
-function _g(e, t) {
+function vg(e, t) {
   let n,
     r = () => {
       if (n) return n;
       let r = indexedDB.open(e);
       return (
         (r.onupgradeneeded = () => r.result.createObjectStore(t)),
-        (n = gg(r)),
+        (n = _g(r)),
         n.then(
           (e) => {
             e.onclose = () => (n = void 0);
@@ -36201,56 +36208,56 @@ function _g(e, t) {
     };
   return (e, n) => r().then((r) => n(r.transaction(t, e).objectStore(t)));
 }
-var vg;
-function yg() {
-  return ((vg ||= _g(`keyval-store`, `keyval`)), vg);
+var yg;
+function bg() {
+  return ((yg ||= vg(`keyval-store`, `keyval`)), yg);
 }
-function bg(e, t = yg()) {
-  return t(`readonly`, (t) => gg(t.get(e)));
+function xg(e, t = bg()) {
+  return t(`readonly`, (t) => _g(t.get(e)));
 }
-function xg(e, t, n = yg()) {
-  return n(`readwrite`, (n) => (n.put(t, e), gg(n.transaction)));
+function Sg(e, t, n = bg()) {
+  return n(`readwrite`, (n) => (n.put(t, e), _g(n.transaction)));
 }
-function Sg(e, t) {
+function Cg(e, t) {
   return (
     (e.openCursor().onsuccess = function () {
       this.result && (t(this.result), this.result.continue());
     }),
-    gg(e.transaction)
+    _g(e.transaction)
   );
 }
-function Cg(e = yg()) {
+function wg(e = bg()) {
   return e(`readonly`, (e) => {
-    if (e.getAllKeys) return gg(e.getAllKeys());
+    if (e.getAllKeys) return _g(e.getAllKeys());
     let t = [];
-    return Sg(e, (e) => t.push(e.key)).then(() => t);
+    return Cg(e, (e) => t.push(e.key)).then(() => t);
   });
 }
-var wg = _g(`thalamus-datasets`, `datasets`),
-  Tg = (e) => xg(`ds:${e.fingerprint}`, e, wg),
-  Eg = (e) => bg(`ds:${e}`, wg),
-  Dg = async () =>
-    (await Cg(wg))
+var Tg = vg(`thalamus-datasets`, `datasets`),
+  Eg = (e) => Sg(`ds:${e.fingerprint}`, e, Tg),
+  Dg = (e) => xg(`ds:${e}`, Tg),
+  Og = async () =>
+    (await wg(Tg))
       .map(String)
       .filter((e) => e.startsWith(`ds:`))
       .map((e) => e.slice(3)),
-  Og = (e, t, n) => `${e}:${t}:${n}`,
-  kg = () => Math.random().toString(36).slice(2, 9),
-  Ag = (e) => e.map(([e, t]) => ({ value: e, color: t })),
-  jg = Ag([
+  kg = (e, t, n) => `${e}:${t}:${n}`,
+  Ag = () => Math.random().toString(36).slice(2, 9),
+  jg = (e) => e.map(([e, t]) => ({ value: e, color: t })),
+  Mg = jg([
     [`abnormal`, `var(--bad)`],
     [`borderline`, `var(--warn)`],
     [`normal`, `var(--ok)`],
     [`not_sure`, `var(--unk)`],
   ]),
-  Mg = Ag([
+  Ng = jg([
     [`kept`, `var(--ok)`],
     [`merged`, `var(--ink-2)`],
     [`dropped`, `var(--unk)`],
     [`unhandled`, `var(--bad)`],
     [`unknown`, `var(--warn)`],
   ]),
-  Ng = Ag([
+  Pg = jg([
     [`active_problem`, `var(--bad)`],
     [`caution`, `var(--warn)`],
     [`contested`, `var(--warn)`],
@@ -36260,7 +36267,7 @@ var wg = _g(`thalamus-datasets`, `datasets`),
     [`standing_fact`, `var(--unk)`],
     [`past_episode`, `var(--unk)`],
   ]),
-  Pg = {
+  Fg = {
     active_problem: `Active problems`,
     plan: `Plan / next steps`,
     medication: `Medications`,
@@ -36270,7 +36277,7 @@ var wg = _g(`thalamus-datasets`, `datasets`),
     past_episode: `Past episodes`,
     contested: `Contested`,
   },
-  Fg = {
+  Ig = {
     D1: `Administrative`,
     D2: `Inside its range`,
     D3: `Superseded`,
@@ -36288,7 +36295,7 @@ var wg = _g(`thalamus-datasets`, `datasets`),
     SUMMARISE: `Summarised into an episode`,
     CONFLICT: `Contradiction resolved`,
   },
-  Ig = {
+  Lg = {
     D1: `Dropped — administrative, not clinical`,
     D2: `Dropped — result inside its reference range`,
     D3: `Dropped — superseded or no longer relevant`,
@@ -36306,7 +36313,7 @@ var wg = _g(`thalamus-datasets`, `datasets`),
     SUMMARISE: `Summarised into an episode line`,
     CONFLICT: `Contradiction resolved`,
   },
-  Lg = {
+  Rg = {
     acdp: [
       {
         key: `acdp_id`,
@@ -36347,7 +36354,7 @@ var wg = _g(`thalamus-datasets`, `datasets`),
         type: `select`,
         source: `derived`,
         width: 96,
-        options: Mg,
+        options: Ng,
         help: `What the L3 reduction did with this point.`,
       },
       {
@@ -36381,7 +36388,7 @@ var wg = _g(`thalamus-datasets`, `datasets`),
         type: `select`,
         source: `derived`,
         width: 128,
-        options: Ng,
+        options: Pg,
       },
       {
         key: `feeds_l3_entry`,
@@ -36473,7 +36480,7 @@ var wg = _g(`thalamus-datasets`, `datasets`),
         type: `select`,
         source: `source`,
         width: 100,
-        options: jg,
+        options: Mg,
         overridable: !0,
       },
       {
@@ -36482,7 +36489,7 @@ var wg = _g(`thalamus-datasets`, `datasets`),
         type: `select`,
         source: `derived`,
         width: 100,
-        options: jg,
+        options: Mg,
         help: `Flag recomputed here from value + printed range. Blank when no range was printed.`,
       },
       {
@@ -36586,7 +36593,7 @@ var wg = _g(`thalamus-datasets`, `datasets`),
         type: `select`,
         source: `source`,
         width: 100,
-        options: jg,
+        options: Mg,
         overridable: !0,
       },
       {
@@ -36595,7 +36602,7 @@ var wg = _g(`thalamus-datasets`, `datasets`),
         type: `select`,
         source: `derived`,
         width: 100,
-        options: jg,
+        options: Mg,
       },
       {
         key: `flag_mismatch`,
@@ -36807,6 +36814,15 @@ var wg = _g(`thalamus-datasets`, `datasets`),
         type: `select`,
         source: `source`,
         width: 158,
+      },
+      {
+        key: `source_file`,
+        label: `File`,
+        type: `text`,
+        source: `source`,
+        width: 190,
+        mono: !0,
+        help: `The file this document was read from.`,
       },
       {
         key: `user_identification`,
@@ -37028,7 +37044,7 @@ var wg = _g(`thalamus-datasets`, `datasets`),
         type: `select`,
         source: `source`,
         width: 140,
-        options: Ng,
+        options: Pg,
         overridable: !0,
       },
       {
@@ -37094,7 +37110,7 @@ var wg = _g(`thalamus-datasets`, `datasets`),
       },
     ],
   },
-  Rg = {
+  zg = {
     acdp: `Data points`,
     biomarker: `Results`,
     document: `Documents`,
@@ -37102,7 +37118,7 @@ var wg = _g(`thalamus-datasets`, `datasets`),
     asserter: `Asserters`,
     l3: `Profile lines`,
   },
-  zg = {
+  Bg = {
     acdp: `acdp_id`,
     biomarker: `biomarker_id`,
     document: `source_id`,
@@ -37110,13 +37126,13 @@ var wg = _g(`thalamus-datasets`, `datasets`),
     asserter: `asserter_id`,
     l3: `l3_id`,
   },
-  Bg = (e, t = `and`) => ({
+  Vg = (e, t = `and`) => ({
     id: `g-${e.map((e) => e.id).join(`-`) || `empty`}`,
     kind: `group`,
     conj: t,
     children: e,
   }),
-  Vg = (e, t, n, r, i) => ({
+  Hg = (e, t, n, r, i) => ({
     id: e,
     kind: `condition`,
     field: t,
@@ -37124,36 +37140,36 @@ var wg = _g(`thalamus-datasets`, `datasets`),
     value: r,
     value2: i,
   });
-function Hg(e, t = 9) {
-  return Lg[e]
+function Ug(e, t = 9) {
+  return Rg[e]
     .filter((e) => !e.internal)
     .slice(0, t)
     .map((e) => e.key);
 }
-function Ug(e, t = `All rows`) {
+function Wg(e, t = `All rows`) {
   return {
     id: `${e}-all`,
     entity: e,
     name: t,
     layout: `table`,
-    columns: Hg(e),
+    columns: Ug(e),
     widths: {},
-    filters: Bg([]),
+    filters: Vg([]),
     sorts: [],
     calcs: {},
   };
 }
-var Wg = [
-  { ...Ug(`acdp`, `All data points`), id: `acdp-all`, builtin: !0 },
+var Gg = [
+  { ...Wg(`acdp`, `All data points`), id: `acdp-all`, builtin: !0 },
   {
-    ...Ug(`acdp`, `Kept & merged only`),
+    ...Wg(`acdp`, `Kept & merged only`),
     id: `acdp-survived`,
     builtin: !0,
-    filters: Bg([Vg(`c1`, `fate`, `none_of`, [`dropped`])]),
+    filters: Vg([Hg(`c1`, `fate`, `none_of`, [`dropped`])]),
     sorts: [{ field: `date`, dir: `desc` }],
   },
   {
-    ...Ug(`acdp`, `Everything dropped`),
+    ...Wg(`acdp`, `Everything dropped`),
     id: `acdp-dropped`,
     builtin: !0,
     columns: [
@@ -37167,12 +37183,12 @@ var Wg = [
       `date`,
       `source_subcategory`,
     ],
-    filters: Bg([Vg(`c1`, `fate`, `is`, `dropped`)]),
+    filters: Vg([Hg(`c1`, `fate`, `is`, `dropped`)]),
     groupBy: `fn`,
     calcs: { acdp_id: `count` },
   },
   {
-    ...Ug(`acdp`, `Abnormal findings`),
+    ...Wg(`acdp`, `Abnormal findings`),
     id: `acdp-abnormal`,
     builtin: !0,
     columns: [
@@ -37185,11 +37201,11 @@ var Wg = [
       `source_subcategory`,
       `fate`,
     ],
-    filters: Bg([Vg(`c1`, `flag`, `any_of`, [`abnormal`, `borderline`])]),
+    filters: Vg([Hg(`c1`, `flag`, `any_of`, [`abnormal`, `borderline`])]),
     sorts: [{ field: `date`, dir: `desc` }],
   },
   {
-    ...Ug(`acdp`, `By body system`),
+    ...Wg(`acdp`, `By body system`),
     id: `acdp-by-system`,
     builtin: !0,
     layout: `board`,
@@ -37197,70 +37213,70 @@ var Wg = [
     columns: [`acdp`, `category`, `flag`, `date`],
   },
   {
-    ...Ug(`biomarker`, `All results`),
+    ...Wg(`biomarker`, `All results`),
     id: `biomarker-all`,
     builtin: !0,
     sorts: [{ field: `date`, dir: `desc` }],
   },
   {
-    ...Ug(`biomarker`, `Unclassified results`),
+    ...Wg(`biomarker`, `Unclassified results`),
     id: `biomarker-notsure`,
     builtin: !0,
-    filters: Bg([Vg(`c1`, `biomarker_flag`, `is`, `not_sure`)]),
+    filters: Vg([Hg(`c1`, `biomarker_flag`, `is`, `not_sure`)]),
     groupBy: `panel`,
     calcs: { biomarker_id: `count` },
   },
   {
-    ...Ug(`biomarker`, `Repeated markers`),
+    ...Wg(`biomarker`, `Repeated markers`),
     id: `biomarker-repeat`,
     builtin: !0,
-    filters: Bg([Vg(`c1`, `readings`, `gte`, 3)]),
+    filters: Vg([Hg(`c1`, `readings`, `gte`, 3)]),
     sorts: [
       { field: `biomarker_name`, dir: `asc` },
       { field: `date`, dir: `asc` },
     ],
   },
   {
-    ...Ug(`document`, `All documents`),
+    ...Wg(`document`, `All documents`),
     id: `document-all`,
     builtin: !0,
     sorts: [{ field: `source_date`, dir: `desc` }],
   },
   {
-    ...Ug(`l3`, `The profile`),
+    ...Wg(`l3`, `The profile`),
     id: `l3-all`,
     builtin: !0,
     groupBy: `section`,
     calcs: { source_count: `sum` },
   },
-  { ...Ug(`medication`, `All medications`), id: `medication-all`, builtin: !0 },
+  { ...Wg(`medication`, `All medications`), id: `medication-all`, builtin: !0 },
   {
-    ...Ug(`asserter`, `All asserters`),
+    ...Wg(`asserter`, `All asserters`),
     id: `asserter-all`,
     builtin: !0,
     sorts: [{ field: `acdp_count`, dir: `desc` }],
   },
 ];
-function Gg(e, t, n) {
-  let r = zg[e];
+function Kg(e, t, n) {
+  let r = Bg[e];
   return {
-    ...Ug(e, t),
+    ...Wg(e, t),
     id: `insight-${t.toLowerCase().replace(/\W+/g, `-`)}`,
-    filters: Bg([Vg(`c1`, r, `any_of`, n.map(String))]),
+    filters: Vg([Hg(`c1`, r, `any_of`, n.map(String))]),
   };
 }
-var Kg = [`acdp`, `category`];
-function qg(e) {
-  let t = e.entity === `acdp` ? [...Kg] : Hg(e.entity, 2);
+var qg = [`acdp`, `category`];
+function Jg(e) {
+  let t = e.entity === `acdp` ? [...qg] : Ug(e.entity, 2);
   return { ...e, layout: `table`, columns: t, groupBy: void 0, calcs: {} };
 }
-var Jg = _g(`thalamus-workspaces`, `workspaces`),
-  Yg = {
+var Yg = vg(`thalamus-workspaces`, `workspaces`),
+  Xg = {
     name: `local`,
-    load: (e) => bg(`ws:${e}`, Jg).then((e) => e ?? null),
-    save: (e, t) => xg(`ws:${e}`, t, Jg),
+    load: (e) => xg(`ws:${e}`, Yg).then((e) => e ?? null),
+    save: (e, t) => Sg(`ws:${e}`, t, Yg),
   },
-  Xg = () => ({
+  Zg = () => ({
     acdp: [],
     biomarker: [],
     document: [],
@@ -37268,8 +37284,8 @@ var Jg = _g(`thalamus-workspaces`, `workspaces`),
     asserter: [],
     l3: [],
   }),
-  Zg = `thalamus.handle`,
-  Qg = w((e, t) => {
+  Qg = `thalamus.handle`,
+  $g = w((e, t) => {
     let n = null,
       r = () => {
         (n && clearTimeout(n),
@@ -37288,12 +37304,12 @@ var Jg = _g(`thalamus-workspaces`, `workspaces`),
       };
     return {
       fingerprint: null,
-      handle: localStorage.getItem(Zg) ?? ``,
-      sync: Yg,
+      handle: localStorage.getItem(Qg) ?? ``,
+      sync: Xg,
       syncState: `idle`,
       syncError: null,
-      views: Wg,
-      columns: Xg(),
+      views: Gg,
+      columns: Zg(),
       cells: {},
       overrides: {},
       async attach(n, r) {
@@ -37302,8 +37318,8 @@ var Jg = _g(`thalamus-workspaces`, `workspaces`),
           fingerprint: n,
           sync: i,
           syncState: `loading`,
-          views: Wg,
-          columns: Xg(),
+          views: Gg,
+          columns: Zg(),
           cells: {},
           overrides: {},
         });
@@ -37316,7 +37332,7 @@ var Jg = _g(`thalamus-workspaces`, `workspaces`),
         }
       },
       setHandle(t) {
-        (localStorage.setItem(Zg, t), e({ handle: t }));
+        (localStorage.setItem(Qg, t), e({ handle: t }));
       },
       saveView(t) {
         (e((e) => ({
@@ -37362,7 +37378,7 @@ var Jg = _g(`thalamus-workspaces`, `workspaces`),
       setCell(t, n, i, a) {
         (e((e) => {
           let r = { ...e.cells },
-            o = Og(t, n, i);
+            o = kg(t, n, i);
           return (
             a === null || a === `` || a === void 0 ? delete r[o] : (r[o] = a),
             { cells: r }
@@ -37372,7 +37388,7 @@ var Jg = _g(`thalamus-workspaces`, `workspaces`),
       },
       setOverride(t, n, i, a, o, s) {
         (e((e) => {
-          let r = Og(t, n, i),
+          let r = kg(t, n, i),
             c = { ...e.overrides };
           return (
             o === a
@@ -37395,7 +37411,7 @@ var Jg = _g(`thalamus-workspaces`, `workspaces`),
       clearOverride(t, n, i) {
         (e((e) => {
           let r = { ...e.overrides };
-          return (delete r[Og(t, n, i)], { overrides: r });
+          return (delete r[kg(t, n, i)], { overrides: r });
         }),
           r());
       },
@@ -37408,7 +37424,7 @@ var Jg = _g(`thalamus-workspaces`, `workspaces`),
             (e) =>
               !e.builtin ||
               JSON.stringify(e) !==
-                JSON.stringify(Wg.find((t) => t.id === e.id)),
+                JSON.stringify(Gg.find((t) => t.id === e.id)),
           ),
           columns: n,
           cells: r,
@@ -37416,21 +37432,21 @@ var Jg = _g(`thalamus-workspaces`, `workspaces`),
         };
       },
       importSnapshot(t) {
-        let n = new Map(Wg.map((e) => [e.id, e]));
+        let n = new Map(Gg.map((e) => [e.id, e]));
         for (let e of t.views ?? []) n.set(e.id, e);
         e({
           views: [...n.values()],
-          columns: { ...Xg(), ...(t.columns ?? {}) },
+          columns: { ...Zg(), ...(t.columns ?? {}) },
           cells: t.cells ?? {},
           overrides: t.overrides ?? {},
         });
       },
       reset() {
-        (e({ views: Wg, columns: Xg(), cells: {}, overrides: {} }), r());
+        (e({ views: Gg, columns: Zg(), cells: {}, overrides: {} }), r());
       },
     };
   }),
-  $g = (e) =>
+  e_ = (e) =>
     Object.values(e).map((e) => ({
       entity: e.entity,
       row_id: e.rowId,
@@ -37441,11 +37457,11 @@ var Jg = _g(`thalamus-workspaces`, `workspaces`),
       at: e.updatedAt,
       by: e.updatedBy ?? null,
     })),
-  e_ = Symbol.for(`@supabase/supabase-js.traceContextExtractor`);
-function t_() {
-  return globalThis[e_];
+  t_ = Symbol.for(`@supabase/supabase-js.traceContextExtractor`);
+function n_() {
+  return globalThis[t_];
 }
-function n_(e, t) {
+function r_(e, t) {
   var n = {};
   for (var r in e)
     Object.prototype.hasOwnProperty.call(e, r) &&
@@ -37458,7 +37474,7 @@ function n_(e, t) {
         (n[r[i]] = e[r[i]]);
   return n;
 }
-function r_(e, t, n, r) {
+function i_(e, t, n, r) {
   function i(e) {
     return e instanceof n
       ? e
@@ -37487,8 +37503,8 @@ function r_(e, t, n, r) {
     c((r = r.apply(e, t || [])).next());
   });
 }
-var i_ = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
-  a_ = class extends Error {
+var a_ = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
+  o_ = class extends Error {
     constructor(e, t = `FunctionsError`, n) {
       (super(e), (this.name = t), (this.context = n));
     }
@@ -37496,7 +37512,7 @@ var i_ = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
       return { name: this.name, message: this.message, context: this.context };
     }
   },
-  o_ = class extends a_ {
+  s_ = class extends o_ {
     constructor(e) {
       super(
         `Failed to send a request to the Edge Function`,
@@ -37505,12 +37521,12 @@ var i_ = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
       );
     }
   },
-  s_ = class extends a_ {
+  c_ = class extends o_ {
     constructor(e) {
       super(`Relay Error invoking the Edge Function`, `FunctionsRelayError`, e);
     }
   },
-  c_ = class extends a_ {
+  l_ = class extends o_ {
     constructor(e) {
       super(
         `Edge Function returned a non-2xx status code`,
@@ -37519,7 +37535,7 @@ var i_ = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
       );
     }
   },
-  l_;
+  u_;
 (function (e) {
   ((e.Any = `any`),
     (e.ApNortheast1 = `ap-northeast-1`),
@@ -37536,22 +37552,22 @@ var i_ = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
     (e.UsEast1 = `us-east-1`),
     (e.UsWest1 = `us-west-1`),
     (e.UsWest2 = `us-west-2`));
-})((l_ ||= {}));
-var u_ = class {
+})((u_ ||= {}));
+var d_ = class {
     constructor(
       e,
-      { headers: t = {}, customFetch: n, region: r = l_.Any } = {},
+      { headers: t = {}, customFetch: n, region: r = u_.Any } = {},
     ) {
       ((this.url = e),
         (this.headers = t),
         (this.region = r),
-        (this.fetch = i_(n)));
+        (this.fetch = a_(n)));
     }
     setAuth(e) {
       this.headers.Authorization = `Bearer ${e}`;
     }
     invoke(e) {
-      return r_(this, arguments, void 0, function* (e, t = {}) {
+      return i_(this, arguments, void 0, function* (e, t = {}) {
         var n;
         let r, i, a;
         try {
@@ -37603,11 +37619,11 @@ var u_ = class {
               body: p,
               signal: h,
             }).catch((e) => {
-              throw new o_(e);
+              throw new s_(e);
             }),
             _ = g.headers.get(`x-relay-error`);
-          if (_ && _ === `true`) throw new s_(g);
-          if (!g.ok) throw new c_(g);
+          if (_ && _ === `true`) throw new c_(g);
+          if (!g.ok) throw new l_(g);
           let v = (g.headers.get(`Content-Type`) ?? `text/plain`)
               .split(`;`)[0]
               .trim()
@@ -37630,7 +37646,7 @@ var u_ = class {
           return {
             data: null,
             error: e,
-            response: e instanceof c_ || e instanceof s_ ? e.context : void 0,
+            response: e instanceof l_ || e instanceof c_ ? e.context : void 0,
           };
         } finally {
           (r && clearTimeout(r),
@@ -37639,11 +37655,11 @@ var u_ = class {
       });
     }
   },
-  d_ = 3,
-  f_ = (e) => Math.min(1e3 * 2 ** e, 3e4),
-  p_ = [520, 503],
-  m_ = [`GET`, `HEAD`, `OPTIONS`],
-  h_ = class extends Error {
+  f_ = 3,
+  p_ = (e) => Math.min(1e3 * 2 ** e, 3e4),
+  m_ = [520, 503],
+  h_ = [`GET`, `HEAD`, `OPTIONS`],
+  g_ = class extends Error {
     constructor(e) {
       (super(e.message),
         (this.name = `PostgrestError`),
@@ -37661,10 +37677,10 @@ var u_ = class {
       };
     }
   };
-function g_(e) {
+function __(e) {
   "@babel/helpers - typeof";
   return (
-    (g_ =
+    (__ =
       typeof Symbol == `function` && typeof Symbol.iterator == `symbol`
         ? function (e) {
             return typeof e;
@@ -37677,26 +37693,26 @@ function g_(e) {
               ? `symbol`
               : typeof e;
           }),
-    g_(e)
+    __(e)
   );
 }
-function __(e, t) {
-  if (g_(e) != `object` || !e) return e;
+function v_(e, t) {
+  if (__(e) != `object` || !e) return e;
   var n = e[Symbol.toPrimitive];
   if (n !== void 0) {
     var r = n.call(e, t || `default`);
-    if (g_(r) != `object`) return r;
+    if (__(r) != `object`) return r;
     throw TypeError(`@@toPrimitive must return a primitive value.`);
   }
   return (t === `string` ? String : Number)(e);
 }
-function v_(e) {
-  var t = __(e, `string`);
-  return g_(t) == `symbol` ? t : t + ``;
+function y_(e) {
+  var t = v_(e, `string`);
+  return __(t) == `symbol` ? t : t + ``;
 }
-function y_(e, t, n) {
+function b_(e, t, n) {
   return (
-    (t = v_(t)) in e
+    (t = y_(t)) in e
       ? Object.defineProperty(e, t, {
           value: n,
           enumerable: !0,
@@ -37707,7 +37723,7 @@ function y_(e, t, n) {
     e
   );
 }
-function b_(e, t) {
+function x_(e, t) {
   var n = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var r = Object.getOwnPropertySymbols(e);
@@ -37719,22 +37735,22 @@ function b_(e, t) {
   }
   return n;
 }
-function x_(e) {
+function S_(e) {
   for (var t = 1; t < arguments.length; t++) {
     var n = arguments[t] == null ? {} : arguments[t];
     t % 2
-      ? b_(Object(n), !0).forEach(function (t) {
-          y_(e, t, n[t]);
+      ? x_(Object(n), !0).forEach(function (t) {
+          b_(e, t, n[t]);
         })
       : Object.getOwnPropertyDescriptors
         ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(n))
-        : b_(Object(n)).forEach(function (t) {
+        : x_(Object(n)).forEach(function (t) {
             Object.defineProperty(e, t, Object.getOwnPropertyDescriptor(n, t));
           });
   }
   return e;
 }
-function S_(e, t) {
+function C_(e, t) {
   return new Promise((n) => {
     if (t?.aborted) {
       n();
@@ -37749,10 +37765,10 @@ function S_(e, t) {
     t?.addEventListener(`abort`, i);
   });
 }
-function C_(e, t, n, r) {
-  return !(!r || n >= d_ || !m_.includes(e) || !p_.includes(t));
+function w_(e, t, n, r) {
+  return !(!r || n >= f_ || !h_.includes(e) || !m_.includes(t));
 }
-var w_ = class {
+var T_ = class {
     constructor(e) {
       ((this.shouldThrowOnError = !1),
         (this.retryEnabled = !0),
@@ -37834,21 +37850,21 @@ var w_ = class {
               if (
                 t?.name === `AbortError` ||
                 t?.code === `ABORT_ERR` ||
-                !m_.includes(n.method)
+                !h_.includes(n.method)
               )
                 throw t;
-              if (n.retryEnabled && e < d_) {
-                let t = f_(e);
-                (e++, await S_(t, n.signal));
+              if (n.retryEnabled && e < f_) {
+                let t = p_(e);
+                (e++, await C_(t, n.signal));
                 continue;
               }
               throw t;
             }
-            if (C_(n.method, i.status, e, n.retryEnabled)) {
+            if (w_(n.method, i.status, e, n.retryEnabled)) {
               let t = i.headers?.get(`Retry-After`) ?? null,
                 r =
-                  t === null ? f_(e) : Math.max(0, parseInt(t, 10) || 0) * 1e3;
-              (await i.text(), e++, await S_(r, n.signal));
+                  t === null ? p_(e) : Math.max(0, parseInt(t, 10) || 0) * 1e3;
+              (await i.text(), e++, await C_(r, n.signal));
               continue;
             }
             return await n.processResponse(i);
@@ -37924,7 +37940,7 @@ var w_ = class {
                 r = JSON.parse(i);
               } catch {
                 if (((n = { message: i }), (r = null), t.shouldThrowOnError))
-                  throw new h_({ message: i, details: ``, hint: ``, code: `` });
+                  throw new g_({ message: i, details: ``, hint: ``, code: `` });
               }
           }
         }
@@ -37950,7 +37966,7 @@ var w_ = class {
               (o = `Not Acceptable`),
               t.shouldThrowOnError)
             )
-              throw new h_(x_(x_({}, n), {}, { hint: n.hint ?? `` }));
+              throw new g_(S_(S_({}, n), {}, { hint: n.hint ?? `` }));
           } else r = r.length === 1 ? r[0] : null;
         }
       } else {
@@ -37965,7 +37981,7 @@ var w_ = class {
             ? ((a = 204), (o = `No Content`))
             : (n = { message: i });
         }
-        if (n && t.shouldThrowOnError) throw new h_(n);
+        if (n && t.shouldThrowOnError) throw new g_(n);
       }
       return {
         success: n === null,
@@ -37983,7 +37999,7 @@ var w_ = class {
       return this;
     }
   },
-  T_ = class extends w_ {
+  E_ = class extends T_ {
     throwOnError() {
       return super.throwOnError();
     }
@@ -38089,8 +38105,8 @@ var w_ = class {
       );
     }
   },
-  E_ = RegExp(`[,()]`),
-  D_ = class extends T_ {
+  D_ = RegExp(`[,()]`),
+  O_ = class extends E_ {
     throwOnError() {
       return super.throwOnError();
     }
@@ -38156,13 +38172,13 @@ var w_ = class {
     }
     in(e, t) {
       let n = Array.from(new Set(t))
-        .map((e) => (typeof e == `string` && E_.test(e) ? `"${e}"` : `${e}`))
+        .map((e) => (typeof e == `string` && D_.test(e) ? `"${e}"` : `${e}`))
         .join(`,`);
       return (this.url.searchParams.append(e, `in.(${n})`), this);
     }
     notIn(e, t) {
       let n = Array.from(new Set(t))
-        .map((e) => (typeof e == `string` && E_.test(e) ? `"${e}"` : `${e}`))
+        .map((e) => (typeof e == `string` && D_.test(e) ? `"${e}"` : `${e}`))
         .join(`,`);
       return (this.url.searchParams.append(e, `not.in.(${n})`), this);
     }
@@ -38240,7 +38256,7 @@ var w_ = class {
       return (this.url.searchParams.append(e, `${t}.${n}`), this);
     }
   },
-  O_ = class {
+  k_ = class {
     constructor(
       e,
       {
@@ -38276,7 +38292,7 @@ var w_ = class {
       return (
         s.searchParams.set(`select`, o),
         r && c.append(`Prefer`, `count=${r}`),
-        new D_({
+        new O_({
           method: i,
           url: s,
           headers: c,
@@ -38300,7 +38316,7 @@ var w_ = class {
           r.searchParams.set(`columns`, e.join(`,`));
         }
       }
-      return new D_({
+      return new O_({
         method: `POST`,
         url: r,
         headers: i,
@@ -38334,7 +38350,7 @@ var w_ = class {
           a.searchParams.set(`columns`, e.join(`,`));
         }
       }
-      return new D_({
+      return new O_({
         method: `POST`,
         url: a,
         headers: o,
@@ -38349,7 +38365,7 @@ var w_ = class {
       let { url: n, headers: r } = this.cloneRequestState();
       return (
         t && r.append(`Prefer`, `count=${t}`),
-        new D_({
+        new O_({
           method: `PATCH`,
           url: n,
           headers: r,
@@ -38365,7 +38381,7 @@ var w_ = class {
       let { url: t, headers: n } = this.cloneRequestState();
       return (
         e && n.append(`Prefer`, `count=${e}`),
-        new D_({
+        new O_({
           method: `DELETE`,
           url: t,
           headers: n,
@@ -38377,7 +38393,7 @@ var w_ = class {
       );
     }
   },
-  k_ = class e {
+  A_ = class e {
     constructor(
       e,
       {
@@ -38407,12 +38423,12 @@ var w_ = class {
                 };
                 return (
                   a.addEventListener(`abort`, i, { once: !0 }),
-                  s(e, x_(x_({}, t), {}, { signal: n.signal })).finally(() => {
+                  s(e, S_(S_({}, t), {}, { signal: n.signal })).finally(() => {
                     (clearTimeout(r), a.removeEventListener(`abort`, i));
                   })
                 );
               }
-              return s(e, x_(x_({}, t), {}, { signal: n.signal })).finally(() =>
+              return s(e, S_(S_({}, t), {}, { signal: n.signal })).finally(() =>
                 clearTimeout(r),
               );
             }
@@ -38424,7 +38440,7 @@ var w_ = class {
         throw Error(
           `Invalid relation name: relation must be a non-empty string.`,
         );
-      return new O_(new URL(`${this.url}/${e}`), {
+      return new k_(new URL(`${this.url}/${e}`), {
         headers: new Headers(this.headers),
         schema: this.schemaName,
         fetch: this.fetch,
@@ -38467,7 +38483,7 @@ var w_ = class {
         l
           ? u.set(`Prefer`, i ? `count=${i},return=minimal` : `return=minimal`)
           : i && u.set(`Prefer`, `count=${i}`),
-        new D_({
+        new O_({
           method: a,
           url: o,
           headers: u,
@@ -38480,7 +38496,7 @@ var w_ = class {
       );
     }
   },
-  A_ = class {
+  j_ = class {
     constructor() {}
     static detectEnvironment() {
       if (typeof WebSocket < `u`)
@@ -38543,19 +38559,19 @@ var w_ = class {
       }
     }
   },
-  j_ = `realtime-js/2.112.3`,
-  M_ = `1.0.0`,
-  N_ = `2.0.0`,
-  P_ = N_,
-  F_ = 1e4,
-  I_ = {
+  M_ = `realtime-js/2.112.3`,
+  N_ = `1.0.0`,
+  P_ = `2.0.0`,
+  F_ = P_,
+  I_ = 1e4,
+  L_ = {
     closed: `closed`,
     errored: `errored`,
     joined: `joined`,
     joining: `joining`,
     leaving: `leaving`,
   },
-  L_ = {
+  R_ = {
     close: `phx_close`,
     error: `phx_error`,
     join: `phx_join`,
@@ -38563,13 +38579,13 @@ var w_ = class {
     leave: `phx_leave`,
     access_token: `access_token`,
   },
-  R_ = {
+  z_ = {
     connecting: `connecting`,
     open: `open`,
     closing: `closing`,
     closed: `closed`,
   },
-  z_ = class {
+  B_ = class {
     constructor(e) {
       ((this.HEADER_LENGTH = 1),
         (this.USER_BROADCAST_PUSH_META_LENGTH = 6),
@@ -38711,7 +38727,7 @@ var w_ = class {
         : Object.fromEntries(Object.entries(e).filter(([e]) => t.includes(e)));
     }
   },
-  B_;
+  V_;
 (function (e) {
   ((e.abstime = `abstime`),
     (e.bool = `bool`),
@@ -38737,56 +38753,56 @@ var w_ = class {
     (e.timetz = `timetz`),
     (e.tsrange = `tsrange`),
     (e.tstzrange = `tstzrange`));
-})((B_ ||= {}));
-var V_ = (e, t, n = {}) => {
+})((V_ ||= {}));
+var H_ = (e, t, n = {}) => {
     let r = n.skipTypes ?? [];
     return t
-      ? Object.keys(t).reduce((n, i) => ((n[i] = H_(i, e, t, r)), n), {})
+      ? Object.keys(t).reduce((n, i) => ((n[i] = U_(i, e, t, r)), n), {})
       : {};
   },
-  H_ = (e, t, n, r) => {
+  U_ = (e, t, n, r) => {
     let i = t.find((t) => t.name === e)?.type,
       a = n[e];
-    return i && !r.includes(i) ? U_(i, a) : W_(a);
+    return i && !r.includes(i) ? W_(i, a) : G_(a);
   },
-  U_ = (e, t) => {
-    if (e.charAt(0) === `_`) return J_(t, e.slice(1, e.length));
+  W_ = (e, t) => {
+    if (e.charAt(0) === `_`) return Y_(t, e.slice(1, e.length));
     switch (e) {
-      case B_.bool:
-        return G_(t);
-      case B_.float4:
-      case B_.float8:
-      case B_.int2:
-      case B_.int4:
-      case B_.int8:
-      case B_.numeric:
-      case B_.oid:
+      case V_.bool:
         return K_(t);
-      case B_.json:
-      case B_.jsonb:
+      case V_.float4:
+      case V_.float8:
+      case V_.int2:
+      case V_.int4:
+      case V_.int8:
+      case V_.numeric:
+      case V_.oid:
         return q_(t);
-      case B_.timestamp:
-        return Y_(t);
-      case B_.abstime:
-      case B_.date:
-      case B_.daterange:
-      case B_.int4range:
-      case B_.int8range:
-      case B_.money:
-      case B_.reltime:
-      case B_.text:
-      case B_.time:
-      case B_.timestamptz:
-      case B_.timetz:
-      case B_.tsrange:
-      case B_.tstzrange:
-        return W_(t);
+      case V_.json:
+      case V_.jsonb:
+        return J_(t);
+      case V_.timestamp:
+        return X_(t);
+      case V_.abstime:
+      case V_.date:
+      case V_.daterange:
+      case V_.int4range:
+      case V_.int8range:
+      case V_.money:
+      case V_.reltime:
+      case V_.text:
+      case V_.time:
+      case V_.timestamptz:
+      case V_.timetz:
+      case V_.tsrange:
+      case V_.tstzrange:
+        return G_(t);
       default:
-        return W_(t);
+        return G_(t);
     }
   },
-  W_ = (e) => e,
-  G_ = (e) => {
+  G_ = (e) => e,
+  K_ = (e) => {
     switch (e) {
       case `t`:
         return !0;
@@ -38796,14 +38812,14 @@ var V_ = (e, t, n = {}) => {
         return e;
     }
   },
-  K_ = (e) => {
+  q_ = (e) => {
     if (typeof e == `string`) {
       let t = parseFloat(e);
       if (!Number.isNaN(t)) return t;
     }
     return e;
   },
-  q_ = (e) => {
+  J_ = (e) => {
     if (typeof e == `string`)
       try {
         return JSON.parse(e);
@@ -38812,7 +38828,7 @@ var V_ = (e, t, n = {}) => {
       }
     return e;
   },
-  J_ = (e, t) => {
+  Y_ = (e, t) => {
     if (typeof e != `string`) return e;
     let n = e.length - 1,
       r = e[n];
@@ -38824,12 +38840,12 @@ var V_ = (e, t, n = {}) => {
       } catch {
         r = i ? i.split(`,`) : [];
       }
-      return r.map((e) => U_(t, e));
+      return r.map((e) => W_(t, e));
     }
     return e;
   },
-  Y_ = (e) => (typeof e == `string` ? e.replace(` `, `T`) : e),
-  X_ = (e) => {
+  X_ = (e) => (typeof e == `string` ? e.replace(` `, `T`) : e),
+  Z_ = (e) => {
     let t = new URL(e);
     return (
       (t.protocol = t.protocol.replace(/^ws/i, `http`)),
@@ -38844,38 +38860,38 @@ var V_ = (e, t, n = {}) => {
       t.href
     );
   },
-  Z_ = (e) =>
+  Q_ = (e) =>
     typeof e == `function`
       ? e
       : function () {
           return e;
         },
-  Q_ = typeof self < `u` ? self : null,
-  $_ = typeof window < `u` ? window : null,
-  ev = Q_ || $_ || globalThis,
-  tv = `2.0.0`,
-  nv = 1e4,
-  rv = 1e3,
-  iv = 100,
-  av = { connecting: 0, open: 1, closing: 2, closed: 3 },
-  ov = {
+  $_ = typeof self < `u` ? self : null,
+  ev = typeof window < `u` ? window : null,
+  tv = $_ || ev || globalThis,
+  nv = `2.0.0`,
+  rv = 1e4,
+  iv = 1e3,
+  av = 100,
+  ov = { connecting: 0, open: 1, closing: 2, closed: 3 },
+  sv = {
     closed: `closed`,
     errored: `errored`,
     joined: `joined`,
     joining: `joining`,
     leaving: `leaving`,
   },
-  sv = {
+  cv = {
     close: `phx_close`,
     error: `phx_error`,
     join: `phx_join`,
     reply: `phx_reply`,
     leave: `phx_leave`,
   },
-  cv = { longpoll: `longpoll`, websocket: `websocket` },
-  lv = { complete: 4 },
-  uv = `base64url.bearer.phx.`,
-  dv = class {
+  lv = { longpoll: `longpoll`, websocket: `websocket` },
+  uv = { complete: 4 },
+  dv = `base64url.bearer.phx.`,
+  fv = class {
     constructor(e, t, n, r) {
       ((this.channel = e),
         (this.event = t),
@@ -38953,7 +38969,7 @@ var V_ = (e, t, n = {}) => {
       this.channel.trigger(this.refEvent, { status: e, response: t });
     }
   },
-  fv = class {
+  pv = class {
     constructor(e, t) {
       ((this.callback = e),
         (this.timerCalc = t),
@@ -38973,20 +38989,20 @@ var V_ = (e, t, n = {}) => {
         )));
     }
   },
-  pv = class {
+  mv = class {
     constructor(e, t, n) {
-      ((this.state = ov.closed),
+      ((this.state = sv.closed),
         (this.topic = e),
-        (this.params = Z_(t || {})),
+        (this.params = Q_(t || {})),
         (this.socket = n),
         (this.bindings = []),
         (this.bindingRef = 0),
         (this.timeout = this.socket.timeout),
         (this.joinedOnce = !1),
-        (this.joinPush = new dv(this, sv.join, this.params, this.timeout)),
+        (this.joinPush = new fv(this, cv.join, this.params, this.timeout)),
         (this.pushBuffer = []),
         (this.stateChangeRefs = []),
-        (this.rejoinTimer = new fv(() => {
+        (this.rejoinTimer = new pv(() => {
           this.socket.isConnected() && this.rejoin();
         }, this.socket.rejoinAfterMs)),
         this.stateChangeRefs.push(
@@ -38998,13 +39014,13 @@ var V_ = (e, t, n = {}) => {
           }),
         ),
         this.joinPush.receive(`ok`, () => {
-          ((this.state = ov.joined),
+          ((this.state = sv.joined),
             this.rejoinTimer.reset(),
             this.pushBuffer.forEach((e) => e.send()),
             (this.pushBuffer = []));
         }),
         this.joinPush.receive(`error`, (e) => {
-          ((this.state = ov.errored),
+          ((this.state = sv.errored),
             this.socket.hasLogger() &&
               this.socket.log(`channel`, `error ${this.topic}`, e),
             this.socket.isConnected() && this.rejoinTimer.scheduleTimeout());
@@ -39013,14 +39029,14 @@ var V_ = (e, t, n = {}) => {
           (this.rejoinTimer.reset(),
             this.socket.hasLogger() &&
               this.socket.log(`channel`, `close ${this.topic}`),
-            (this.state = ov.closed),
+            (this.state = sv.closed),
             this.socket.remove(this));
         }),
         this.onError((e) => {
           (this.socket.hasLogger() &&
             this.socket.log(`channel`, `error ${this.topic}`, e),
             this.isJoining() && this.joinPush.reset(),
-            (this.state = ov.errored),
+            (this.state = sv.errored),
             this.socket.isConnected() && this.rejoinTimer.scheduleTimeout());
         }),
         this.joinPush.receive(`timeout`, () => {
@@ -39030,12 +39046,12 @@ var V_ = (e, t, n = {}) => {
               `timeout ${this.topic}`,
               this.joinPush.timeout,
             ),
-            new dv(this, sv.leave, Z_({}), this.timeout).send(),
-            (this.state = ov.errored),
+            new fv(this, cv.leave, Q_({}), this.timeout).send(),
+            (this.state = sv.errored),
             this.joinPush.reset(),
             this.socket.isConnected() && this.rejoinTimer.scheduleTimeout());
         }),
-        this.on(sv.reply, (e, t) => {
+        this.on(cv.reply, (e, t) => {
           this.trigger(this.replyEventName(t), e);
         }));
     }
@@ -39056,14 +39072,14 @@ var V_ = (e, t, n = {}) => {
         (this.pushBuffer = []),
         this.rejoinTimer.reset(),
         this.joinPush.destroy(),
-        (this.state = ov.closed),
+        (this.state = sv.closed),
         (this.bindings = []));
     }
     onClose(e) {
-      this.on(sv.close, e);
+      this.on(cv.close, e);
     }
     onError(e) {
-      return this.on(sv.error, (t) => e(t));
+      return this.on(cv.error, (t) => e(t));
     }
     on(e, t) {
       let n = this.bindingRef++;
@@ -39082,7 +39098,7 @@ var V_ = (e, t, n = {}) => {
         throw Error(
           `tried to push '${e}' to '${this.topic}' before joining. Use channel.join() before pushing events`,
         );
-      let r = new dv(
+      let r = new fv(
         this,
         e,
         function () {
@@ -39098,13 +39114,13 @@ var V_ = (e, t, n = {}) => {
     leave(e = this.timeout) {
       (this.rejoinTimer.reset(),
         this.joinPush.cancelTimeout(),
-        (this.state = ov.leaving));
+        (this.state = sv.leaving));
       let t = () => {
           (this.socket.hasLogger() &&
             this.socket.log(`channel`, `leave ${this.topic}`),
-            this.trigger(sv.close, `leave`));
+            this.trigger(cv.close, `leave`));
         },
-        n = new dv(this, sv.leave, Z_({}), e);
+        n = new fv(this, cv.leave, Q_({}), e);
       return (
         n.receive(`ok`, () => t()).receive(`timeout`, () => t()),
         n.send(),
@@ -39138,7 +39154,7 @@ var V_ = (e, t, n = {}) => {
     rejoin(e = this.timeout) {
       this.isLeaving() ||
         (this.socket.leaveOpenTopic(this.topic),
-        (this.state = ov.joining),
+        (this.state = sv.joining),
         this.joinPush.resend(e));
     }
     trigger(e, t, n, r) {
@@ -39157,32 +39173,32 @@ var V_ = (e, t, n = {}) => {
       return `chan_reply_${e}`;
     }
     isClosed() {
-      return this.state === ov.closed;
+      return this.state === sv.closed;
     }
     isErrored() {
-      return this.state === ov.errored;
+      return this.state === sv.errored;
     }
     isJoined() {
-      return this.state === ov.joined;
+      return this.state === sv.joined;
     }
     isJoining() {
-      return this.state === ov.joining;
+      return this.state === sv.joining;
     }
     isLeaving() {
-      return this.state === ov.leaving;
+      return this.state === sv.leaving;
     }
   },
-  mv = class {
+  hv = class {
     static request(e, t, n, r, i, a, o) {
-      if (ev.XDomainRequest) {
-        let n = new ev.XDomainRequest();
+      if (tv.XDomainRequest) {
+        let n = new tv.XDomainRequest();
         return this.xdomainRequest(n, e, t, r, i, a, o);
       }
-      if (ev.XMLHttpRequest) {
-        let s = new ev.XMLHttpRequest();
+      if (tv.XMLHttpRequest) {
+        let s = new tv.XMLHttpRequest();
         return this.xhrRequest(s, e, t, n, r, i, a, o);
       }
-      if (ev.fetch && ev.AbortController)
+      if (tv.fetch && tv.AbortController)
         return this.fetchRequest(e, t, n, r, i, a, o);
       throw Error(`No suitable XMLHttpRequest implementation found`);
     }
@@ -39194,7 +39210,7 @@ var V_ = (e, t, n = {}) => {
           ((c = new AbortController()),
           setTimeout(() => c.abort(), i),
           (s.signal = c.signal)),
-        ev
+        tv
           .fetch(t, s)
           .then((e) => e.text())
           .then((e) => this.parseJSON(e))
@@ -39225,7 +39241,7 @@ var V_ = (e, t, n = {}) => {
       return (
         (e.onerror = () => s && s(null)),
         (e.onreadystatechange = () => {
-          e.readyState === lv.complete &&
+          e.readyState === uv.complete &&
             s &&
             s(this.parseJSON(e.responseText));
         }),
@@ -39263,19 +39279,19 @@ var V_ = (e, t, n = {}) => {
         : `${e}${e.match(/\?/) ? `&` : `?`}${this.serialize(t)}`;
     }
   },
-  hv = (e) => {
+  gv = (e) => {
     let t = ``,
       n = new Uint8Array(e),
       r = n.byteLength;
     for (let e = 0; e < r; e++) t += String.fromCharCode(n[e]);
     return btoa(t);
   },
-  gv = class {
+  _v = class {
     constructor(e, t) {
       (t &&
         t.length === 2 &&
-        t[1].startsWith(uv) &&
-        (this.authToken = atob(t[1].slice(uv.length))),
+        t[1].startsWith(dv) &&
+        (this.authToken = atob(t[1].slice(dv.length))),
         (this.endPoint = null),
         (this.token = null),
         (this.skipHeartbeat = !0),
@@ -39289,26 +39305,26 @@ var V_ = (e, t, n = {}) => {
         (this.onmessage = function () {}),
         (this.onclose = function () {}),
         (this.pollEndpoint = this.normalizeEndpoint(e)),
-        (this.readyState = av.connecting),
+        (this.readyState = ov.connecting),
         setTimeout(() => this.poll(), 0));
     }
     normalizeEndpoint(e) {
       return e
         .replace(`ws://`, `http://`)
         .replace(`wss://`, `https://`)
-        .replace(RegExp(`(.*)/` + cv.websocket), `$1/` + cv.longpoll);
+        .replace(RegExp(`(.*)/` + lv.websocket), `$1/` + lv.longpoll);
     }
     endpointURL() {
-      return mv.appendParams(this.pollEndpoint, { token: this.token });
+      return hv.appendParams(this.pollEndpoint, { token: this.token });
     }
     closeAndRetry(e, t, n) {
-      (this.close(e, t, n), (this.readyState = av.connecting));
+      (this.close(e, t, n), (this.readyState = ov.connecting));
     }
     ontimeout() {
       (this.onerror(`timeout`), this.closeAndRetry(1005, `timeout`, !1));
     }
     isActive() {
-      return this.readyState === av.open || this.readyState === av.connecting;
+      return this.readyState === ov.open || this.readyState === ov.connecting;
     }
     poll() {
       let e = { Accept: `application/json` };
@@ -39339,7 +39355,7 @@ var V_ = (e, t, n = {}) => {
                 this.poll();
                 break;
               case 410:
-                ((this.readyState = av.open), this.onopen({}), this.poll());
+                ((this.readyState = ov.open), this.onopen({}), this.poll());
                 break;
               case 403:
                 (this.onerror(403), this.close(1008, `forbidden`, !1));
@@ -39356,7 +39372,7 @@ var V_ = (e, t, n = {}) => {
         ));
     }
     send(e) {
-      (typeof e != `string` && (e = hv(e)),
+      (typeof e != `string` && (e = gv(e)),
         this.currentBatch
           ? this.currentBatch.push(e)
           : this.awaitingBatchAck
@@ -39368,7 +39384,7 @@ var V_ = (e, t, n = {}) => {
     }
     batchSend(e, t = 0) {
       this.awaitingBatchAck = !0;
-      let n = t + iv,
+      let n = t + av,
         r = e.slice(t, n);
       this.ajax(
         `POST`,
@@ -39391,7 +39407,7 @@ var V_ = (e, t, n = {}) => {
     }
     close(e, t, n) {
       for (let e of this.reqs) e.abort();
-      this.readyState = av.closed;
+      this.readyState = ov.closed;
       let r = Object.assign(
         { code: 1e3, reason: void 0, wasClean: !0 },
         { code: e, reason: t, wasClean: n },
@@ -39405,7 +39421,7 @@ var V_ = (e, t, n = {}) => {
     }
     ajax(e, t, n, r, i) {
       let a;
-      ((a = mv.request(
+      ((a = hv.request(
         e,
         this.endpointURL(),
         t,
@@ -39421,7 +39437,7 @@ var V_ = (e, t, n = {}) => {
         this.reqs.add(a));
     }
   },
-  _v = class e {
+  vv = class e {
     constructor(t, n = {}) {
       let r = n.events || { state: `presence_state`, diff: `presence_diff` };
       ((this.state = Object.create(null)),
@@ -39539,7 +39555,7 @@ var V_ = (e, t, n = {}) => {
       return JSON.parse(JSON.stringify(e));
     }
   },
-  vv = {
+  yv = {
     HEADER_LENGTH: 1,
     META_LENGTH: 4,
     KINDS: { push: 0, reply: 1, broadcast: 2 },
@@ -39649,7 +39665,7 @@ var V_ = (e, t, n = {}) => {
       let d = n.decode(e.slice(s, s + o));
       s += o;
       let f = { status: d, response: e.slice(s, e.byteLength) };
-      return { join_ref: c, ref: l, topic: u, event: sv.reply, payload: f };
+      return { join_ref: c, ref: l, topic: u, event: cv.reply, payload: f };
     },
     decodeBroadcast(e, t, n) {
       let r = t.getUint8(1),
@@ -39670,7 +39686,7 @@ var V_ = (e, t, n = {}) => {
       );
     },
   },
-  yv = class {
+  bv = class {
     constructor(e, t = {}) {
       ((this.stateChangeCallbacks = {
         open: [],
@@ -39682,20 +39698,20 @@ var V_ = (e, t, n = {}) => {
         (this.sendBuffer = []),
         (this.ref = 0),
         (this.fallbackRef = null),
-        (this.timeout = t.timeout || nv),
-        (this.transport = t.transport || ev.WebSocket || gv),
+        (this.timeout = t.timeout || rv),
+        (this.transport = t.transport || tv.WebSocket || _v),
         (this.conn = void 0),
         (this.primaryPassedHealthCheck = !1),
         (this.longPollFallbackMs = t.longPollFallbackMs),
         (this.fallbackTimer = null));
       let n = null;
       try {
-        n = ev && ev.sessionStorage;
+        n = tv && tv.sessionStorage;
       } catch {}
       ((this.sessionStore = t.sessionStorage || n),
         (this.establishedConnections = 0),
-        (this.defaultEncoder = vv.encode.bind(vv)),
-        (this.defaultDecoder = vv.decode.bind(vv)),
+        (this.defaultEncoder = yv.encode.bind(yv)),
+        (this.defaultDecoder = yv.decode.bind(yv)),
         (this.closeWasClean = !0),
         (this.disconnecting = !1),
         (this.binaryType = t.binaryType || `arraybuffer`),
@@ -39703,21 +39719,21 @@ var V_ = (e, t, n = {}) => {
         (this.pageHidden = !1),
         (this.encode = void 0),
         (this.decode = void 0),
-        this.transport === gv
+        this.transport === _v
           ? ((this.encode = this.defaultEncoder),
             (this.decode = this.defaultDecoder))
           : ((this.encode = t.encode || this.defaultEncoder),
             (this.decode = t.decode || this.defaultDecoder)));
       let r = null;
-      ($_ &&
-        $_.addEventListener &&
-        ($_.addEventListener(`pagehide`, (e) => {
+      (ev &&
+        ev.addEventListener &&
+        (ev.addEventListener(`pagehide`, (e) => {
           this.conn && (this.disconnect(), (r = this.connectClock));
         }),
-        $_.addEventListener(`pageshow`, (e) => {
+        ev.addEventListener(`pageshow`, (e) => {
           r === this.connectClock && ((r = null), this.connect());
         }),
-        $_.addEventListener(`visibilitychange`, () => {
+        ev.addEventListener(`visibilitychange`, () => {
           document.visibilityState === `hidden`
             ? (this.pageHidden = !0)
             : ((this.pageHidden = !1),
@@ -39741,14 +39757,14 @@ var V_ = (e, t, n = {}) => {
             console.log(`${e}: ${t}`, n);
           }),
         (this.longpollerTimeout = t.longpollerTimeout || 2e4),
-        (this.params = Z_(t.params || {})),
-        (this.endPoint = `${e}/${cv.websocket}`),
-        (this.vsn = t.vsn || tv),
+        (this.params = Q_(t.params || {})),
+        (this.endPoint = `${e}/${lv.websocket}`),
+        (this.vsn = t.vsn || nv),
         (this.heartbeatTimeoutTimer = null),
         (this.heartbeatTimer = null),
         (this.heartbeatSentAt = null),
         (this.pendingHeartbeatRef = null),
-        (this.reconnectTimer = new fv(() => {
+        (this.reconnectTimer = new pv(() => {
           if (this.pageHidden) {
             (this.log(`Not reconnecting as page is hidden!`), this.teardown());
             return;
@@ -39757,10 +39773,10 @@ var V_ = (e, t, n = {}) => {
             (t.beforeReconnect && (await t.beforeReconnect()), this.connect());
           });
         }, this.reconnectAfterMs)),
-        (this.authToken = t.authToken && Z_(t.authToken)));
+        (this.authToken = t.authToken && Q_(t.authToken)));
     }
     getLongPollTransport() {
-      return gv;
+      return _v;
     }
     replaceTransport(e) {
       (this.connectClock++,
@@ -39774,7 +39790,7 @@ var V_ = (e, t, n = {}) => {
       return location.protocol.match(/^https/) ? `wss` : `ws`;
     }
     endPointURL() {
-      let e = mv.appendParams(mv.appendParams(this.endPoint, this.params()), {
+      let e = hv.appendParams(hv.appendParams(this.endPoint, this.params()), {
         vsn: this.vsn,
       });
       return e.charAt(0) === `/`
@@ -39803,10 +39819,10 @@ var V_ = (e, t, n = {}) => {
           console.log(
             `passing params to connect is deprecated. Instead pass :params to the Socket constructor`,
           ),
-        (this.params = Z_(e))),
+        (this.params = Q_(e))),
         !(this.conn && !this.disconnecting) &&
-          (this.longPollFallbackMs && this.transport !== gv
-            ? this.connectWithFallback(gv, this.longPollFallbackMs)
+          (this.longPollFallbackMs && this.transport !== _v
+            ? this.connectWithFallback(_v, this.longPollFallbackMs)
             : this.transportConnect()));
     }
     log(e, t, n) {
@@ -39846,7 +39862,7 @@ var V_ = (e, t, n = {}) => {
     }
     transportName(e) {
       switch (e) {
-        case gv:
+        case _v:
           return `LongPoll`;
         default:
           return e.name;
@@ -39856,7 +39872,7 @@ var V_ = (e, t, n = {}) => {
       (this.connectClock++, (this.closeWasClean = !1));
       let e;
       (this.authToken &&
-        (e = [`phoenix`, `${uv}${btoa(this.authToken()).replace(/=/g, ``)}`]),
+        (e = [`phoenix`, `${dv}${btoa(this.authToken()).replace(/=/g, ``)}`]),
         (this.conn = new this.transport(this.endPointURL(), e)),
         (this.conn.binaryType = this.binaryType),
         (this.conn.timeout = this.longpollerTimeout),
@@ -39944,7 +39960,7 @@ var V_ = (e, t, n = {}) => {
           (this.closeWasClean = !1),
           this.teardown(
             () => this.reconnectTimer.scheduleTimeout(),
-            rv,
+            iv,
             `heartbeat timeout`,
           ));
       }
@@ -39984,7 +40000,7 @@ var V_ = (e, t, n = {}) => {
       }, 150 * n);
     }
     waitForSocketClosed(e, t, n = 1) {
-      if (n === 5 || e.readyState === av.closed) {
+      if (n === 5 || e.readyState === ov.closed) {
         t();
         return;
       }
@@ -40012,16 +40028,16 @@ var V_ = (e, t, n = {}) => {
         t.isErrored() ||
           t.isLeaving() ||
           t.isClosed() ||
-          t.trigger(sv.error, e);
+          t.trigger(cv.error, e);
       });
     }
     connectionState() {
       switch (this.conn && this.conn.readyState) {
-        case av.connecting:
+        case ov.connecting:
           return `connecting`;
-        case av.open:
+        case ov.open:
           return `open`;
-        case av.closing:
+        case ov.closing:
           return `closing`;
         default:
           return `closed`;
@@ -40041,7 +40057,7 @@ var V_ = (e, t, n = {}) => {
         );
     }
     channel(e, t = {}) {
-      let n = new pv(e, t, this);
+      let n = new mv(e, t, this);
       return (this.channels.push(n), n);
     }
     push(e) {
@@ -40150,10 +40166,10 @@ var V_ = (e, t, n = {}) => {
         t.leave());
     }
   },
-  bv = class e {
+  xv = class e {
     constructor(t, n) {
-      let r = Cv(n);
-      ((this.presence = new _v(t.getChannel(), r)),
+      let r = wv(n);
+      ((this.presence = new vv(t.getChannel(), r)),
         this.presence.onJoin((n, r, i) => {
           let a = e.onJoinPayload(n, r, i);
           t.getChannel().trigger(`presence`, a);
@@ -40171,10 +40187,10 @@ var V_ = (e, t, n = {}) => {
     }
     static transformState(e) {
       return (
-        (e = Sv(e)),
+        (e = Cv(e)),
         Object.getOwnPropertyNames(e).reduce((t, n) => {
           let r = e[n];
-          return ((t[n] = xv(r)), t);
+          return ((t[n] = Sv(r)), t);
         }, {})
       );
     }
@@ -40182,20 +40198,20 @@ var V_ = (e, t, n = {}) => {
       return {
         event: `join`,
         key: e,
-        currentPresences: wv(t),
-        newPresences: xv(n),
+        currentPresences: Tv(t),
+        newPresences: Sv(n),
       };
     }
     static onLeavePayload(e, t, n) {
       return {
         event: `leave`,
         key: e,
-        currentPresences: wv(t),
-        leftPresences: xv(n),
+        currentPresences: Tv(t),
+        leftPresences: Sv(n),
       };
     }
   };
-function xv(e) {
+function Sv(e) {
   return e.metas.map((e) => {
     let t = Object.getOwnPropertyDescriptors(e),
       n = Object.defineProperties({}, t);
@@ -40207,29 +40223,29 @@ function xv(e) {
     );
   });
 }
-function Sv(e) {
+function Cv(e) {
   return JSON.parse(JSON.stringify(e));
 }
-function Cv(e) {
+function wv(e) {
   return e?.events && { events: e.events };
 }
-function wv(e) {
-  return e?.metas ? xv(e) : [];
+function Tv(e) {
+  return e?.metas ? Sv(e) : [];
 }
-var Tv;
+var Ev;
 (function (e) {
   ((e.SYNC = `sync`), (e.JOIN = `join`), (e.LEAVE = `leave`));
-})((Tv ||= {}));
-var Ev = class {
+})((Ev ||= {}));
+var Dv = class {
   get state() {
     return this.presenceAdapter.state;
   }
   constructor(e, t) {
     ((this.channel = e),
-      (this.presenceAdapter = new bv(this.channel.channelAdapter, t)));
+      (this.presenceAdapter = new xv(this.channel.channelAdapter, t)));
   }
 };
-function Dv(e) {
+function Ov(e) {
   if (e instanceof Error) return e;
   if (typeof e == `string`) return Error(e);
   if (e && typeof e == `object`) {
@@ -40242,9 +40258,9 @@ function Dv(e) {
   }
   return Error(`channel error: connection lost`);
 }
-var Ov = class {
+var kv = class {
   constructor(e, t, n) {
-    let r = kv(n);
+    let r = Av(n);
     ((this.channel = e.getSocket().channel(t, r)), (this.socket = e));
   }
   get state() {
@@ -40309,19 +40325,19 @@ var Ov = class {
       Object.assign(Object.assign({}, t), e);
   }
   canPush() {
-    return this.socket.isConnected() && this.state === I_.joined;
+    return this.socket.isConnected() && this.state === L_.joined;
   }
   isJoined() {
-    return this.state === I_.joined;
+    return this.state === L_.joined;
   }
   isJoining() {
-    return this.state === I_.joining;
+    return this.state === L_.joining;
   }
   isClosed() {
-    return this.state === I_.closed;
+    return this.state === L_.closed;
   }
   isLeaving() {
-    return this.state === I_.leaving;
+    return this.state === L_.leaving;
   }
   updateFilterBindings(e) {
     this.channel.filterBindings = e;
@@ -40333,7 +40349,7 @@ var Ov = class {
     return this.channel;
   }
 };
-function kv(e) {
+function Av(e) {
   return {
     config: Object.assign(
       {
@@ -40345,32 +40361,32 @@ function kv(e) {
     ),
   };
 }
-var Av = /[,()"\\]/,
-  jv = (e) => Av.test(e) || e !== e.trim(),
-  Mv = (e) => `"${e.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`)}"`,
-  Nv = (e) => {
+var jv = /[,()"\\]/,
+  Mv = (e) => jv.test(e) || e !== e.trim(),
+  Nv = (e) => `"${e.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`)}"`,
+  Pv = (e) => {
     let t = e === null ? `null` : String(e);
-    return jv(t) ? Mv(t) : t;
+    return Mv(t) ? Nv(t) : t;
   },
-  Pv = (e) => (e === null ? `null` : String(e)),
-  Fv = (e, t) => {
+  Fv = (e) => (e === null ? `null` : String(e)),
+  Iv = (e, t) => {
     if (e === `in`) {
       let e = Array.isArray(t) ? t : [t];
       if (e.length === 0)
         throw Error("Realtime `in` filter requires at least one value.");
       return `in.(${Array.from(new Set(e))
-        .map((e) => Nv(e))
+        .map((e) => Pv(e))
         .join(`,`)})`;
     }
-    return e === `is` ? `is.${Pv(t)}` : `${e}.${Nv(t)}`;
+    return e === `is` ? `is.${Fv(t)}` : `${e}.${Pv(t)}`;
   },
-  Iv = class {
+  Lv = class {
     constructor() {
       this.filters = [];
     }
     add(e, t, n, r = !1) {
       let i = r ? `not.` : ``;
-      return (this.filters.push(`${e}=${i}${Fv(t, n)}`), this);
+      return (this.filters.push(`${e}=${i}${Iv(t, n)}`), this);
     }
     eq(e, t) {
       return this.add(e, `eq`, t);
@@ -40421,28 +40437,28 @@ var Av = /[,()"\\]/,
       return this.build();
     }
   },
-  Lv;
+  Rv;
 (function (e) {
   ((e.ALL = `*`),
     (e.INSERT = `INSERT`),
     (e.UPDATE = `UPDATE`),
     (e.DELETE = `DELETE`));
-})((Lv ||= {}));
-var Rv;
+})((Rv ||= {}));
+var zv;
 (function (e) {
   ((e.BROADCAST = `broadcast`),
     (e.PRESENCE = `presence`),
     (e.POSTGRES_CHANGES = `postgres_changes`),
     (e.SYSTEM = `system`));
-})((Rv ||= {}));
-var zv;
+})((zv ||= {}));
+var Bv;
 (function (e) {
   ((e.SUBSCRIBED = `SUBSCRIBED`),
     (e.TIMED_OUT = `TIMED_OUT`),
     (e.CLOSED = `CLOSED`),
     (e.CHANNEL_ERROR = `CHANNEL_ERROR`));
-})((zv ||= {}));
-var Bv = class e {
+})((Bv ||= {}));
+var Vv = class e {
     get state() {
       return this.channelAdapter.state;
     }
@@ -40476,17 +40492,17 @@ var Bv = class e {
           },
           t.config,
         )),
-        (this.channelAdapter = new Ov(
+        (this.channelAdapter = new kv(
           this.socket.socketAdapter,
           e,
           this.params,
         )),
-        (this.presence = new Ev(this)),
+        (this.presence = new Dv(this)),
         this._onClose(() => {
           this.socket._remove(this);
         }),
         this._updateFilterTransform(),
-        (this.broadcastEndpointURL = X_(
+        (this.broadcastEndpointURL = Z_(
           this.socket.socketAdapter.endPointURL(),
         )),
         (this.private = this.params.config.private || !1),
@@ -40506,8 +40522,8 @@ var Bv = class e {
           } = this.params,
           a = this.bindings.postgres_changes?.map((e) => e.filter) ?? [],
           o =
-            (!!this.bindings[Rv.PRESENCE] &&
-              this.bindings[Rv.PRESENCE].length > 0) ||
+            (!!this.bindings[zv.PRESENCE] &&
+              this.bindings[zv.PRESENCE].length > 0) ||
             this.params.config.presence?.enabled === !0,
           s = {},
           c = {
@@ -40519,9 +40535,9 @@ var Bv = class e {
         (this.socket.accessTokenValue &&
           (s.access_token = this.socket.accessTokenValue),
           this._onError((t) => {
-            e?.(zv.CHANNEL_ERROR, Dv(t));
+            e?.(Bv.CHANNEL_ERROR, Ov(t));
           }),
-          this._onClose(() => e?.(zv.CLOSED)),
+          this._onClose(() => e?.(Bv.CLOSED)),
           this.updateJoinPayload(Object.assign({ config: c }, s)),
           this._updateFilterMessage(),
           this.channelAdapter
@@ -40531,18 +40547,18 @@ var Bv = class e {
                 (this.socket._isManualToken() || this.socket.setAuth(),
                 t === void 0)
               ) {
-                e?.(zv.SUBSCRIBED);
+                e?.(Bv.SUBSCRIBED);
                 return;
               }
               this._updatePostgresBindings(t, e);
             })
             .receive(`error`, (t) => {
-              this.state = I_.errored;
+              this.state = L_.errored;
               let n = Object.values(t).join(`, `) || `error`;
-              e?.(zv.CHANNEL_ERROR, Error(n, { cause: t }));
+              e?.(Bv.CHANNEL_ERROR, Error(n, { cause: t }));
             })
             .receive(`timeout`, () => {
-              e?.(zv.TIMED_OUT);
+              e?.(Bv.TIMED_OUT);
             }));
       }
       return this;
@@ -40567,9 +40583,9 @@ var Bv = class e {
           a.push(Object.assign(Object.assign({}, i), { id: d.id }));
         else {
           (this.unsubscribe(),
-            (this.state = I_.errored),
+            (this.state = L_.errored),
             n?.(
-              zv.CHANNEL_ERROR,
+              Bv.CHANNEL_ERROR,
               Error(
                 `mismatch between server and client bindings for postgres changes`,
               ),
@@ -40578,7 +40594,7 @@ var Bv = class e {
         }
       }
       ((this.bindings.postgres_changes = a),
-        this.state != I_.errored && n && n(zv.SUBSCRIBED));
+        this.state != L_.errored && n && n(Bv.SUBSCRIBED));
     }
     presenceState() {
       return this.presence.state;
@@ -40594,7 +40610,7 @@ var Bv = class e {
     }
     on(e, t, n) {
       let r = this.channelAdapter.isJoined() || this.channelAdapter.isJoining(),
-        i = e === Rv.PRESENCE || e === Rv.POSTGRES_CHANGES;
+        i = e === zv.PRESENCE || e === zv.POSTGRES_CHANGES;
       if (r && i)
         throw (
           this.socket.log(
@@ -40717,10 +40733,10 @@ var Bv = class e {
       let i = t.toLocaleLowerCase(),
         a = n?.filter;
       if (
-        ((a instanceof Iv ||
+        ((a instanceof Lv ||
           (typeof a == `object` && a && typeof a.build == `function`)) &&
           (n = Object.assign(Object.assign({}, n), { filter: a.build() })),
-        i === Rv.POSTGRES_CHANGES &&
+        i === zv.POSTGRES_CHANGES &&
           this.bindings[i]?.find((t) => e.isSamePostgresFilter(t.filter, n)))
       )
         return (
@@ -40771,7 +40787,7 @@ var Bv = class e {
       });
     }
     _notThisChannelEvent(e, t) {
-      let { close: n, error: r, leave: i, join: a } = L_;
+      let { close: n, error: r, leave: i, join: a } = R_;
       return t && [n, r, i, a].includes(e) && t !== this.joinPush.ref;
     }
     _updateFilterTransform() {
@@ -40828,16 +40844,16 @@ var Bv = class e {
       let t = { new: {}, old: {} };
       return (
         (e.type === `INSERT` || e.type === `UPDATE`) &&
-          (t.new = V_(e.columns, e.record)),
+          (t.new = H_(e.columns, e.record)),
         (e.type === `UPDATE` || e.type === `DELETE`) &&
-          (t.old = V_(e.columns, e.old_record)),
+          (t.old = H_(e.columns, e.old_record)),
         t
       );
     }
   },
-  Vv = class {
+  Hv = class {
     constructor(e, t) {
-      this.socket = new yv(e, t);
+      this.socket = new bv(e, t);
     }
     get timeout() {
       return this.socket.timeout;
@@ -40924,10 +40940,10 @@ var Bv = class e {
       return this.socket.isConnected();
     }
     isConnecting() {
-      return this.socket.connectionState() == R_.connecting;
+      return this.socket.connectionState() == z_.connecting;
     }
     isDisconnecting() {
-      return this.socket.connectionState() == R_.closing;
+      return this.socket.connectionState() == z_.closing;
     }
     connectionState() {
       return this.socket.connectionState();
@@ -40942,14 +40958,14 @@ var Bv = class e {
       return this.socket;
     }
   },
-  Hv = {
+  Uv = {
     HEARTBEAT_INTERVAL: 25e3,
     RECONNECT_DELAY: 10,
     HEARTBEAT_TIMEOUT_FALLBACK: 100,
   },
-  Uv = [1e3, 2e3, 5e3, 1e4],
-  Wv = 1e4;
-function Gv() {
+  Wv = [1e3, 2e3, 5e3, 1e4],
+  Gv = 1e4;
+function Kv() {
   let e = new Map();
   return {
     get length() {
@@ -40972,20 +40988,20 @@ function Gv() {
     },
   };
 }
-function Kv() {
+function qv() {
   try {
     if (typeof globalThis < `u` && globalThis.sessionStorage)
       return globalThis.sessionStorage;
   } catch {}
-  return Gv();
+  return Kv();
 }
-var qv = `
+var Jv = `
   addEventListener("message", (e) => {
     if (e.data.event === "start") {
       setInterval(() => postMessage({ event: "keepAlive" }), e.data.interval);
     }
   });`,
-  Jv = class {
+  Yv = class {
     get endPoint() {
       return this.socketAdapter.endPoint;
     }
@@ -41042,7 +41058,7 @@ var qv = `
         (this.headers = {}),
         (this.params = {}),
         (this.ref = 0),
-        (this.serializer = new z_()),
+        (this.serializer = new B_()),
         (this._manuallySetToken = !1),
         (this._authPromise = null),
         (this._authGeneration = 0),
@@ -41057,8 +41073,8 @@ var qv = `
         throw Error(`API key is required to connect to Realtime`);
       this.apiKey = t.params.apikey;
       let n = this._initializeOptions(t);
-      ((this.socketAdapter = new Vv(e, n)),
-        (this.httpEndpoint = X_(e)),
+      ((this.socketAdapter = new Hv(e, n)),
+        (this.httpEndpoint = Z_(e)),
         (this.fetch = this._resolveFetch(t?.fetch)));
     }
     connect() {
@@ -41115,7 +41131,7 @@ var qv = `
       this.socketAdapter.log(e, t, n);
     }
     connectionState() {
-      return this.socketAdapter.connectionState() || R_.closed;
+      return this.socketAdapter.connectionState() || z_.closed;
     }
     isConnected() {
       return this.socketAdapter.isConnected();
@@ -41131,7 +41147,7 @@ var qv = `
         r = this.getChannels().find((e) => e.topic === n);
       if (r) return r;
       {
-        let n = new Bv(`realtime:${e}`, t, this);
+        let n = new Vv(`realtime:${e}`, t, this);
         return (this._cancelPendingDisconnect(), this.channels.push(n), n);
       }
     }
@@ -41220,11 +41236,11 @@ var qv = `
         this.accessTokenValue != n &&
           ((this.accessTokenValue = n),
           this.channels.forEach((e) => {
-            let t = { access_token: n, version: j_ };
+            let t = { access_token: n, version: M_ };
             (e.updateJoinPayload(t),
               e.joinedOnce &&
                 e.channelAdapter.isJoined() &&
-                e.channelAdapter.push(L_.access_token, { access_token: n }));
+                e.channelAdapter.push(R_.access_token, { access_token: n }));
           })));
     }
     async _waitForAuthIfNeeded() {
@@ -41296,7 +41312,7 @@ var qv = `
       let t;
       if (e) t = e;
       else {
-        let e = new Blob([qv], { type: `application/javascript` });
+        let e = new Blob([Jv], { type: `application/javascript` });
         t = URL.createObjectURL(e);
       }
       return t;
@@ -41305,29 +41321,29 @@ var qv = `
       ((this.worker = e?.worker ?? !1),
         (this.accessToken = e?.accessToken ?? null));
       let t = {};
-      ((t.timeout = e?.timeout ?? F_),
+      ((t.timeout = e?.timeout ?? I_),
         (t.heartbeatIntervalMs =
-          e?.heartbeatIntervalMs ?? Hv.HEARTBEAT_INTERVAL),
+          e?.heartbeatIntervalMs ?? Uv.HEARTBEAT_INTERVAL),
         (this._disconnectOnEmptyChannelsAfterMs =
           e?.disconnectOnEmptyChannelsAfterMs ??
-          2 * (e?.heartbeatIntervalMs ?? Hv.HEARTBEAT_INTERVAL)),
-        (t.transport = e?.transport ?? A_.getWebSocketConstructor()),
+          2 * (e?.heartbeatIntervalMs ?? Uv.HEARTBEAT_INTERVAL)),
+        (t.transport = e?.transport ?? j_.getWebSocketConstructor()),
         (t.params = e?.params),
         (t.logger = e?.logger),
         (t.heartbeatCallback = this._wrapHeartbeatCallback(
           e?.heartbeatCallback,
         )),
-        (t.sessionStorage = e?.sessionStorage ?? Kv()),
-        (t.reconnectAfterMs = e?.reconnectAfterMs ?? ((e) => Uv[e - 1] || Wv)));
+        (t.sessionStorage = e?.sessionStorage ?? qv()),
+        (t.reconnectAfterMs = e?.reconnectAfterMs ?? ((e) => Wv[e - 1] || Gv)));
       let n,
         r,
-        i = e?.vsn ?? P_;
+        i = e?.vsn ?? F_;
       switch (i) {
-        case M_:
+        case N_:
           ((n = (e, t) => t(JSON.stringify(e))),
             (r = (e, t) => t(JSON.parse(e))));
           break;
-        case N_:
+        case P_:
           ((n = this.serializer.encode.bind(this.serializer)),
             (r = this.serializer.decode.bind(this.serializer)));
           break;
@@ -41356,7 +41372,7 @@ var qv = `
       (await this._waitForAuthIfNeeded(), this.isConnected() || this.connect());
     }
   },
-  Yv = class extends Error {
+  Xv = class extends Error {
     constructor(e, t) {
       (super(e),
         (this.name = `IcebergError`),
@@ -41379,14 +41395,14 @@ var qv = `
       return this.status === 419;
     }
   };
-function Xv(e, t, n) {
+function Zv(e, t, n) {
   let r = new URL(t, e);
   if (n)
     for (let [e, t] of Object.entries(n))
       t !== void 0 && r.searchParams.set(e, t);
   return r.toString();
 }
-async function Zv(e) {
+async function Qv(e) {
   return !e || e.type === `none`
     ? {}
     : e.type === `bearer`
@@ -41397,12 +41413,12 @@ async function Zv(e) {
           ? await e.getHeaders()
           : {};
 }
-function Qv(e) {
+function $v(e) {
   let t = e.fetchImpl ?? globalThis.fetch;
   return {
     async request({ method: n, path: r, query: i, body: a, headers: o }) {
-      let s = Xv(e.baseUrl, r, i),
-        c = await Zv(e.auth),
+      let s = Zv(e.baseUrl, r, i),
+        c = await Qv(e.auth),
         l = await t(s, {
           method: n,
           headers: {
@@ -41418,7 +41434,7 @@ function Qv(e) {
       if (!l.ok) {
         let e = d ? f : void 0,
           t = e?.error;
-        throw new Yv(t?.message ?? `Request failed with status ${l.status}`, {
+        throw new Xv(t?.message ?? `Request failed with status ${l.status}`, {
           status: l.status,
           icebergType: t?.type,
           icebergCode: t?.code,
@@ -41429,15 +41445,15 @@ function Qv(e) {
     },
   };
 }
-function $v(e) {
+function ey(e) {
   return e.join(``);
 }
-var ey = class {
+var ty = class {
   constructor(e, t = ``) {
     ((this.client = e), (this.prefix = t));
   }
   async listNamespaces(e) {
-    let t = e ? { parent: $v(e.namespace) } : void 0;
+    let t = e ? { parent: ey(e.namespace) } : void 0;
     return (
       await this.client.request({
         method: `GET`,
@@ -41459,7 +41475,7 @@ var ey = class {
   async dropNamespace(e) {
     await this.client.request({
       method: `DELETE`,
-      path: `${this.prefix}/namespaces/${$v(e.namespace)}`,
+      path: `${this.prefix}/namespaces/${ey(e.namespace)}`,
     });
   }
   async loadNamespaceMetadata(e) {
@@ -41467,7 +41483,7 @@ var ey = class {
       properties: (
         await this.client.request({
           method: `GET`,
-          path: `${this.prefix}/namespaces/${$v(e.namespace)}`,
+          path: `${this.prefix}/namespaces/${ey(e.namespace)}`,
         })
       ).data.properties,
     };
@@ -41477,12 +41493,12 @@ var ey = class {
       return (
         await this.client.request({
           method: `HEAD`,
-          path: `${this.prefix}/namespaces/${$v(e.namespace)}`,
+          path: `${this.prefix}/namespaces/${ey(e.namespace)}`,
         }),
         !0
       );
     } catch (e) {
-      if (e instanceof Yv && e.status === 404) return !1;
+      if (e instanceof Xv && e.status === 404) return !1;
       throw e;
     }
   }
@@ -41490,15 +41506,15 @@ var ey = class {
     try {
       return await this.createNamespace(e, t);
     } catch (e) {
-      if (e instanceof Yv && e.status === 409) return;
+      if (e instanceof Xv && e.status === 409) return;
       throw e;
     }
   }
 };
-function ty(e) {
+function ny(e) {
   return e.join(``);
 }
-var ny = class {
+var ry = class {
     constructor(e, t = ``, n) {
       ((this.client = e), (this.prefix = t), (this.accessDelegation = n));
     }
@@ -41506,7 +41522,7 @@ var ny = class {
       return (
         await this.client.request({
           method: `GET`,
-          path: `${this.prefix}/namespaces/${ty(e.namespace)}/tables`,
+          path: `${this.prefix}/namespaces/${ny(e.namespace)}/tables`,
         })
       ).data.identifiers;
     }
@@ -41518,7 +41534,7 @@ var ny = class {
         (
           await this.client.request({
             method: `POST`,
-            path: `${this.prefix}/namespaces/${ty(e.namespace)}/tables`,
+            path: `${this.prefix}/namespaces/${ny(e.namespace)}/tables`,
             body: t,
             headers: n,
           })
@@ -41528,7 +41544,7 @@ var ny = class {
     async updateTable(e, t) {
       let n = await this.client.request({
         method: `POST`,
-        path: `${this.prefix}/namespaces/${ty(e.namespace)}/tables/${e.name}`,
+        path: `${this.prefix}/namespaces/${ny(e.namespace)}/tables/${e.name}`,
         body: t,
       });
       return {
@@ -41539,7 +41555,7 @@ var ny = class {
     async dropTable(e, t) {
       await this.client.request({
         method: `DELETE`,
-        path: `${this.prefix}/namespaces/${ty(e.namespace)}/tables/${e.name}`,
+        path: `${this.prefix}/namespaces/${ny(e.namespace)}/tables/${e.name}`,
         query: { purgeRequested: String(t?.purge ?? !1) },
       });
     }
@@ -41551,7 +41567,7 @@ var ny = class {
         (
           await this.client.request({
             method: `GET`,
-            path: `${this.prefix}/namespaces/${ty(e.namespace)}/tables/${e.name}`,
+            path: `${this.prefix}/namespaces/${ny(e.namespace)}/tables/${e.name}`,
             headers: t,
           })
         ).data.metadata
@@ -41565,13 +41581,13 @@ var ny = class {
         return (
           await this.client.request({
             method: `HEAD`,
-            path: `${this.prefix}/namespaces/${ty(e.namespace)}/tables/${e.name}`,
+            path: `${this.prefix}/namespaces/${ny(e.namespace)}/tables/${e.name}`,
             headers: t,
           }),
           !0
         );
       } catch (e) {
-        if (e instanceof Yv && e.status === 404) return !1;
+        if (e instanceof Xv && e.status === 404) return !1;
         throw e;
       }
     }
@@ -41579,21 +41595,21 @@ var ny = class {
       try {
         return await this.createTable(e, t);
       } catch (n) {
-        if (n instanceof Yv && n.status === 409)
+        if (n instanceof Xv && n.status === 409)
           return await this.loadTable({ namespace: e.namespace, name: t.name });
         throw n;
       }
     }
   },
-  ry = class {
+  iy = class {
     constructor(e) {
       let t = `v1`;
       e.catalogName && (t += `/${e.catalogName}`);
       let n = e.baseUrl.endsWith(`/`) ? e.baseUrl : `${e.baseUrl}/`;
-      ((this.client = Qv({ baseUrl: n, auth: e.auth, fetchImpl: e.fetch })),
+      ((this.client = $v({ baseUrl: n, auth: e.auth, fetchImpl: e.fetch })),
         (this.accessDelegation = e.accessDelegation?.join(`,`)),
-        (this.namespaceOps = new ey(this.client, t)),
-        (this.tableOps = new ny(this.client, t, this.accessDelegation)));
+        (this.namespaceOps = new ty(this.client, t)),
+        (this.tableOps = new ry(this.client, t, this.accessDelegation)));
     }
     async listNamespaces(e) {
       return this.namespaceOps.listNamespaces(e);
@@ -41635,10 +41651,10 @@ var ny = class {
       return this.tableOps.createTableIfNotExists(e, t);
     }
   };
-function iy(e) {
+function ay(e) {
   "@babel/helpers - typeof";
   return (
-    (iy =
+    (ay =
       typeof Symbol == `function` && typeof Symbol.iterator == `symbol`
         ? function (e) {
             return typeof e;
@@ -41651,26 +41667,26 @@ function iy(e) {
               ? `symbol`
               : typeof e;
           }),
-    iy(e)
+    ay(e)
   );
 }
-function ay(e, t) {
-  if (iy(e) != `object` || !e) return e;
+function oy(e, t) {
+  if (ay(e) != `object` || !e) return e;
   var n = e[Symbol.toPrimitive];
   if (n !== void 0) {
     var r = n.call(e, t || `default`);
-    if (iy(r) != `object`) return r;
+    if (ay(r) != `object`) return r;
     throw TypeError(`@@toPrimitive must return a primitive value.`);
   }
   return (t === `string` ? String : Number)(e);
 }
-function oy(e) {
-  var t = ay(e, `string`);
-  return iy(t) == `symbol` ? t : t + ``;
+function sy(e) {
+  var t = oy(e, `string`);
+  return ay(t) == `symbol` ? t : t + ``;
 }
-function sy(e, t, n) {
+function cy(e, t, n) {
   return (
-    (t = oy(t)) in e
+    (t = sy(t)) in e
       ? Object.defineProperty(e, t, {
           value: n,
           enumerable: !0,
@@ -41681,7 +41697,7 @@ function sy(e, t, n) {
     e
   );
 }
-function cy(e, t) {
+function ly(e, t) {
   var n = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var r = Object.getOwnPropertySymbols(e);
@@ -41697,18 +41713,18 @@ function q(e) {
   for (var t = 1; t < arguments.length; t++) {
     var n = arguments[t] == null ? {} : arguments[t];
     t % 2
-      ? cy(Object(n), !0).forEach(function (t) {
-          sy(e, t, n[t]);
+      ? ly(Object(n), !0).forEach(function (t) {
+          cy(e, t, n[t]);
         })
       : Object.getOwnPropertyDescriptors
         ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(n))
-        : cy(Object(n)).forEach(function (t) {
+        : ly(Object(n)).forEach(function (t) {
             Object.defineProperty(e, t, Object.getOwnPropertyDescriptor(n, t));
           });
   }
   return e;
 }
-var ly = class extends Error {
+var uy = class extends Error {
   constructor(e, t = `storage`, n, r) {
     (super(e),
       (this.__isStorageError = !0),
@@ -41726,10 +41742,10 @@ var ly = class extends Error {
     };
   }
 };
-function uy(e) {
+function dy(e) {
   return typeof e == `object` && !!e && `__isStorageError` in e;
 }
-var dy = class extends ly {
+var fy = class extends uy {
     constructor(e, t, n, r = `storage`, i) {
       (super(e, r, t, n),
         (this.name =
@@ -41742,7 +41758,7 @@ var dy = class extends ly {
       return q(q({}, super.toJSON()), {}, { code: this.code });
     }
   },
-  fy = class extends ly {
+  py = class extends uy {
     constructor(e, t, n = `storage`) {
       (super(e, n),
         (this.name =
@@ -41752,19 +41768,19 @@ var dy = class extends ly {
         (this.originalError = t));
     }
   };
-function py(e, t, n) {
+function my(e, t, n) {
   let r = q({}, e),
     i = t.toLowerCase();
   for (let e of Object.keys(r)) e.toLowerCase() === i && delete r[e];
   return ((r[i] = n), r);
 }
-function my(e) {
+function hy(e) {
   let t = {};
   for (let [n, r] of Object.entries(e)) t[n.toLowerCase()] = r;
   return t;
 }
-var hy = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
-  gy = (e) => {
+var gy = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
+  _y = (e) => {
     if (typeof e != `object` || !e) return !1;
     let t = Object.getPrototypeOf(e);
     return (
@@ -41775,8 +41791,8 @@ var hy = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
       !(Symbol.iterator in e)
     );
   },
-  _y = (e) => {
-    if (Array.isArray(e)) return e.map((e) => _y(e));
+  vy = (e) => {
+    if (Array.isArray(e)) return e.map((e) => vy(e));
     if (typeof e == `function` || e !== Object(e)) return e;
     let t = {};
     return (
@@ -41784,12 +41800,12 @@ var hy = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
         let r = e.replace(/([-_][a-z])/gi, (e) =>
           e.toUpperCase().replace(/[-_]/g, ``),
         );
-        t[r] = _y(n);
+        t[r] = vy(n);
       }),
       t
     );
   },
-  vy = (e) =>
+  yy = (e) =>
     !e ||
     typeof e != `string` ||
     e.length === 0 ||
@@ -41799,8 +41815,8 @@ var hy = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
     e.includes(`\\`)
       ? !1
       : /^[\w!.\*'() &$@=;:+,?-]+$/.test(e),
-  yy = (e) => e.split(`/`).map(encodeURIComponent).join(`/`),
-  by = (e) => {
+  by = (e) => e.split(`/`).map(encodeURIComponent).join(`/`),
+  xy = (e) => {
     if (typeof e == `object` && e) {
       let t = e;
       if (typeof t.msg == `string`) return t.msg;
@@ -41814,7 +41830,7 @@ var hy = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
     }
     return JSON.stringify(e);
   },
-  xy = async (e, t, n, r) => {
+  Sy = async (e, t, n, r) => {
     if (
       typeof e == `object` &&
       e &&
@@ -41828,30 +41844,30 @@ var hy = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
           .json()
           .then((e) => {
             let n = e?.statusCode || e?.code || i + ``;
-            t(new dy(by(e), i, n, r, e?.code));
+            t(new fy(xy(e), i, n, r, e?.code));
           })
           .catch(() => {
             let e = i + ``;
-            t(new dy(n.statusText || `HTTP ${i} error`, i, e, r));
+            t(new fy(n.statusText || `HTTP ${i} error`, i, e, r));
           }));
-    } else t(new fy(by(e), e, r));
+    } else t(new py(xy(e), e, r));
   },
-  Sy = (e, t, n, r) => {
+  Cy = (e, t, n, r) => {
     let i = { method: e, headers: t?.headers || {} };
     if (e === `GET` || e === `HEAD` || !r) return q(q({}, i), n);
-    if (gy(r)) {
+    if (_y(r)) {
       let e = t?.headers || {},
         n;
       for (let [t, r] of Object.entries(e))
         t.toLowerCase() === `content-type` && (n = r);
-      ((i.headers = py(e, `Content-Type`, n ?? `application/json`)),
+      ((i.headers = my(e, `Content-Type`, n ?? `application/json`)),
         (i.body = JSON.stringify(r)));
     } else i.body = r;
     return (t?.duplex && (i.duplex = t.duplex), q(q({}, i), n));
   };
-async function Cy(e, t, n, r, i, a, o) {
+async function wy(e, t, n, r, i, a, o) {
   return new Promise((s, c) => {
-    e(n, Sy(t, r, i, a))
+    e(n, Cy(t, r, i, a))
       .then((e) => {
         if (!e.ok) throw e;
         if (r?.noResolveJson) return e;
@@ -41868,34 +41884,34 @@ async function Cy(e, t, n, r, i, a, o) {
         return e.json();
       })
       .then((e) => s(e))
-      .catch((e) => xy(e, c, r, o));
+      .catch((e) => Sy(e, c, r, o));
   });
 }
-function wy(e = `storage`) {
+function Ty(e = `storage`) {
   return {
-    get: async (t, n, r, i) => Cy(t, `GET`, n, r, i, void 0, e),
-    post: async (t, n, r, i, a) => Cy(t, `POST`, n, i, a, r, e),
-    put: async (t, n, r, i, a) => Cy(t, `PUT`, n, i, a, r, e),
+    get: async (t, n, r, i) => wy(t, `GET`, n, r, i, void 0, e),
+    post: async (t, n, r, i, a) => wy(t, `POST`, n, i, a, r, e),
+    put: async (t, n, r, i, a) => wy(t, `PUT`, n, i, a, r, e),
     head: async (t, n, r, i) =>
-      Cy(t, `HEAD`, n, q(q({}, r), {}, { noResolveJson: !0 }), i, void 0, e),
-    remove: async (t, n, r, i, a) => Cy(t, `DELETE`, n, i, a, r, e),
+      wy(t, `HEAD`, n, q(q({}, r), {}, { noResolveJson: !0 }), i, void 0, e),
+    remove: async (t, n, r, i, a) => wy(t, `DELETE`, n, i, a, r, e),
   };
 }
-var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
-  Ay = wy(`vectors`),
-  jy = class {
+var { get: Ey, post: Dy, put: Oy, head: ky, remove: Ay } = Ty(`storage`),
+  jy = Ty(`vectors`),
+  My = class {
     constructor(e, t = {}, n, r = `storage`) {
       ((this.shouldThrowOnError = !1),
         (this.url = e),
-        (this.headers = my(t)),
-        (this.fetch = hy(n)),
+        (this.headers = hy(t)),
+        (this.fetch = gy(n)),
         (this.namespace = r));
     }
     throwOnError() {
       return ((this.shouldThrowOnError = !0), this);
     }
     setHeader(e, t) {
-      return ((this.headers = py(this.headers, e, t)), this);
+      return ((this.headers = my(this.headers, e, t)), this);
     }
     async handleOperation(e) {
       var t = this;
@@ -41903,17 +41919,17 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
         return { data: await e(), error: null };
       } catch (e) {
         if (t.shouldThrowOnError) throw e;
-        if (uy(e)) return { data: null, error: e };
+        if (dy(e)) return { data: null, error: e };
         throw e;
       }
     }
   },
-  My = Symbol.toStringTag,
-  Ny = class {
+  Ny = Symbol.toStringTag,
+  Py = class {
     constructor(e, t) {
       ((this.downloadFn = e),
         (this.shouldThrowOnError = t),
-        (this[My] = `StreamDownloadBuilder`),
+        (this[Ny] = `StreamDownloadBuilder`),
         (this.promise = null));
     }
     then(e, t) {
@@ -41934,21 +41950,21 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
         return { data: (await e.downloadFn()).body, error: null };
       } catch (t) {
         if (e.shouldThrowOnError) throw t;
-        if (uy(t)) return { data: null, error: t };
+        if (dy(t)) return { data: null, error: t };
         throw t;
       }
     }
   },
-  Py = Symbol.toStringTag,
-  Fy = class {
+  Fy = Symbol.toStringTag,
+  Iy = class {
     constructor(e, t) {
       ((this.downloadFn = e),
         (this.shouldThrowOnError = t),
-        (this[Py] = `BlobDownloadBuilder`),
+        (this[Fy] = `BlobDownloadBuilder`),
         (this.promise = null));
     }
     asStream() {
-      return new Ny(this.downloadFn, this.shouldThrowOnError);
+      return new Py(this.downloadFn, this.shouldThrowOnError);
     }
     then(e, t) {
       return this.getPromise().then(e, t);
@@ -41968,18 +41984,18 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
         return { data: await (await e.downloadFn()).blob(), error: null };
       } catch (t) {
         if (e.shouldThrowOnError) throw t;
-        if (uy(t)) return { data: null, error: t };
+        if (dy(t)) return { data: null, error: t };
         throw t;
       }
     }
   },
-  Iy = { limit: 100, offset: 0, sortBy: { column: `name`, order: `asc` } },
-  Ly = {
+  Ly = { limit: 100, offset: 0, sortBy: { column: `name`, order: `asc` } },
+  Ry = {
     cacheControl: `3600`,
     contentType: `text/plain;charset=UTF-8`,
     upsert: !1,
   },
-  Ry = class extends jy {
+  zy = class extends My {
     constructor(e, t = {}, n, r) {
       (super(e, t, r, `storage`), (this.bucketId = n));
     }
@@ -41987,7 +42003,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var i = this;
       return i.handleOperation(async () => {
         let a,
-          o = q(q({}, Ly), r),
+          o = q(q({}, Ry), r),
           s = q(
             q({}, i.headers),
             e === `POST` && { "x-upsert": String(o.upsert) },
@@ -42019,10 +42035,10 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
                   (o.duplex = `half`)),
           r?.headers)
         )
-          for (let [e, t] of Object.entries(r.headers)) s = py(s, e, t);
+          for (let [e, t] of Object.entries(r.headers)) s = my(s, e, t);
         let l = i._removeEmptyFolders(t),
           u = i._getFinalPath(l),
-          d = await (e == `PUT` ? Dy : Ey)(
+          d = await (e == `PUT` ? Oy : Dy)(
             i.fetch,
             `${i.url}/object/${u}`,
             a,
@@ -42043,7 +42059,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
         s.searchParams.set(`token`, t),
         i.handleOperation(async () => {
           let e,
-            t = q(q({}, Ly), r),
+            t = q(q({}, Ry), r),
             o = q(q({}, i.headers), { "x-upsert": String(t.upsert) }),
             c = t.metadata;
           if (
@@ -42073,11 +42089,11 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
                     (t.duplex = `half`)),
             r?.headers)
           )
-            for (let [e, t] of Object.entries(r.headers)) o = py(o, e, t);
+            for (let [e, t] of Object.entries(r.headers)) o = my(o, e, t);
           return {
             path: a,
             fullPath: (
-              await Dy(
+              await Oy(
                 i.fetch,
                 s.toString(),
                 e,
@@ -42094,7 +42110,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
         let r = n._getFinalPath(e),
           i = q({}, n.headers);
         t?.upsert && (i[`x-upsert`] = `true`);
-        let a = await Ey(
+        let a = await Dy(
             n.fetch,
             `${n.url}/object/upload/sign/${r}`,
             {},
@@ -42102,7 +42118,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
           ),
           o = new URL(n.url + a.url),
           s = o.searchParams.get(`token`);
-        if (!s) throw new ly(`No token returned by API`);
+        if (!s) throw new uy(`No token returned by API`);
         return { signedUrl: o.toString(), path: e, token: s };
       });
     }
@@ -42113,7 +42129,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var r = this;
       return r.handleOperation(
         async () =>
-          await Ey(
+          await Dy(
             r.fetch,
             `${r.url}/object/move`,
             {
@@ -42130,7 +42146,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var r = this;
       return r.handleOperation(async () => ({
         path: (
-          await Ey(
+          await Dy(
             r.fetch,
             `${r.url}/object/copy`,
             {
@@ -42152,7 +42168,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
             typeof n?.transform == `object` &&
             n.transform !== null &&
             Object.keys(n.transform).length > 0,
-          o = await Ey(
+          o = await Dy(
             r.fetch,
             `${r.url}/object/sign/${i}`,
             q({ expiresIn: t }, a ? { transform: n.transform } : {}),
@@ -42170,7 +42186,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
     async createSignedUrls(e, t, n) {
       var r = this;
       return r.handleOperation(async () => {
-        let i = await Ey(
+        let i = await Dy(
             r.fetch,
             `${r.url}/object/sign/${r.bucketId}`,
             { expiresIn: t, paths: e },
@@ -42205,9 +42221,9 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
         t?.cacheNonce != null && i.set(`cacheNonce`, String(t.cacheNonce)));
       let a = i.toString(),
         o = this._getFinalPath(e);
-      return new Fy(
+      return new Iy(
         () =>
-          Ty(
+          Ey(
             this.fetch,
             `${this.url}/${r}/${o}${a ? `?${a}` : ``}`,
             { headers: this.headers, noResolveJson: !0 },
@@ -42220,8 +42236,8 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var t = this;
       let n = t._getFinalPath(e);
       return t.handleOperation(async () =>
-        _y(
-          await Ty(t.fetch, `${t.url}/object/info/${n}`, {
+        vy(
+          await Ey(t.fetch, `${t.url}/object/info/${n}`, {
             headers: t.headers,
           }),
         ),
@@ -42232,16 +42248,16 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       let n = t._getFinalPath(e);
       try {
         return (
-          await Oy(t.fetch, `${t.url}/object/${n}`, { headers: t.headers }),
+          await ky(t.fetch, `${t.url}/object/${n}`, { headers: t.headers }),
           { data: !0, error: null }
         );
       } catch (e) {
         if (t.shouldThrowOnError) throw e;
-        if (uy(e)) {
+        if (dy(e)) {
           let t =
-            e instanceof dy
+            e instanceof fy
               ? e.status
-              : e instanceof fy
+              : e instanceof py
                 ? e.originalError?.status
                 : void 0;
           if (t !== void 0 && [400, 404].includes(t))
@@ -42274,7 +42290,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var t = this;
       return t.handleOperation(
         async () =>
-          await ky(
+          await Ay(
             t.fetch,
             `${t.url}/object/${t.bucketId}`,
             { prefixes: e },
@@ -42285,11 +42301,11 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
     async purgeCache(e, t, n) {
       var r = this;
       return r.handleOperation(async () => {
-        let i = yy(r._getFinalPath(e)),
+        let i = by(r._getFinalPath(e)),
           a = new URLSearchParams();
         t?.transformations && a.set(`transformations`, `true`);
         let o = a.toString();
-        return await ky(
+        return await Ay(
           r.fetch,
           `${r.url}/cdn/${i}${o ? `?${o}` : ``}`,
           {},
@@ -42301,9 +42317,9 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
     async list(e, t, n) {
       var r = this;
       return r.handleOperation(async () => {
-        let i = t?.sortBy ? q(q({}, Iy.sortBy), t.sortBy) : Iy.sortBy,
-          a = q(q(q({}, Iy), t), {}, { sortBy: i, prefix: e || `` });
-        return await Ey(
+        let i = t?.sortBy ? q(q({}, Ly.sortBy), t.sortBy) : Ly.sortBy,
+          a = q(q(q({}, Ly), t), {}, { sortBy: i, prefix: e || `` });
+        return await Dy(
           r.fetch,
           `${r.url}/object/list/${r.bucketId}`,
           a,
@@ -42316,7 +42332,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var n = this;
       return n.handleOperation(async () => {
         let r = q({}, e);
-        return await Ey(
+        return await Dy(
           n.fetch,
           `${n.url}/object/list-v2/${n.bucketId}`,
           r,
@@ -42348,8 +42364,8 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       );
     }
   },
-  zy = { "X-Client-Info": `storage-js/2.112.3` },
-  By = class extends jy {
+  By = { "X-Client-Info": `storage-js/2.112.3` },
+  Vy = class extends My {
     constructor(e, t = {}, n, r) {
       let i = new URL(e);
       r?.useNewHostname &&
@@ -42357,28 +42373,28 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
         !i.hostname.includes(`storage.supabase.`) &&
         (i.hostname = i.hostname.replace(`supabase.`, `storage.supabase.`));
       let a = i.href.replace(/\/$/, ``),
-        o = q(q({}, zy), t);
+        o = q(q({}, By), t);
       super(a, o, n, `storage`);
     }
     async listBuckets(e) {
       var t = this;
       return t.handleOperation(async () => {
         let n = t.listBucketOptionsToQueryString(e);
-        return await Ty(t.fetch, `${t.url}/bucket${n}`, { headers: t.headers });
+        return await Ey(t.fetch, `${t.url}/bucket${n}`, { headers: t.headers });
       });
     }
     async getBucket(e) {
       var t = this;
       return t.handleOperation(
         async () =>
-          await Ty(t.fetch, `${t.url}/bucket/${e}`, { headers: t.headers }),
+          await Ey(t.fetch, `${t.url}/bucket/${e}`, { headers: t.headers }),
       );
     }
     async createBucket(e, t = { public: !1 }) {
       var n = this;
       return n.handleOperation(
         async () =>
-          await Ey(
+          await Dy(
             n.fetch,
             `${n.url}/bucket`,
             {
@@ -42397,7 +42413,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var n = this;
       return n.handleOperation(
         async () =>
-          await Dy(
+          await Oy(
             n.fetch,
             `${n.url}/bucket/${e}`,
             {
@@ -42415,7 +42431,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var t = this;
       return t.handleOperation(
         async () =>
-          await Ey(
+          await Dy(
             t.fetch,
             `${t.url}/bucket/${e}/empty`,
             {},
@@ -42427,7 +42443,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var t = this;
       return t.handleOperation(
         async () =>
-          await ky(t.fetch, `${t.url}/bucket/${e}`, {}, { headers: t.headers }),
+          await Ay(t.fetch, `${t.url}/bucket/${e}`, {}, { headers: t.headers }),
       );
     }
     async purgeBucketCache(e, t, n) {
@@ -42436,9 +42452,9 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
         let i = new URLSearchParams();
         t?.transformations && i.set(`transformations`, `true`);
         let a = i.toString();
-        return await ky(
+        return await Ay(
           r.fetch,
-          `${r.url}/cdn/${yy(e)}${a ? `?${a}` : ``}`,
+          `${r.url}/cdn/${by(e)}${a ? `?${a}` : ``}`,
           {},
           { headers: r.headers },
           n,
@@ -42458,17 +42474,17 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       );
     }
   },
-  Vy = class extends jy {
+  Hy = class extends My {
     constructor(e, t = {}, n) {
       let r = e.replace(/\/$/, ``),
-        i = q(q({}, zy), t);
+        i = q(q({}, By), t);
       super(r, i, n, `storage`);
     }
     async createBucket(e) {
       var t = this;
       return t.handleOperation(
         async () =>
-          await Ey(
+          await Dy(
             t.fetch,
             `${t.url}/bucket`,
             { name: e },
@@ -42487,23 +42503,23 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
           e?.search && n.set(`search`, e.search));
         let r = n.toString(),
           i = r ? `${t.url}/bucket?${r}` : `${t.url}/bucket`;
-        return await Ty(t.fetch, i, { headers: t.headers });
+        return await Ey(t.fetch, i, { headers: t.headers });
       });
     }
     async deleteBucket(e) {
       var t = this;
       return t.handleOperation(
         async () =>
-          await ky(t.fetch, `${t.url}/bucket/${e}`, {}, { headers: t.headers }),
+          await Ay(t.fetch, `${t.url}/bucket/${e}`, {}, { headers: t.headers }),
       );
     }
     from(e) {
       var t = this;
-      if (!vy(e))
-        throw new ly(
+      if (!yy(e))
+        throw new uy(
           `Invalid bucket name: File, folder, and bucket names must follow AWS object key naming guidelines and should avoid the use of any other characters.`,
         );
-      let n = new ry({
+      let n = new iy({
           baseUrl: this.url,
           catalogName: e,
           auth: { type: `custom`, getHeaders: async () => t.headers },
@@ -42527,17 +42543,17 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       });
     }
   },
-  Hy = class extends jy {
+  Uy = class extends My {
     constructor(e, t = {}, n) {
       let r = e.replace(/\/$/, ``),
-        i = q(q({}, zy), {}, { "Content-Type": `application/json` }, t);
+        i = q(q({}, By), {}, { "Content-Type": `application/json` }, t);
       super(r, i, n, `vectors`);
     }
     async createIndex(e) {
       var t = this;
       return t.handleOperation(
         async () =>
-          (await Ay.post(t.fetch, `${t.url}/CreateIndex`, e, {
+          (await jy.post(t.fetch, `${t.url}/CreateIndex`, e, {
             headers: t.headers,
           })) || {},
       );
@@ -42546,7 +42562,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var n = this;
       return n.handleOperation(
         async () =>
-          await Ay.post(
+          await jy.post(
             n.fetch,
             `${n.url}/GetIndex`,
             { vectorBucketName: e, indexName: t },
@@ -42558,7 +42574,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var t = this;
       return t.handleOperation(
         async () =>
-          await Ay.post(t.fetch, `${t.url}/ListIndexes`, e, {
+          await jy.post(t.fetch, `${t.url}/ListIndexes`, e, {
             headers: t.headers,
           }),
       );
@@ -42567,7 +42583,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var n = this;
       return n.handleOperation(
         async () =>
-          (await Ay.post(
+          (await jy.post(
             n.fetch,
             `${n.url}/DeleteIndex`,
             { vectorBucketName: e, indexName: t },
@@ -42576,10 +42592,10 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       );
     }
   },
-  Uy = class extends jy {
+  Wy = class extends My {
     constructor(e, t = {}, n) {
       let r = e.replace(/\/$/, ``),
-        i = q(q({}, zy), {}, { "Content-Type": `application/json` }, t);
+        i = q(q({}, By), {}, { "Content-Type": `application/json` }, t);
       super(r, i, n, `vectors`);
     }
     async putVectors(e) {
@@ -42588,7 +42604,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
         throw Error(`Vector batch size must be between 1 and 500 items`);
       return t.handleOperation(
         async () =>
-          (await Ay.post(t.fetch, `${t.url}/PutVectors`, e, {
+          (await jy.post(t.fetch, `${t.url}/PutVectors`, e, {
             headers: t.headers,
           })) || {},
       );
@@ -42597,7 +42613,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var t = this;
       return t.handleOperation(
         async () =>
-          await Ay.post(t.fetch, `${t.url}/GetVectors`, e, {
+          await jy.post(t.fetch, `${t.url}/GetVectors`, e, {
             headers: t.headers,
           }),
       );
@@ -42617,7 +42633,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       }
       return t.handleOperation(
         async () =>
-          await Ay.post(t.fetch, `${t.url}/ListVectors`, e, {
+          await jy.post(t.fetch, `${t.url}/ListVectors`, e, {
             headers: t.headers,
           }),
       );
@@ -42626,7 +42642,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var t = this;
       return t.handleOperation(
         async () =>
-          await Ay.post(t.fetch, `${t.url}/QueryVectors`, e, {
+          await jy.post(t.fetch, `${t.url}/QueryVectors`, e, {
             headers: t.headers,
           }),
       );
@@ -42637,23 +42653,23 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
         throw Error(`Keys batch size must be between 1 and 500 items`);
       return t.handleOperation(
         async () =>
-          (await Ay.post(t.fetch, `${t.url}/DeleteVectors`, e, {
+          (await jy.post(t.fetch, `${t.url}/DeleteVectors`, e, {
             headers: t.headers,
           })) || {},
       );
     }
   },
-  Wy = class extends jy {
+  Gy = class extends My {
     constructor(e, t = {}, n) {
       let r = e.replace(/\/$/, ``),
-        i = q(q({}, zy), {}, { "Content-Type": `application/json` }, t);
+        i = q(q({}, By), {}, { "Content-Type": `application/json` }, t);
       super(r, i, n, `vectors`);
     }
     async createBucket(e) {
       var t = this;
       return t.handleOperation(
         async () =>
-          (await Ay.post(
+          (await jy.post(
             t.fetch,
             `${t.url}/CreateVectorBucket`,
             { vectorBucketName: e },
@@ -42665,7 +42681,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var t = this;
       return t.handleOperation(
         async () =>
-          await Ay.post(
+          await jy.post(
             t.fetch,
             `${t.url}/GetVectorBucket`,
             { vectorBucketName: e },
@@ -42677,7 +42693,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var t = this;
       return t.handleOperation(
         async () =>
-          await Ay.post(t.fetch, `${t.url}/ListVectorBuckets`, e, {
+          await jy.post(t.fetch, `${t.url}/ListVectorBuckets`, e, {
             headers: t.headers,
           }),
       );
@@ -42686,7 +42702,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       var t = this;
       return t.handleOperation(
         async () =>
-          (await Ay.post(
+          (await jy.post(
             t.fetch,
             `${t.url}/DeleteVectorBucket`,
             { vectorBucketName: e },
@@ -42695,12 +42711,12 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       );
     }
   },
-  Gy = class extends Wy {
+  Ky = class extends Gy {
     constructor(e, t = {}) {
       super(e, t.headers || {}, t.fetch);
     }
     from(e) {
-      return new Ky(this.url, this.headers, e, this.fetch);
+      return new qy(this.url, this.headers, e, this.fetch);
     }
     async createBucket(e) {
       var t = () => super.createBucket,
@@ -42723,7 +42739,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       return t().call(n, e);
     }
   },
-  Ky = class extends Hy {
+  qy = class extends Uy {
     constructor(e, t, n, r) {
       (super(e, t, r), (this.vectorBucketName = n));
     }
@@ -42754,7 +42770,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       return t().call(n, n.vectorBucketName, e);
     }
     index(e) {
-      return new qy(
+      return new Jy(
         this.url,
         this.headers,
         this.vectorBucketName,
@@ -42763,7 +42779,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       );
     }
   },
-  qy = class extends Uy {
+  Jy = class extends Wy {
     constructor(e, t, n, r, i) {
       (super(e, t, i), (this.vectorBucketName = n), (this.indexName = r));
     }
@@ -42828,40 +42844,40 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
       );
     }
   },
-  Jy = class extends By {
+  Yy = class extends Vy {
     constructor(e, t = {}, n, r) {
       super(e, t, n, r);
     }
     from(e) {
-      return new Ry(this.url, this.headers, e, this.fetch);
+      return new zy(this.url, this.headers, e, this.fetch);
     }
     get vectors() {
-      return new Gy(this.url + `/vector`, {
+      return new Ky(this.url + `/vector`, {
         headers: this.headers,
         fetch: this.fetch,
       });
     }
     get analytics() {
-      return new Vy(this.url + `/iceberg`, this.headers, this.fetch);
+      return new Hy(this.url + `/iceberg`, this.headers, this.fetch);
     }
   },
-  Yy = `2.112.3`,
-  Xy = 3e4,
-  Zy = 3 * Xy,
-  Qy = 2 * Xy,
-  $y = `http://localhost:9999`,
-  eb = `supabase.auth.token`,
-  tb = { "X-Client-Info": `gotrue-js/${Yy}` },
-  nb = `X-Supabase-Api-Version`,
-  rb = {
+  Xy = `2.112.3`,
+  Zy = 3e4,
+  Qy = 3 * Zy,
+  $y = 2 * Zy,
+  eb = `http://localhost:9999`,
+  tb = `supabase.auth.token`,
+  nb = { "X-Client-Info": `gotrue-js/${Xy}` },
+  rb = `X-Supabase-Api-Version`,
+  ib = {
     "2024-01-01": {
       timestamp: Date.parse(`2024-01-01T00:00:00.0Z`),
       name: `2024-01-01`,
     },
   },
-  ib = /^([a-z0-9_-]{4})*($|[a-z0-9_-]{3}$|[a-z0-9_-]{2}$)$/i,
-  ab = `sb_flow_id`,
-  ob = class extends Error {
+  ab = /^([a-z0-9_-]{4})*($|[a-z0-9_-]{3}$|[a-z0-9_-]{2}$)$/i,
+  ob = `sb_flow_id`,
+  sb = class extends Error {
     constructor(e, t, n) {
       (super(e),
         (this.__isAuthError = !0),
@@ -42881,7 +42897,7 @@ var { get: Ty, post: Ey, put: Dy, head: Oy, remove: ky } = wy(`storage`),
 function J(e) {
   return typeof e == `object` && !!e && `__isAuthError` in e;
 }
-var sb = class extends ob {
+var cb = class extends sb {
   constructor(e, t, n) {
     (super(e, t, n),
       (this.name = `AuthApiError`),
@@ -42889,28 +42905,28 @@ var sb = class extends ob {
       (this.code = n));
   }
 };
-function cb(e) {
+function lb(e) {
   return J(e) && e.name === `AuthApiError`;
 }
-var lb = class extends ob {
+var ub = class extends sb {
     constructor(e, t) {
       (super(e), (this.name = `AuthUnknownError`), (this.originalError = t));
     }
   },
-  ub = class extends ob {
+  db = class extends sb {
     constructor(e, t, n, r) {
       (super(e, n, r), (this.name = t), (this.status = n));
     }
   },
-  db = class extends ub {
+  fb = class extends db {
     constructor() {
       super(`Auth session missing!`, `AuthSessionMissingError`, 400, void 0);
     }
   };
-function fb(e) {
+function pb(e) {
   return J(e) && e.name === `AuthSessionMissingError`;
 }
-var pb = class extends ub {
+var mb = class extends db {
     constructor() {
       super(
         `Auth session or user missing`,
@@ -42920,12 +42936,12 @@ var pb = class extends ub {
       );
     }
   },
-  mb = class extends ub {
+  hb = class extends db {
     constructor(e) {
       super(e, `AuthInvalidCredentialsError`, 400, void 0);
     }
   },
-  hb = class extends ub {
+  gb = class extends db {
     constructor(e, t = null) {
       (super(e, `AuthImplicitGrantRedirectError`, 500, void 0),
         (this.details = null),
@@ -42937,10 +42953,10 @@ var pb = class extends ub {
       });
     }
   };
-function gb(e) {
+function _b(e) {
   return J(e) && e.name === `AuthImplicitGrantRedirectError`;
 }
-var _b = class extends ub {
+var vb = class extends db {
     constructor(e, t = null) {
       (super(e, `AuthPKCEGrantCodeExchangeError`, 500, void 0),
         (this.details = null),
@@ -42952,7 +42968,7 @@ var _b = class extends ub {
       });
     }
   },
-  vb = class extends ub {
+  yb = class extends db {
     constructor() {
       super(
         `PKCE code verifier not found in storage. This can happen if the auth flow was initiated in a different browser or device, or if the storage was cleared. For SSR frameworks (Next.js, SvelteKit, etc.), use @supabase/ssr on both the server and client to store the code verifier in cookies.`,
@@ -42962,25 +42978,25 @@ var _b = class extends ub {
       );
     }
   },
-  yb = class extends ub {
+  bb = class extends db {
     constructor(e, t) {
       super(e, `AuthRetryableFetchError`, t, void 0);
     }
   };
-function bb(e) {
+function xb(e) {
   return J(e) && e.name === `AuthRetryableFetchError`;
 }
-var xb = class extends ub {
+var Sb = class extends db {
   constructor(
     e = `Refresh result discarded: session state changed mid-flight (e.g., concurrent signOut)`,
   ) {
     super(e, `AuthRefreshDiscardedError`, 409, void 0);
   }
 };
-function Sb(e) {
+function Cb(e) {
   return J(e) && e.name === `AuthRefreshDiscardedError`;
 }
-var Cb = class extends ub {
+var wb = class extends db {
     constructor(e, t, n) {
       (super(e, `AuthWeakPasswordError`, t, `weak_password`),
         (this.reasons = n));
@@ -42991,40 +43007,40 @@ var Cb = class extends ub {
       });
     }
   },
-  wb = class extends ub {
+  Tb = class extends db {
     constructor(e) {
       super(e, `AuthInvalidJwtError`, 400, `invalid_jwt`);
     }
   },
-  Tb = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_`.split(
+  Eb = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_`.split(
     ``,
   ),
-  Eb = ` 	
+  Db = ` 	
 \r=`.split(``),
-  Db = (() => {
+  Ob = (() => {
     let e = Array(128);
     for (let t = 0; t < e.length; t += 1) e[t] = -1;
-    for (let t = 0; t < Eb.length; t += 1) e[Eb[t].charCodeAt(0)] = -2;
-    for (let t = 0; t < Tb.length; t += 1) e[Tb[t].charCodeAt(0)] = t;
+    for (let t = 0; t < Db.length; t += 1) e[Db[t].charCodeAt(0)] = -2;
+    for (let t = 0; t < Eb.length; t += 1) e[Eb[t].charCodeAt(0)] = t;
     return e;
   })();
-function Ob(e, t, n) {
+function kb(e, t, n) {
   if (e !== null)
     for (t.queue = (t.queue << 8) | e, t.queuedBits += 8; t.queuedBits >= 6; )
-      (n(Tb[(t.queue >> (t.queuedBits - 6)) & 63]), (t.queuedBits -= 6));
+      (n(Eb[(t.queue >> (t.queuedBits - 6)) & 63]), (t.queuedBits -= 6));
   else if (t.queuedBits > 0)
     for (t.queue <<= 6 - t.queuedBits, t.queuedBits = 6; t.queuedBits >= 6; )
-      (n(Tb[(t.queue >> (t.queuedBits - 6)) & 63]), (t.queuedBits -= 6));
+      (n(Eb[(t.queue >> (t.queuedBits - 6)) & 63]), (t.queuedBits -= 6));
 }
-function kb(e, t, n) {
-  let r = Db[e];
+function Ab(e, t, n) {
+  let r = Ob[e];
   if (r > -1)
     for (t.queue = (t.queue << 6) | r, t.queuedBits += 6; t.queuedBits >= 8; )
       (n((t.queue >> (t.queuedBits - 8)) & 255), (t.queuedBits -= 8));
   else if (r === -2) return;
   else throw Error(`Invalid Base64-URL character "${String.fromCharCode(e)}"`);
 }
-function Ab(e) {
+function jb(e) {
   let t = [],
     n = (e) => {
       t.push(String.fromCodePoint(e));
@@ -43032,12 +43048,12 @@ function Ab(e) {
     r = { utf8seq: 0, codepoint: 0 },
     i = { queue: 0, queuedBits: 0 },
     a = (e) => {
-      Nb(e, r, n);
+      Pb(e, r, n);
     };
-  for (let t = 0; t < e.length; t += 1) kb(e.charCodeAt(t), i, a);
+  for (let t = 0; t < e.length; t += 1) Ab(e.charCodeAt(t), i, a);
   return t.join(``);
 }
-function jb(e, t) {
+function Mb(e, t) {
   if (e <= 127) {
     t(e);
     return;
@@ -43059,17 +43075,17 @@ function jb(e, t) {
   }
   throw Error(`Unrecognized Unicode codepoint: ${e.toString(16)}`);
 }
-function Mb(e, t) {
+function Nb(e, t) {
   for (let n = 0; n < e.length; n += 1) {
     let r = e.charCodeAt(n);
     if (r > 55295 && r <= 56319) {
       let t = ((r - 55296) * 1024) & 65535;
       ((r = (((e.charCodeAt(n + 1) - 56320) & 65535) | t) + 65536), (n += 1));
     }
-    jb(r, t);
+    Mb(r, t);
   }
 }
-function Nb(e, t, n) {
+function Pb(e, t, n) {
   if (t.utf8seq === 0) {
     if (e <= 127) {
       n(e);
@@ -43092,55 +43108,55 @@ function Nb(e, t, n) {
       t.utf8seq === 0 && n(t.codepoint));
   }
 }
-function Pb(e) {
+function Fb(e) {
   let t = [],
     n = { queue: 0, queuedBits: 0 },
     r = (e) => {
       t.push(e);
     };
-  for (let t = 0; t < e.length; t += 1) kb(e.charCodeAt(t), n, r);
+  for (let t = 0; t < e.length; t += 1) Ab(e.charCodeAt(t), n, r);
   return new Uint8Array(t);
 }
-function Fb(e) {
-  let t = [];
-  return (Mb(e, (e) => t.push(e)), new Uint8Array(t));
-}
 function Ib(e) {
+  let t = [];
+  return (Nb(e, (e) => t.push(e)), new Uint8Array(t));
+}
+function Lb(e) {
   let t = [],
     n = { queue: 0, queuedBits: 0 },
     r = (e) => {
       t.push(e);
     };
-  return (e.forEach((e) => Ob(e, n, r)), Ob(null, n, r), t.join(``));
+  return (e.forEach((e) => kb(e, n, r)), kb(null, n, r), t.join(``));
 }
-function Lb(e) {
+function Rb(e) {
   return Math.round(Date.now() / 1e3) + e;
 }
-function Rb() {
+function zb() {
   return Symbol(`auth-callback`);
 }
-var zb = () => typeof window < `u` && typeof document < `u`,
-  Bb = { tested: !1, writable: !1 },
-  Vb = () => {
-    if (!zb()) return !1;
+var Bb = () => typeof window < `u` && typeof document < `u`,
+  Vb = { tested: !1, writable: !1 },
+  Hb = () => {
+    if (!Bb()) return !1;
     try {
       if (typeof globalThis.localStorage != `object`) return !1;
     } catch {
       return !1;
     }
-    if (Bb.tested) return Bb.writable;
+    if (Vb.tested) return Vb.writable;
     let e = `lswt-${Math.random()}${Math.random()}`;
     try {
       (globalThis.localStorage.setItem(e, e),
         globalThis.localStorage.removeItem(e),
-        (Bb.tested = !0),
-        (Bb.writable = !0));
+        (Vb.tested = !0),
+        (Vb.writable = !0));
     } catch {
-      ((Bb.tested = !0), (Bb.writable = !1));
+      ((Vb.tested = !0), (Vb.writable = !1));
     }
-    return Bb.writable;
+    return Vb.writable;
   };
-function Hb(e) {
+function Ub(e) {
   let t = {},
     n = new URL(e);
   if (n.hash && n.hash[0] === `#`)
@@ -43156,18 +43172,18 @@ function Hb(e) {
     t
   );
 }
-var Ub = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
-  Wb = (e) =>
+var Wb = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
+  Gb = (e) =>
     typeof e == `object` &&
     !!e &&
     `status` in e &&
     `ok` in e &&
     `json` in e &&
     typeof e.json == `function`,
-  Gb = async (e, t, n) => {
+  Kb = async (e, t, n) => {
     await e.setItem(t, JSON.stringify(n));
   },
-  Kb = async (e, t) => {
+  qb = async (e, t) => {
     let n = await e.getItem(t);
     if (!n) return null;
     try {
@@ -43176,35 +43192,35 @@ var Ub = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
       return null;
     }
   },
-  qb = async (e, t) => {
+  Jb = async (e, t) => {
     await e.removeItem(t);
   },
-  Jb = class e {
+  Yb = class e {
     constructor() {
       this.promise = new e.promiseConstructor((e, t) => {
         ((this.resolve = e), (this.reject = t));
       });
     }
   };
-Jb.promiseConstructor = Promise;
-function Yb(e) {
+Yb.promiseConstructor = Promise;
+function Xb(e) {
   let t = e.split(`.`);
-  if (t.length !== 3) throw new wb(`Invalid JWT structure`);
+  if (t.length !== 3) throw new Tb(`Invalid JWT structure`);
   for (let e = 0; e < t.length; e++)
-    if (!ib.test(t[e])) throw new wb(`JWT not in base64url format`);
+    if (!ab.test(t[e])) throw new Tb(`JWT not in base64url format`);
   return {
-    header: JSON.parse(Ab(t[0])),
-    payload: JSON.parse(Ab(t[1])),
-    signature: Pb(t[2]),
+    header: JSON.parse(jb(t[0])),
+    payload: JSON.parse(jb(t[1])),
+    signature: Fb(t[2]),
     raw: { header: t[0], payload: t[1] },
   };
 }
-async function Xb(e) {
+async function Zb(e) {
   return await new Promise((t) => {
     setTimeout(() => t(null), e);
   });
 }
-function Zb(e, t) {
+function Qb(e, t) {
   return new Promise((n, r) => {
     (async () => {
       for (let i = 0; i < 1 / 0; i++)
@@ -43223,10 +43239,10 @@ function Zb(e, t) {
     })();
   });
 }
-function Qb(e) {
+function $b(e) {
   return (`0` + e.toString(16)).substr(-2);
 }
-function $b() {
+function ex() {
   let e = new Uint32Array(56);
   if (typeof crypto > `u`) {
     let e = ``;
@@ -43237,9 +43253,9 @@ function $b() {
         );
     return e;
   }
-  return (crypto.getRandomValues(e), Array.from(e, Qb).join(``));
+  return (crypto.getRandomValues(e), Array.from(e, $b).join(``));
 }
-async function ex(e) {
+async function tx(e) {
   let t = new TextEncoder().encode(e),
     n = await crypto.subtle.digest(`SHA-256`, t),
     r = new Uint8Array(n);
@@ -43247,7 +43263,7 @@ async function ex(e) {
     .map((e) => String.fromCharCode(e))
     .join(``);
 }
-async function tx(e) {
+async function nx(e) {
   if (
     !(
       typeof crypto < `u` &&
@@ -43261,66 +43277,66 @@ async function tx(e) {
       ),
       e
     );
-  let t = await ex(e);
+  let t = await tx(e);
   return btoa(t).replace(/\+/g, `-`).replace(/\//g, `_`).replace(/=+$/, ``);
 }
-var nx = /^[a-zA-Z0-9_-]{8,64}$/;
-function rx(e) {
-  return typeof e == `string` && nx.test(e) ? e : null;
+var rx = /^[a-zA-Z0-9_-]{8,64}$/;
+function ix(e) {
+  return typeof e == `string` && rx.test(e) ? e : null;
 }
-function ix() {
+function ax() {
   if (typeof crypto < `u` && typeof crypto.getRandomValues == `function`) {
     let e = new Uint8Array(16);
-    return (crypto.getRandomValues(e), Array.from(e, Qb).join(``));
+    return (crypto.getRandomValues(e), Array.from(e, $b).join(``));
   }
   let e = ``;
   for (let t = 0; t < 32; t++) e += Math.floor(Math.random() * 16).toString(16);
   return e;
 }
-var ax = (e, t) => `${e}-flow-${t}-code-verifier`,
-  ox = (e) => `${e}-flows-code-verifier`;
-async function sx(e, t) {
-  let n = await Kb(e, ox(t));
-  return Array.isArray(n) ? n.filter((e) => rx(e) !== null) : [];
+var ox = (e, t) => `${e}-flow-${t}-code-verifier`,
+  sx = (e) => `${e}-flows-code-verifier`;
+async function cx(e, t) {
+  let n = await qb(e, sx(t));
+  return Array.isArray(n) ? n.filter((e) => ix(e) !== null) : [];
 }
-async function cx(e, t, n, r, i) {
-  await Gb(e, ax(t, n), r);
-  let a = (await sx(e, t)).filter((e) => e !== n);
+async function lx(e, t, n, r, i) {
+  await Kb(e, ox(t, n), r);
+  let a = (await cx(e, t)).filter((e) => e !== n);
   for (a.push(n); a.length > 5; ) {
     let n = a.shift();
-    (await qb(e, ax(t, n)), i?.(n));
+    (await Jb(e, ox(t, n)), i?.(n));
   }
-  (await Gb(e, ox(t), a), await Gb(e, `${t}-code-verifier`, r));
-}
-async function lx(e, t, n) {
-  if (n) {
-    let r = await Kb(e, ax(t, n));
-    return { verifier: typeof r == `string` ? r : null, flowId: n };
-  }
-  let r = await Kb(e, `${t}-code-verifier`);
-  return { verifier: typeof r == `string` ? r : null, flowId: null };
+  (await Kb(e, sx(t), a), await Kb(e, `${t}-code-verifier`, r));
 }
 async function ux(e, t, n) {
+  if (n) {
+    let r = await qb(e, ox(t, n));
+    return { verifier: typeof r == `string` ? r : null, flowId: n };
+  }
+  let r = await qb(e, `${t}-code-verifier`);
+  return { verifier: typeof r == `string` ? r : null, flowId: null };
+}
+async function dx(e, t, n) {
   let r = `${t}-code-verifier`;
   if (!n) {
-    await qb(e, r);
+    await Jb(e, r);
     return;
   }
-  let i = ax(t, n),
-    a = await Kb(e, i);
-  await qb(e, i);
-  let o = await sx(e, t),
+  let i = ox(t, n),
+    a = await qb(e, i);
+  await Jb(e, i);
+  let o = await cx(e, t),
     s = o.filter((e) => e !== n);
   (s.length !== o.length &&
-    (s.length > 0 ? await Gb(e, ox(t), s) : await qb(e, ox(t))),
-    a != null && a === (await Kb(e, r)) && (await qb(e, r)));
+    (s.length > 0 ? await Kb(e, sx(t), s) : await Jb(e, sx(t))),
+    a != null && a === (await qb(e, r)) && (await Jb(e, r)));
 }
-async function dx(e, t) {
-  let n = await sx(e, t);
-  for (let r of n) await qb(e, ax(t, r));
-  (await qb(e, ox(t)), await qb(e, `${t}-code-verifier`));
+async function fx(e, t) {
+  let n = await cx(e, t);
+  for (let r of n) await Jb(e, ox(t, r));
+  (await Jb(e, sx(t)), await Jb(e, `${t}-code-verifier`));
 }
-function fx(e, t) {
+function px(e, t) {
   let n = e.indexOf(`#`),
     r = n === -1 ? e : e.slice(0, n),
     i = n === -1 ? `` : e.slice(n),
@@ -43336,32 +43352,32 @@ function fx(e, t) {
     r = t.length > 0 ? `${e}?${t.join(`&`)}` : e;
   }
   let o = r.includes(`?`) ? `&` : `?`;
-  return `${r}${o}${ab}=${encodeURIComponent(t)}${i}`;
+  return `${r}${o}${ob}=${encodeURIComponent(t)}${i}`;
 }
-async function px(e, t, n = !1, r) {
-  let i = $b(),
+async function mx(e, t, n = !1, r) {
+  let i = ex(),
     a = i;
   n && (a += `/recovery`);
-  let o = ix();
-  await cx(e, t, o, a, r);
-  let s = await tx(i);
+  let o = ax();
+  await lx(e, t, o, a, r);
+  let s = await nx(i);
   return [s, i === s ? `plain` : `s256`, o];
 }
-var mx = /^2[0-9]{3}-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[0-1])$/i;
-function hx(e) {
-  let t = e.headers.get(nb);
-  if (!t || !t.match(mx)) return null;
+var hx = /^2[0-9]{3}-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[0-1])$/i;
+function gx(e) {
+  let t = e.headers.get(rb);
+  if (!t || !t.match(hx)) return null;
   try {
     return new Date(`${t}T00:00:00.0Z`);
   } catch {
     return null;
   }
 }
-function gx(e) {
+function _x(e) {
   if (!e) throw Error(`Missing exp claim`);
   if (e <= Math.floor(Date.now() / 1e3)) throw Error(`JWT has expired`);
 }
-function _x(e) {
+function vx(e) {
   switch (e) {
     case `RS256`:
       return { name: `RSASSA-PKCS1-v1_5`, hash: { name: `SHA-256` } };
@@ -43371,18 +43387,18 @@ function _x(e) {
       throw Error(`Invalid alg claim`);
   }
 }
-var vx = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-function yx(e) {
-  if (!vx.test(e))
+var yx = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function bx(e) {
+  if (!yx.test(e))
     throw Error(`@supabase/auth-js: Expected parameter to be UUID but is not`);
 }
-function bx(e) {
+function xx(e) {
   if (!e.passkey)
     throw Error(
       "@supabase/auth-js: the passkey API is experimental and disabled by default. Enable it by passing `auth: { experimental: { passkey: true } }` to createClient (or to the GoTrueClient constructor).",
     );
 }
-function xx() {
+function Sx() {
   return new Proxy(
     {},
     {
@@ -43414,7 +43430,7 @@ function xx() {
     },
   );
 }
-function Sx(e, t) {
+function Cx(e, t) {
   return new Proxy(e, {
     get: (e, n, r) => {
       if (n === `__isInsecureUserWarningProxy`) return !0;
@@ -43440,10 +43456,10 @@ function Sx(e, t) {
     },
   });
 }
-function Cx(e) {
+function wx(e) {
   return JSON.parse(JSON.stringify(e));
 }
-var wx = (e) => {
+var Tx = (e) => {
     if (typeof e == `object` && e) {
       let t = e;
       if (typeof t.msg == `string`) return t.msg;
@@ -43453,26 +43469,26 @@ var wx = (e) => {
     }
     return JSON.stringify(e);
   },
-  Tx = [
+  Ex = [
     500, 501, 502, 503, 504, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529,
     530,
   ];
-async function Ex(e) {
-  if (!Wb(e)) throw new yb(wx(e), 0);
+async function Dx(e) {
+  if (!Gb(e)) throw new bb(Tx(e), 0);
   let t;
   try {
     t = await e.json();
   } catch (t) {
-    throw Tx.includes(e.status)
-      ? new yb(e.statusText || `HTTP ${e.status}`, e.status)
-      : new lb(wx(t), t);
+    throw Ex.includes(e.status)
+      ? new bb(e.statusText || `HTTP ${e.status}`, e.status)
+      : new ub(Tx(t), t);
   }
-  if (Tx.includes(e.status)) throw new yb(wx(t), e.status);
+  if (Ex.includes(e.status)) throw new bb(Tx(t), e.status);
   let n,
-    r = hx(e);
+    r = gx(e);
   if (
     (r &&
-    r.getTime() >= rb[`2024-01-01`].timestamp &&
+    r.getTime() >= ib[`2024-01-01`].timestamp &&
     typeof t == `object` &&
     t &&
     typeof t.code == `string`
@@ -43492,13 +43508,13 @@ async function Ex(e) {
       t.weak_password.reasons.length &&
       t.weak_password.reasons.reduce((e, t) => e && typeof t == `string`, !0)
     )
-      throw new Cb(wx(t), e.status, t.weak_password.reasons);
+      throw new wb(Tx(t), e.status, t.weak_password.reasons);
   } else if (n === `weak_password`)
-    throw new Cb(wx(t), e.status, t.weak_password?.reasons || []);
-  else if (n === `session_not_found`) throw new db();
-  throw new sb(wx(t), e.status || 500, n);
+    throw new wb(Tx(t), e.status, t.weak_password?.reasons || []);
+  else if (n === `session_not_found`) throw new fb();
+  throw new cb(Tx(t), e.status || 500, n);
 }
-var Dx = (e, t, n, r) => {
+var Ox = (e, t, n, r) => {
   let i = { method: e, headers: t?.headers || {} };
   return e === `GET`
     ? i
@@ -43511,11 +43527,11 @@ var Dx = (e, t, n, r) => {
 };
 async function Y(e, t, n, r) {
   let i = Object.assign({}, r?.headers);
-  (i[`X-Supabase-Api-Version`] || (i[nb] = rb[`2024-01-01`].name),
+  (i[`X-Supabase-Api-Version`] || (i[rb] = ib[`2024-01-01`].name),
     r?.jwt && (i.Authorization = `Bearer ${r.jwt}`));
   let a = r?.query ?? {};
   r?.redirectTo && (a.redirect_to = r.redirectTo);
-  let o = await Ox(
+  let o = await kx(
     e,
     t,
     n + (Object.keys(a).length ? `?` + new URLSearchParams(a).toString() : ``),
@@ -43525,31 +43541,31 @@ async function Y(e, t, n, r) {
   );
   return r?.xform ? r?.xform(o) : { data: Object.assign({}, o), error: null };
 }
-async function Ox(e, t, n, r, i, a) {
-  let o = Dx(t, r, i, a),
+async function kx(e, t, n, r, i, a) {
+  let o = Ox(t, r, i, a),
     s;
   try {
     s = await e(n, Object.assign({}, o));
   } catch (e) {
-    throw new yb(wx(e), 0);
+    throw new bb(Tx(e), 0);
   }
-  if ((s.ok || (await Ex(s)), r?.noResolveJson)) return s;
+  if ((s.ok || (await Dx(s)), r?.noResolveJson)) return s;
   try {
     return await s.json();
   } catch (e) {
-    await Ex(e);
+    await Dx(e);
   }
 }
-function kx(e) {
+function Ax(e) {
   let t = null;
-  Fx(e) &&
+  Ix(e) &&
     ((t = Object.assign({}, e)),
-    e.expires_at || (t.expires_at = Lb(e.expires_in)));
+    e.expires_at || (t.expires_at = Rb(e.expires_in)));
   let n = e.user ?? (typeof e?.id == `string` ? e : null);
   return { data: { session: t, user: n }, error: null };
 }
-function Ax(e) {
-  let t = kx(e);
+function jx(e) {
+  let t = Ax(e);
   return (
     !t.error &&
       e.weak_password &&
@@ -43563,13 +43579,13 @@ function Ax(e) {
     t
   );
 }
-function jx(e) {
+function Mx(e) {
   return { data: { user: e.user ?? e }, error: null };
 }
-function Mx(e) {
+function Nx(e) {
   return { data: e, error: null };
 }
-function Nx(e) {
+function Px(e) {
   let {
       action_link: t,
       email_otp: n,
@@ -43577,7 +43593,7 @@ function Nx(e) {
       redirect_to: i,
       verification_type: a,
     } = e,
-    o = n_(e, [
+    o = r_(e, [
       `action_link`,
       `email_otp`,
       `hashed_token`,
@@ -43598,18 +43614,18 @@ function Nx(e) {
     error: null,
   };
 }
-function Px(e) {
+function Fx(e) {
   return e;
 }
-function Fx(e) {
+function Ix(e) {
   return !!e.access_token && !!e.refresh_token && !!e.expires_in;
 }
-var Ix = [`global`, `local`, `others`],
-  Lx = class {
+var Lx = [`global`, `local`, `others`],
+  Rx = class {
     constructor({ url: e = ``, headers: t = {}, fetch: n, experimental: r }) {
       ((this.url = e),
         (this.headers = t),
-        (this.fetch = Ub(n)),
+        (this.fetch = Wb(n)),
         (this.experimental = r ?? {}),
         (this.mfa = {
           listFactors: this._listFactors.bind(this),
@@ -43635,10 +43651,10 @@ var Ix = [`global`, `local`, `others`],
           deletePasskey: this._adminDeletePasskey.bind(this),
         }));
     }
-    async signOut(e, t = Ix[0]) {
-      if (Ix.indexOf(t) < 0)
+    async signOut(e, t = Lx[0]) {
+      if (Lx.indexOf(t) < 0)
         throw Error(
-          `@supabase/auth-js: Parameter scope must be one of ${Ix.join(`, `)}`,
+          `@supabase/auth-js: Parameter scope must be one of ${Lx.join(`, `)}`,
         );
       try {
         return (
@@ -43660,7 +43676,7 @@ var Ix = [`global`, `local`, `others`],
           body: { email: e, data: t.data },
           headers: this.headers,
           redirectTo: t.redirectTo,
-          xform: jx,
+          xform: Mx,
         });
       } catch (e) {
         if (J(e)) return { data: { user: null }, error: e };
@@ -43670,14 +43686,14 @@ var Ix = [`global`, `local`, `others`],
     async generateLink(e) {
       try {
         let { options: t } = e,
-          n = n_(e, [`options`]),
+          n = r_(e, [`options`]),
           r = Object.assign(Object.assign({}, n), t);
         return (
           `newEmail` in n && ((r.new_email = n?.newEmail), delete r.newEmail),
           await Y(this.fetch, `POST`, `${this.url}/admin/generate_link`, {
             body: r,
             headers: this.headers,
-            xform: Nx,
+            xform: Px,
             redirectTo: t?.redirectTo,
           })
         );
@@ -43691,7 +43707,7 @@ var Ix = [`global`, `local`, `others`],
         return await Y(this.fetch, `POST`, `${this.url}/admin/users`, {
           body: e,
           headers: this.headers,
-          xform: jx,
+          xform: Mx,
         });
       } catch (e) {
         if (J(e)) return { data: { user: null }, error: e };
@@ -43708,7 +43724,7 @@ var Ix = [`global`, `local`, `others`],
               page: e?.page?.toString() ?? ``,
               per_page: e?.perPage?.toString() ?? ``,
             },
-            xform: Px,
+            xform: Fx,
           });
         if (n.error) throw n.error;
         let r = await n.json(),
@@ -43730,11 +43746,11 @@ var Ix = [`global`, `local`, `others`],
       }
     }
     async getUserById(e) {
-      yx(e);
+      bx(e);
       try {
         return await Y(this.fetch, `GET`, `${this.url}/admin/users/${e}`, {
           headers: this.headers,
-          xform: jx,
+          xform: Mx,
         });
       } catch (e) {
         if (J(e)) return { data: { user: null }, error: e };
@@ -43742,12 +43758,12 @@ var Ix = [`global`, `local`, `others`],
       }
     }
     async updateUserById(e, t) {
-      yx(e);
+      bx(e);
       try {
         return await Y(this.fetch, `PUT`, `${this.url}/admin/users/${e}`, {
           body: t,
           headers: this.headers,
-          xform: jx,
+          xform: Mx,
         });
       } catch (e) {
         if (J(e)) return { data: { user: null }, error: e };
@@ -43755,12 +43771,12 @@ var Ix = [`global`, `local`, `others`],
       }
     }
     async deleteUser(e, t = !1) {
-      yx(e);
+      bx(e);
       try {
         return await Y(this.fetch, `DELETE`, `${this.url}/admin/users/${e}`, {
           headers: this.headers,
           body: { should_soft_delete: t },
-          xform: jx,
+          xform: Mx,
         });
       } catch (e) {
         if (J(e)) return { data: { user: null }, error: e };
@@ -43768,7 +43784,7 @@ var Ix = [`global`, `local`, `others`],
       }
     }
     async _listFactors(e) {
-      yx(e.userId);
+      bx(e.userId);
       try {
         let { data: t, error: n } = await Y(
           this.fetch,
@@ -43786,7 +43802,7 @@ var Ix = [`global`, `local`, `others`],
       }
     }
     async _deleteFactor(e) {
-      (yx(e.userId), yx(e.id));
+      (bx(e.userId), bx(e.id));
       try {
         return {
           data: await Y(
@@ -43812,7 +43828,7 @@ var Ix = [`global`, `local`, `others`],
               page: e?.page?.toString() ?? ``,
               per_page: e?.perPage?.toString() ?? ``,
             },
-            xform: Px,
+            xform: Fx,
           });
         if (n.error) throw n.error;
         let r = await n.json(),
@@ -43987,7 +44003,7 @@ var Ix = [`global`, `local`, `others`],
       }
     }
     async _adminListPasskeys(e) {
-      (bx(this.experimental), yx(e.userId));
+      (xx(this.experimental), bx(e.userId));
       try {
         return await Y(
           this.fetch,
@@ -44001,7 +44017,7 @@ var Ix = [`global`, `local`, `others`],
       }
     }
     async _adminDeletePasskey(e) {
-      (bx(this.experimental), yx(e.userId), yx(e.passkeyId));
+      (xx(this.experimental), bx(e.userId), bx(e.passkeyId));
       try {
         return (
           await Y(
@@ -44018,7 +44034,7 @@ var Ix = [`global`, `local`, `others`],
       }
     }
   };
-function Rx(e = {}) {
+function zx(e = {}) {
   return {
     getItem: (t) => e[t] || null,
     setItem: (t, n) => {
@@ -44030,15 +44046,15 @@ function Rx(e = {}) {
   };
 }
 globalThis &&
-  Vb() &&
+  Hb() &&
   globalThis.localStorage &&
   globalThis.localStorage.getItem(`supabase.gotrue-js.locks.debug`);
-var zx = class extends Error {
+var Bx = class extends Error {
   constructor(e) {
     (super(e), (this.isAcquireTimeout = !0));
   }
 };
-function Bx() {
+function Vx() {
   if (typeof globalThis != `object`)
     try {
       (Object.defineProperty(Object.prototype, "__magic__", {
@@ -44053,19 +44069,19 @@ function Bx() {
       typeof self < `u` && (self.globalThis = self);
     }
 }
-function Vx(e) {
+function Hx(e) {
   if (!/^0x[a-fA-F0-9]{40}$/.test(e))
     throw Error(`@supabase/auth-js: Address "${e}" is invalid.`);
   return e.toLowerCase();
 }
-function Hx(e) {
+function Ux(e) {
   return parseInt(e, 16);
 }
-function Ux(e) {
+function Wx(e) {
   let t = new TextEncoder().encode(e);
   return `0x` + Array.from(t, (e) => e.toString(16).padStart(2, `0`)).join(``);
 }
-function Wx(e) {
+function Gx(e) {
   let {
     chainId: t,
     domain: n,
@@ -44106,7 +44122,7 @@ function Wx(e) {
     throw Error(
       `@supabase/auth-js: Invalid SIWE message field "statement". Statement must not include '\\n'. Provided value: ${e.statement}`,
     );
-  let f = Vx(e.address),
+  let f = Hx(e.address),
     p = `${l ? `${l}://${n}` : n} wants you to sign in with your Ethereum account:\n${f}\n\n${e.statement ? `${e.statement}\n` : ``}`,
     m = `URI: ${u}\nVersion: ${d}\nChain ID: ${t}${a ? `\nNonce: ${a}` : ``}\nIssued At: ${i.toISOString()}`;
   if (
@@ -44128,7 +44144,7 @@ Resources:`;
   }
   return `${p}\n${m}`;
 }
-var Gx = class extends Error {
+var Kx = class extends Error {
     constructor({ message: e, code: t, cause: n, name: r }) {
       (super(e, { cause: n }),
         (this.__isWebAuthnError = !0),
@@ -44140,7 +44156,7 @@ var Gx = class extends Error {
       return { name: this.name, message: this.message, code: this.code };
     }
   },
-  Kx = class extends Gx {
+  qx = class extends Kx {
     constructor(e, t) {
       (super({
         code: `ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY`,
@@ -44151,19 +44167,19 @@ var Gx = class extends Error {
         (this.originalError = t));
     }
   };
-function qx({ error: e, options: t }) {
+function Jx({ error: e, options: t }) {
   let { publicKey: n } = t;
   if (!n) throw Error(`options was missing required publicKey property`);
   if (e.name === `AbortError`) {
     if (t.signal instanceof AbortSignal)
-      return new Gx({
+      return new Kx({
         message: `Registration ceremony was sent an abort signal`,
         code: `ERROR_CEREMONY_ABORTED`,
         cause: e,
       });
   } else if (e.name === `ConstraintError`) {
     if (n.authenticatorSelection?.requireResidentKey === !0)
-      return new Gx({
+      return new Kx({
         message: `Discoverable credentials were required but no available authenticator supported it`,
         code: `ERROR_AUTHENTICATOR_MISSING_DISCOVERABLE_CREDENTIAL_SUPPORT`,
         cause: e,
@@ -44172,25 +44188,25 @@ function qx({ error: e, options: t }) {
       t.mediation === `conditional` &&
       n.authenticatorSelection?.userVerification === `required`
     )
-      return new Gx({
+      return new Kx({
         message: `User verification was required during automatic registration but it could not be performed`,
         code: `ERROR_AUTO_REGISTER_USER_VERIFICATION_FAILURE`,
         cause: e,
       });
     if (n.authenticatorSelection?.userVerification === `required`)
-      return new Gx({
+      return new Kx({
         message: `User verification was required but no available authenticator supported it`,
         code: `ERROR_AUTHENTICATOR_MISSING_USER_VERIFICATION_SUPPORT`,
         cause: e,
       });
   } else if (e.name === `InvalidStateError`)
-    return new Gx({
+    return new Kx({
       message: `The authenticator was previously registered`,
       code: `ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED`,
       cause: e,
     });
   else if (e.name === `NotAllowedError`)
-    return new Gx({
+    return new Kx({
       message: e.message,
       code: `ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY`,
       cause: e,
@@ -44198,92 +44214,92 @@ function qx({ error: e, options: t }) {
   else if (e.name === `NotSupportedError`)
     return n.pubKeyCredParams.filter((e) => e.type === `public-key`).length ===
       0
-      ? new Gx({
+      ? new Kx({
           message: `No entry in pubKeyCredParams was of type "public-key"`,
           code: `ERROR_MALFORMED_PUBKEYCREDPARAMS`,
           cause: e,
         })
-      : new Gx({
+      : new Kx({
           message: `No available authenticator supported any of the specified pubKeyCredParams algorithms`,
           code: `ERROR_AUTHENTICATOR_NO_SUPPORTED_PUBKEYCREDPARAMS_ALG`,
           cause: e,
         });
   else if (e.name === `SecurityError`) {
     let t = window.location.hostname;
-    if (!eS(t))
-      return new Gx({
+    if (!tS(t))
+      return new Kx({
         message: `${window.location.hostname} is an invalid domain`,
         code: `ERROR_INVALID_DOMAIN`,
         cause: e,
       });
     if (n.rp.id !== t)
-      return new Gx({
+      return new Kx({
         message: `The RP ID "${n.rp.id}" is invalid for this domain`,
         code: `ERROR_INVALID_RP_ID`,
         cause: e,
       });
   } else if (e.name === `TypeError`) {
     if (n.user.id.byteLength < 1 || n.user.id.byteLength > 64)
-      return new Gx({
+      return new Kx({
         message: `User ID was not between 1 and 64 characters`,
         code: `ERROR_INVALID_USER_ID_LENGTH`,
         cause: e,
       });
   } else if (e.name === `UnknownError`)
-    return new Gx({
+    return new Kx({
       message: `The authenticator was unable to process the specified options, or could not create a new credential`,
       code: `ERROR_AUTHENTICATOR_GENERAL_ERROR`,
       cause: e,
     });
-  return new Gx({
+  return new Kx({
     message: `a Non-Webauthn related error has occurred`,
     code: `ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY`,
     cause: e,
   });
 }
-function Jx({ error: e, options: t }) {
+function Yx({ error: e, options: t }) {
   let { publicKey: n } = t;
   if (!n) throw Error(`options was missing required publicKey property`);
   if (e.name === `AbortError`) {
     if (t.signal instanceof AbortSignal)
-      return new Gx({
+      return new Kx({
         message: `Authentication ceremony was sent an abort signal`,
         code: `ERROR_CEREMONY_ABORTED`,
         cause: e,
       });
   } else if (e.name === `NotAllowedError`)
-    return new Gx({
+    return new Kx({
       message: e.message,
       code: `ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY`,
       cause: e,
     });
   else if (e.name === `SecurityError`) {
     let t = window.location.hostname;
-    if (!eS(t))
-      return new Gx({
+    if (!tS(t))
+      return new Kx({
         message: `${window.location.hostname} is an invalid domain`,
         code: `ERROR_INVALID_DOMAIN`,
         cause: e,
       });
     if (n.rpId !== t)
-      return new Gx({
+      return new Kx({
         message: `The RP ID "${n.rpId}" is invalid for this domain`,
         code: `ERROR_INVALID_RP_ID`,
         cause: e,
       });
   } else if (e.name === `UnknownError`)
-    return new Gx({
+    return new Kx({
       message: `The authenticator was unable to process the specified options, or could not create a new assertion signature`,
       code: `ERROR_AUTHENTICATOR_GENERAL_ERROR`,
       cause: e,
     });
-  return new Gx({
+  return new Kx({
     message: `a Non-Webauthn related error has occurred`,
     code: `ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY`,
     cause: e,
   });
 }
-var Yx = new (class {
+var Xx = new (class {
   createNewAbortSignal() {
     if (this.controller) {
       let e = Error(`Cancelling existing WebAuthn API call for new one`);
@@ -44301,7 +44317,7 @@ var Yx = new (class {
     }
   }
 })();
-function Xx(e) {
+function Zx(e) {
   if (!e) throw Error(`Credential creation options are required`);
   if (
     typeof PublicKeyCredential < `u` &&
@@ -44310,16 +44326,16 @@ function Xx(e) {
   )
     return PublicKeyCredential.parseCreationOptionsFromJSON(e);
   let { challenge: t, user: n, excludeCredentials: r } = e,
-    i = n_(e, [`challenge`, `user`, `excludeCredentials`]),
-    a = Pb(t).buffer,
-    o = Object.assign(Object.assign({}, n), { id: Pb(n.id).buffer }),
+    i = r_(e, [`challenge`, `user`, `excludeCredentials`]),
+    a = Fb(t).buffer,
+    o = Object.assign(Object.assign({}, n), { id: Fb(n.id).buffer }),
     s = Object.assign(Object.assign({}, i), { challenge: a, user: o });
   if (r && r.length > 0) {
     s.excludeCredentials = Array(r.length);
     for (let e = 0; e < r.length; e++) {
       let t = r[e];
       s.excludeCredentials[e] = Object.assign(Object.assign({}, t), {
-        id: Pb(t.id).buffer,
+        id: Fb(t.id).buffer,
         type: t.type || `public-key`,
         transports: t.transports,
       });
@@ -44327,7 +44343,7 @@ function Xx(e) {
   }
   return s;
 }
-function Zx(e) {
+function Qx(e) {
   if (!e) throw Error(`Credential request options are required`);
   if (
     typeof PublicKeyCredential < `u` &&
@@ -44336,15 +44352,15 @@ function Zx(e) {
   )
     return PublicKeyCredential.parseRequestOptionsFromJSON(e);
   let { challenge: t, allowCredentials: n } = e,
-    r = n_(e, [`challenge`, `allowCredentials`]),
-    i = Pb(t).buffer,
+    r = r_(e, [`challenge`, `allowCredentials`]),
+    i = Fb(t).buffer,
     a = Object.assign(Object.assign({}, r), { challenge: i });
   if (n && n.length > 0) {
     a.allowCredentials = Array(n.length);
     for (let e = 0; e < n.length; e++) {
       let t = n[e];
       a.allowCredentials[e] = Object.assign(Object.assign({}, t), {
-        id: Pb(t.id).buffer,
+        id: Fb(t.id).buffer,
         type: t.type || `public-key`,
         transports: t.transports,
       });
@@ -44352,22 +44368,22 @@ function Zx(e) {
   }
   return a;
 }
-function Qx(e) {
+function $x(e) {
   if (`toJSON` in e && typeof e.toJSON == `function`) return e.toJSON();
   let t = e;
   return {
     id: e.id,
     rawId: e.id,
     response: {
-      attestationObject: Ib(new Uint8Array(e.response.attestationObject)),
-      clientDataJSON: Ib(new Uint8Array(e.response.clientDataJSON)),
+      attestationObject: Lb(new Uint8Array(e.response.attestationObject)),
+      clientDataJSON: Lb(new Uint8Array(e.response.clientDataJSON)),
     },
     type: `public-key`,
     clientExtensionResults: e.getClientExtensionResults(),
     authenticatorAttachment: t.authenticatorAttachment ?? void 0,
   };
 }
-function $x(e) {
+function eS(e) {
   if (`toJSON` in e && typeof e.toJSON == `function`) return e.toJSON();
   let t = e,
     n = e.getClientExtensionResults(),
@@ -44376,22 +44392,22 @@ function $x(e) {
     id: e.id,
     rawId: e.id,
     response: {
-      authenticatorData: Ib(new Uint8Array(r.authenticatorData)),
-      clientDataJSON: Ib(new Uint8Array(r.clientDataJSON)),
-      signature: Ib(new Uint8Array(r.signature)),
-      userHandle: r.userHandle ? Ib(new Uint8Array(r.userHandle)) : void 0,
+      authenticatorData: Lb(new Uint8Array(r.authenticatorData)),
+      clientDataJSON: Lb(new Uint8Array(r.clientDataJSON)),
+      signature: Lb(new Uint8Array(r.signature)),
+      userHandle: r.userHandle ? Lb(new Uint8Array(r.userHandle)) : void 0,
     },
     type: `public-key`,
     clientExtensionResults: n,
     authenticatorAttachment: t.authenticatorAttachment ?? void 0,
   };
 }
-function eS(e) {
+function tS(e) {
   return e === `localhost` || /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i.test(e);
 }
-function tS() {
+function nS() {
   return !!(
-    zb() &&
+    Bb() &&
     `PublicKeyCredential` in window &&
     window.PublicKeyCredential &&
     `credentials` in navigator &&
@@ -44401,7 +44417,7 @@ function tS() {
       `function`
   );
 }
-async function nS(e) {
+async function rS(e) {
   try {
     let t = await navigator.credentials.create(e);
     return t
@@ -44409,14 +44425,14 @@ async function nS(e) {
         ? { data: t, error: null }
         : {
             data: null,
-            error: new Kx(`Browser returned unexpected credential type`, t),
+            error: new qx(`Browser returned unexpected credential type`, t),
           }
-      : { data: null, error: new Kx(`Empty credential response`, t) };
+      : { data: null, error: new qx(`Empty credential response`, t) };
   } catch (t) {
-    return { data: null, error: qx({ error: t, options: e }) };
+    return { data: null, error: Jx({ error: t, options: e }) };
   }
 }
-async function rS(e) {
+async function iS(e) {
   try {
     let t = await navigator.credentials.get(e);
     return t
@@ -44424,14 +44440,14 @@ async function rS(e) {
         ? { data: t, error: null }
         : {
             data: null,
-            error: new Kx(`Browser returned unexpected credential type`, t),
+            error: new qx(`Browser returned unexpected credential type`, t),
           }
-      : { data: null, error: new Kx(`Empty credential response`, t) };
+      : { data: null, error: new qx(`Empty credential response`, t) };
   } catch (t) {
-    return { data: null, error: Jx({ error: t, options: e }) };
+    return { data: null, error: Yx({ error: t, options: e }) };
   }
 }
-var iS = {
+var aS = {
     hints: [`security-key`],
     authenticatorSelection: {
       authenticatorAttachment: `cross-platform`,
@@ -44441,12 +44457,12 @@ var iS = {
     },
     attestation: `direct`,
   },
-  aS = {
+  oS = {
     userVerification: `preferred`,
     hints: [`security-key`],
     attestation: `direct`,
   };
-function oS(...e) {
+function sS(...e) {
   let t = (e) => typeof e == `object` && !!e && !Array.isArray(e),
     n = (e) => e instanceof ArrayBuffer || ArrayBuffer.isView(e),
     r = {};
@@ -44459,19 +44475,19 @@ function oS(...e) {
           else if (n(a)) r[e] = a;
           else if (t(a)) {
             let n = r[e];
-            r[e] = t(n) ? oS(n, a) : oS(a);
+            r[e] = t(n) ? sS(n, a) : sS(a);
           } else r[e] = a;
         }
       }
   return r;
 }
-function sS(e, t) {
-  return oS(iS, e, t || {});
-}
 function cS(e, t) {
-  return oS(aS, e, t || {});
+  return sS(aS, e, t || {});
 }
-var lS = class {
+function lS(e, t) {
+  return sS(oS, e, t || {});
+}
+var uS = class {
   constructor(e) {
     ((this.client = e),
       (this.enroll = this._enroll.bind(this)),
@@ -44495,7 +44511,7 @@ var lS = class {
         webauthn: t,
       });
       if (!a) return { data: null, error: o };
-      let s = r ?? Yx.createNewAbortSignal();
+      let s = r ?? Xx.createNewAbortSignal();
       if (a.webauthn.type === `create`) {
         let { user: e } = a.webauthn.credential_options.publicKey;
         if (!e.name) {
@@ -44511,8 +44527,8 @@ var lS = class {
       }
       switch (a.webauthn.type) {
         case `create`: {
-          let { data: t, error: n } = await nS({
-            publicKey: sS(a.webauthn.credential_options.publicKey, i?.create),
+          let { data: t, error: n } = await rS({
+            publicKey: cS(a.webauthn.credential_options.publicKey, i?.create),
             signal: s,
           });
           return t
@@ -44527,8 +44543,8 @@ var lS = class {
             : { data: null, error: n };
         }
         case `request`: {
-          let t = cS(a.webauthn.credential_options.publicKey, i?.request),
-            { data: n, error: r } = await rS(
+          let t = lS(a.webauthn.credential_options.publicKey, i?.request),
+            { data: n, error: r } = await iS(
               Object.assign(Object.assign({}, a.webauthn.credential_options), {
                 publicKey: t,
                 signal: s,
@@ -44549,7 +44565,7 @@ var lS = class {
     } catch (e) {
       return J(e)
         ? { data: null, error: e }
-        : { data: null, error: new lb(`Unexpected error in challenge`, e) };
+        : { data: null, error: new ub(`Unexpected error in challenge`, e) };
     }
   }
   async _verify({ challengeId: e, factorId: t, webauthn: n }) {
@@ -44569,13 +44585,13 @@ var lS = class {
     if (!t)
       return {
         data: null,
-        error: new ob(`rpId is required for WebAuthn authentication`),
+        error: new sb(`rpId is required for WebAuthn authentication`),
       };
     try {
-      if (!tS())
+      if (!nS())
         return {
           data: null,
-          error: new lb(`Browser does not support WebAuthn`, null),
+          error: new ub(`Browser does not support WebAuthn`, null),
         };
       let { data: a, error: o } = await this.challenge(
         { factorId: e, webauthn: { rpId: t, rpOrigins: n }, signal: r },
@@ -44596,7 +44612,7 @@ var lS = class {
     } catch (e) {
       return J(e)
         ? { data: null, error: e }
-        : { data: null, error: new lb(`Unexpected error in authenticate`, e) };
+        : { data: null, error: new ub(`Unexpected error in authenticate`, e) };
     }
   }
   async _register(
@@ -44613,13 +44629,13 @@ var lS = class {
     if (!t)
       return {
         data: null,
-        error: new ob(`rpId is required for WebAuthn registration`),
+        error: new sb(`rpId is required for WebAuthn registration`),
       };
     try {
-      if (!tS())
+      if (!nS())
         return {
           data: null,
-          error: new lb(`Browser does not support WebAuthn`, null),
+          error: new ub(`Browser does not support WebAuthn`, null),
         };
       let { data: a, error: o } = await this._enroll({ friendlyName: e });
       if (!a)
@@ -44663,18 +44679,18 @@ var lS = class {
     } catch (e) {
       return J(e)
         ? { data: null, error: e }
-        : { data: null, error: new lb(`Unexpected error in register`, e) };
+        : { data: null, error: new ub(`Unexpected error in register`, e) };
     }
   }
 };
-Bx();
-var uS = {
-    url: $y,
-    storageKey: eb,
+Vx();
+var dS = {
+    url: eb,
+    storageKey: tb,
     autoRefreshToken: !0,
     persistSession: !0,
     detectSessionInUrl: !0,
-    headers: tb,
+    headers: nb,
     flowType: `implicit`,
     debug: !1,
     hasCustomAuthorizationHeader: !1,
@@ -44683,23 +44699,23 @@ var uS = {
     skipAutoInitialize: !1,
     experimental: {},
   },
-  dS = {},
-  fS = class e {
+  fS = {},
+  pS = class e {
     get jwks() {
-      return dS[this.storageKey]?.jwks ?? { keys: [] };
+      return fS[this.storageKey]?.jwks ?? { keys: [] };
     }
     set jwks(e) {
-      dS[this.storageKey] = Object.assign(
-        Object.assign({}, dS[this.storageKey]),
+      fS[this.storageKey] = Object.assign(
+        Object.assign({}, fS[this.storageKey]),
         { jwks: e },
       );
     }
     get jwks_cached_at() {
-      return dS[this.storageKey]?.cachedAt ?? -(2 ** 53 - 1);
+      return fS[this.storageKey]?.cachedAt ?? -(2 ** 53 - 1);
     }
     set jwks_cached_at(e) {
-      dS[this.storageKey] = Object.assign(
-        Object.assign({}, dS[this.storageKey]),
+      fS[this.storageKey] = Object.assign(
+        Object.assign({}, fS[this.storageKey]),
         { cachedAt: e },
       );
     }
@@ -44724,14 +44740,14 @@ var uS = {
         (this.pendingInLock = []),
         (this.broadcastChannel = null),
         (this.logger = console.log));
-      let r = Object.assign(Object.assign({}, uS), t);
+      let r = Object.assign(Object.assign({}, dS), t);
       if (
         ((this.storageKey = r.storageKey),
         (this.instanceID = e.nextInstanceID[this.storageKey] ?? 0),
         (e.nextInstanceID[this.storageKey] = this.instanceID + 1),
         (this.logDebugMessages = !!r.debug),
         typeof r.debug == `function` && (this.logger = r.debug),
-        this.instanceID > 0 && zb())
+        this.instanceID > 0 && Bb())
       ) {
         let e = `${this._logPrefix()} Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.`;
         (console.warn(e), this.logDebugMessages && console.trace(e));
@@ -44740,7 +44756,7 @@ var uS = {
         ((this.persistSession = r.persistSession),
         (this.autoRefreshToken = r.autoRefreshToken),
         (this.experimental = r.experimental ?? {}),
-        (this.admin = new Lx({
+        (this.admin = new Rx({
           url: r.url,
           headers: r.headers,
           fetch: r.fetch,
@@ -44748,7 +44764,7 @@ var uS = {
         })),
         (this.url = r.url),
         (this.headers = r.headers),
-        (this.fetch = Ub(r.fetch)),
+        (this.fetch = Wb(r.fetch)),
         (this.detectSessionInUrl = r.detectSessionInUrl),
         (this.flowType = r.flowType),
         (this.hasCustomAuthorizationHeader = r.hasCustomAuthorizationHeader),
@@ -44766,7 +44782,7 @@ var uS = {
           challengeAndVerify: this._challengeAndVerify.bind(this),
           getAuthenticatorAssuranceLevel:
             this._getAuthenticatorAssuranceLevel.bind(this),
-          webauthn: new lS(this),
+          webauthn: new uS(this),
         }),
         (this.oauth = {
           getAuthorizationDetails: this._getAuthorizationDetails.bind(this),
@@ -44787,14 +44803,14 @@ var uS = {
         this.persistSession
           ? (r.storage
               ? (this.storage = r.storage)
-              : Vb()
+              : Hb()
                 ? (this.storage = globalThis.localStorage)
                 : ((this.memoryStorage = {}),
-                  (this.storage = Rx(this.memoryStorage))),
+                  (this.storage = zx(this.memoryStorage))),
             r.userStorage && (this.userStorage = r.userStorage))
           : ((this.memoryStorage = {}),
-            (this.storage = Rx(this.memoryStorage))),
-        zb() &&
+            (this.storage = zx(this.memoryStorage))),
+        Bb() &&
           globalThis.BroadcastChannel &&
           this.persistSession &&
           this.storageKey)
@@ -44842,7 +44858,7 @@ var uS = {
       return e;
     }
     _logPrefix() {
-      return `GoTrueClient@${this.storageKey}:${this.instanceID} (${Yy}) ${new Date().toISOString()}`;
+      return `GoTrueClient@${this.storageKey}:${this.instanceID} (${Xy}) ${new Date().toISOString()}`;
     }
     _debug(...e) {
       return (
@@ -44872,12 +44888,12 @@ var uS = {
         let e = {},
           t = `none`;
         if (
-          (zb() &&
-            ((e = Hb(window.location.href)),
+          (Bb() &&
+            ((e = Ub(window.location.href)),
             this._isImplicitGrantCallback(e)
               ? (t = `implicit`)
               : (await this._isPKCECallback(e)) && (t = `pkce`)),
-          zb() && this.detectSessionInUrl && t !== `none`)
+          Bb() && this.detectSessionInUrl && t !== `none`)
         ) {
           let { data: n, error: r } = await this._getSessionFromURL(e, t);
           if (r) {
@@ -44887,7 +44903,7 @@ var uS = {
                 `error detecting session from URL`,
                 r,
               ),
-              gb(r))
+              _b(r))
             ) {
               let e = r.details?.code;
               if (
@@ -44922,7 +44938,7 @@ var uS = {
         return J(e)
           ? this._returnResult({ error: e })
           : this._returnResult({
-              error: new lb(`Unexpected error during initialization`, e),
+              error: new ub(`Unexpected error during initialization`, e),
             });
       } finally {
         (await this._handleVisibilityChange(),
@@ -44941,7 +44957,7 @@ var uS = {
               data: e?.options?.data ?? {},
               gotrue_meta_security: { captcha_token: e?.options?.captchaToken },
             },
-            xform: kx,
+            xform: Ax,
           },
         );
         if (n || !t)
@@ -44990,7 +45006,7 @@ var uS = {
                 code_challenge: o,
                 code_challenge_method: s,
               },
-              xform: kx,
+              xform: Ax,
             })));
         } else if (`phone` in e) {
           let { phone: t, password: r, options: i } = e;
@@ -45003,16 +45019,16 @@ var uS = {
               channel: i?.channel ?? `sms`,
               gotrue_meta_security: { captcha_token: i?.captchaToken },
             },
-            xform: kx,
+            xform: Ax,
           });
         } else
-          throw new mb(
+          throw new hb(
             `You must provide either an email or phone number and a password`,
           );
         let { data: r, error: i } = n;
         if (i || !r)
           return (
-            await ux(this.storage, this.storageKey, t),
+            await dx(this.storage, this.storageKey, t),
             this._returnResult({
               data: { user: null, session: null },
               error: i,
@@ -45027,7 +45043,7 @@ var uS = {
           this._returnResult({ data: { user: o, session: a }, error: null })
         );
       } catch (e) {
-        if ((await ux(this.storage, this.storageKey, t), J(e)))
+        if ((await dx(this.storage, this.storageKey, t), J(e)))
           return this._returnResult({
             data: { user: null, session: null },
             error: e,
@@ -45051,7 +45067,7 @@ var uS = {
                 password: r,
                 gotrue_meta_security: { captcha_token: i?.captchaToken },
               },
-              xform: Ax,
+              xform: jx,
             },
           );
         } else if (`phone` in e) {
@@ -45067,11 +45083,11 @@ var uS = {
                 password: r,
                 gotrue_meta_security: { captcha_token: i?.captchaToken },
               },
-              xform: Ax,
+              xform: jx,
             },
           );
         } else
-          throw new mb(
+          throw new hb(
             `You must provide either an email or phone number and a password`,
           );
         let { data: n, error: r } = t;
@@ -45081,7 +45097,7 @@ var uS = {
             error: r,
           });
         if (!n || !n.session || !n.user) {
-          let e = new pb();
+          let e = new mb();
           return this._returnResult({
             data: { user: null, session: null },
             error: e,
@@ -45143,7 +45159,7 @@ var uS = {
       else {
         let { chain: r, wallet: i, statement: a, options: o } = e,
           s;
-        if (!zb()) {
+        if (!Bb()) {
           if (typeof i != `object` || !o?.url)
             throw Error(
               `@supabase/auth-js: Both wallet and url must be specified in non-browser environments.`,
@@ -45177,10 +45193,10 @@ var uS = {
           throw Error(
             `@supabase/auth-js: No accounts available. Please ensure the wallet is connected.`,
           );
-        let u = Vx(l[0]),
+        let u = Hx(l[0]),
           d = o?.signInWithEthereum?.chainId;
-        ((d ||= Hx(await s.request({ method: `eth_chainId` }))),
-          (t = Wx({
+        ((d ||= Ux(await s.request({ method: `eth_chainId` }))),
+          (t = Gx({
             domain: c.host,
             address: u,
             statement: a,
@@ -45196,7 +45212,7 @@ var uS = {
           })),
           (n = await s.request({
             method: `personal_sign`,
-            params: [Ux(t), u],
+            params: [Wx(t), u],
           })));
       }
       try {
@@ -45216,12 +45232,12 @@ var uS = {
                   }
                 : null,
             ),
-            xform: kx,
+            xform: Ax,
           },
         );
         if (i) throw i;
         if (!r || !r.session || !r.user) {
-          let e = new pb();
+          let e = new mb();
           return this._returnResult({
             data: { user: null, session: null },
             error: e,
@@ -45248,7 +45264,7 @@ var uS = {
       else {
         let { chain: r, wallet: i, statement: a, options: o } = e,
           s;
-        if (!zb()) {
+        if (!Bb()) {
           if (typeof i != `object` || !o?.url)
             throw Error(
               `@supabase/auth-js: Both wallet and url must be specified in non-browser environments.`,
@@ -45372,7 +45388,7 @@ var uS = {
           {
             headers: this.headers,
             body: Object.assign(
-              { chain: `solana`, message: t, signature: Ib(n) },
+              { chain: `solana`, message: t, signature: Lb(n) },
               e.options?.captchaToken
                 ? {
                     gotrue_meta_security: {
@@ -45381,12 +45397,12 @@ var uS = {
                   }
                 : null,
             ),
-            xform: kx,
+            xform: Ax,
           },
         );
         if (i) throw i;
         if (!r || !r.session || !r.user) {
-          let e = new pb();
+          let e = new mb();
           return this._returnResult({
             data: { user: null, session: null },
             error: e,
@@ -45409,7 +45425,7 @@ var uS = {
     }
     async _exchangeCodeForSession(e, t) {
       let n = t?.flowId != null,
-        r = n ? rx(t?.flowId) : zb() ? rx(Hb(window.location.href)[ab]) : null;
+        r = n ? ix(t?.flowId) : Bb() ? ix(Ub(window.location.href)[ob]) : null;
       n &&
         !r &&
         this._debug(
@@ -45420,10 +45436,10 @@ var uS = {
       let { verifier: i, flowId: a } =
           n && !r
             ? { verifier: null, flowId: null }
-            : await lx(this.storage, this.storageKey, r),
+            : await ux(this.storage, this.storageKey, r),
         [o, s] = (i ?? ``).split(`/`);
       try {
-        if (!o && this.flowType === `pkce`) throw new vb();
+        if (!o && this.flowType === `pkce`) throw new yb();
         let { data: t, error: n } = await Y(
           this.fetch,
           `POST`,
@@ -45431,12 +45447,12 @@ var uS = {
           {
             headers: this.headers,
             body: { auth_code: e, code_verifier: o },
-            xform: kx,
+            xform: Ax,
           },
         );
-        if ((await ux(this.storage, this.storageKey, a), n)) throw n;
+        if ((await dx(this.storage, this.storageKey, a), n)) throw n;
         if (!t || !t.session || !t.user) {
-          let e = new pb();
+          let e = new mb();
           return this._returnResult({
             data: { user: null, session: null, redirectType: null },
             error: e,
@@ -45457,7 +45473,7 @@ var uS = {
           })
         );
       } catch (e) {
-        if ((await ux(this.storage, this.storageKey, a), J(e)))
+        if ((await dx(this.storage, this.storageKey, a), J(e)))
           return this._returnResult({
             data: { user: null, session: null, redirectType: null },
             error: e,
@@ -45487,7 +45503,7 @@ var uS = {
                 nonce: a,
                 gotrue_meta_security: { captcha_token: t?.captchaToken },
               },
-              xform: kx,
+              xform: Ax,
             },
           );
         if (s)
@@ -45496,7 +45512,7 @@ var uS = {
             error: s,
           });
         if (!o || !o.session || !o.user) {
-          let e = new pb();
+          let e = new mb();
           return this._returnResult({
             data: { user: null, session: null },
             error: e,
@@ -45568,9 +45584,9 @@ var uS = {
             error: i,
           });
         }
-        throw new mb(`You must provide either an email or phone number.`);
+        throw new hb(`You must provide either an email or phone number.`);
       } catch (e) {
-        if ((await ux(this.storage, this.storageKey, t), J(e)))
+        if ((await dx(this.storage, this.storageKey, t), J(e)))
           return this._returnResult({
             data: { user: null, session: null },
             error: e,
@@ -45593,7 +45609,7 @@ var uS = {
               gotrue_meta_security: { captcha_token: n },
             }),
             redirectTo: t,
-            xform: kx,
+            xform: Ax,
           },
         );
         if (i) throw i;
@@ -45658,17 +45674,17 @@ var uS = {
             },
           ),
           headers: this.headers,
-          xform: Mx,
+          xform: Nx,
         });
         return (
           i.data?.url &&
-            zb() &&
+            Bb() &&
             !e.options?.skipBrowserRedirect &&
             window.location.assign(i.data.url),
           this._returnResult(i)
         );
       } catch (e) {
-        if ((await ux(this.storage, this.storageKey, t), J(e)))
+        if ((await dx(this.storage, this.storageKey, t), J(e)))
           return this._returnResult({ data: null, error: e });
         throw e;
       }
@@ -45692,7 +45708,7 @@ var uS = {
             error: n,
           } = e;
           if (n) throw n;
-          if (!t) throw new db();
+          if (!t) throw new fb();
           let { error: r } = await Y(
             this.fetch,
             `GET`,
@@ -45738,7 +45754,7 @@ var uS = {
             ),
           });
           return (
-            c && (await ux(this.storage, this.storageKey, t)),
+            c && (await dx(this.storage, this.storageKey, t)),
             this._returnResult({
               data: { user: null, session: null },
               error: c,
@@ -45760,11 +45776,11 @@ var uS = {
             error: o,
           });
         }
-        throw new mb(
+        throw new hb(
           `You must provide either an email or phone number and a type`,
         );
       } catch (e) {
-        if ((await ux(this.storage, this.storageKey, t), J(e)))
+        if ((await dx(this.storage, this.storageKey, t), J(e)))
           return this._returnResult({
             data: { user: null, session: null },
             error: e,
@@ -45857,7 +45873,7 @@ var uS = {
           ));
       try {
         let e = null,
-          t = await Kb(this.storage, this.storageKey);
+          t = await qb(this.storage, this.storageKey);
         if (
           (this._debug(`#getSession()`, `session from storage`, t),
           t !== null &&
@@ -45871,7 +45887,7 @@ var uS = {
           !e)
         )
           return { data: { session: null }, error: null };
-        let n = e.expires_at ? e.expires_at * 1e3 - Date.now() < Zy : !1;
+        let n = e.expires_at ? e.expires_at * 1e3 - Date.now() < Qy : !1;
         if (
           (this._debug(
             `#__loadSession()`,
@@ -45882,8 +45898,8 @@ var uS = {
           !n)
         ) {
           if (this.userStorage) {
-            let t = await Kb(this.userStorage, this.storageKey + `-user`);
-            t?.user ? (e.user = t.user) : (e.user = xx());
+            let t = await qb(this.userStorage, this.storageKey + `-user`);
+            t?.user ? (e.user = t.user) : (e.user = Sx());
           }
           if (
             this.storage.isServer &&
@@ -45891,7 +45907,7 @@ var uS = {
             !e.user.__isUserNotAvailableProxy
           ) {
             let t = { value: this.suppressGetSessionWarning };
-            ((e.user = Sx(e.user, t)),
+            ((e.user = Cx(e.user, t)),
               t.value && (this.suppressGetSessionWarning = !0));
           }
           return { data: { session: e }, error: null };
@@ -45901,7 +45917,7 @@ var uS = {
         );
         if (i) {
           if (e.expires_at && e.expires_at * 1e3 > Date.now()) {
-            let t = await Kb(this.storage, this.storageKey);
+            let t = await qb(this.storage, this.storageKey);
             if (t && t.refresh_token === e.refresh_token)
               return this._returnResult({ data: { session: e }, error: null });
           }
@@ -45934,24 +45950,24 @@ var uS = {
           ? await Y(this.fetch, `GET`, `${this.url}/user`, {
               headers: this.headers,
               jwt: e,
-              xform: jx,
+              xform: Mx,
             })
           : await this._useSession(async (e) => {
               let { data: t, error: n } = e;
               if (n) throw n;
               return !t.session?.access_token &&
                 !this.hasCustomAuthorizationHeader
-                ? { data: { user: null }, error: new db() }
+                ? { data: { user: null }, error: new fb() }
                 : await Y(this.fetch, `GET`, `${this.url}/user`, {
                     headers: this.headers,
                     jwt: t.session?.access_token ?? void 0,
-                    xform: jx,
+                    xform: Mx,
                   });
             });
       } catch (e) {
         if (J(e))
           return (
-            fb(e) && (await this._removeSession()),
+            pb(e) && (await this._removeSession()),
             this._returnResult({ data: { user: null }, error: e })
           );
         throw e;
@@ -45974,7 +45990,7 @@ var uS = {
         return await this._useSession(async (r) => {
           let { data: i, error: a } = r;
           if (a) throw a;
-          if (!i.session) throw new db();
+          if (!i.session) throw new fb();
           let o = i.session,
             s = null,
             c = null;
@@ -45996,7 +46012,7 @@ var uS = {
                 code_challenge_method: c,
               }),
               jwt: o.access_token,
-              xform: jx,
+              xform: Mx,
             },
           );
           if (u) throw u;
@@ -46008,7 +46024,7 @@ var uS = {
           );
         });
       } catch (e) {
-        if ((await ux(this.storage, this.storageKey, n), J(e)))
+        if ((await dx(this.storage, this.storageKey, n), J(e)))
           return this._returnResult({ data: { user: null }, error: e });
         throw e;
       }
@@ -46026,12 +46042,12 @@ var uS = {
     }
     async _setSession(e) {
       try {
-        if (!e.access_token || !e.refresh_token) throw new db();
+        if (!e.access_token || !e.refresh_token) throw new fb();
         let t = Date.now() / 1e3,
           n = t,
           r = !0,
           i = null,
-          { payload: a } = Yb(e.access_token);
+          { payload: a } = Xb(e.access_token);
         if ((a.exp && ((n = a.exp), (r = n <= t)), r)) {
           let { data: t, error: n } = await this._callRefreshToken(
             e.refresh_token,
@@ -46093,7 +46109,7 @@ var uS = {
             if (r) throw r;
             e = n.session ?? void 0;
           }
-          if (!e?.refresh_token) throw new db();
+          if (!e?.refresh_token) throw new fb();
           let { data: n, error: r } = await this._callRefreshToken(
             e.refresh_token,
           );
@@ -46123,9 +46139,9 @@ var uS = {
     }
     async _getSessionFromURL(e, t) {
       try {
-        if (!zb()) throw new hb(`No browser detected.`);
+        if (!Bb()) throw new gb(`No browser detected.`);
         if (e.error || e.error_description || e.error_code)
-          throw new hb(
+          throw new gb(
             e.error_description ||
               `Error in URL with unspecified error_description`,
             {
@@ -46136,27 +46152,27 @@ var uS = {
         switch (t) {
           case `implicit`:
             if (this.flowType === `pkce`)
-              throw new _b(`Not a valid PKCE flow url.`);
+              throw new vb(`Not a valid PKCE flow url.`);
             break;
           case `pkce`:
             if (this.flowType === `implicit`)
-              throw new hb(`Not a valid implicit grant flow url.`);
+              throw new gb(`Not a valid implicit grant flow url.`);
         }
         if (t === `pkce`) {
           if (
             (this._debug(`#_initialize()`, `begin`, `is PKCE flow`, !0),
             !e.code)
           )
-            throw new _b(`No code detected.`);
+            throw new vb(`No code detected.`);
           let { data: t, error: n } = await this._exchangeCodeForSession(
             e.code,
-            { flowId: e[ab] },
+            { flowId: e[ob] },
           );
           if (n) throw n;
           let r = new URL(window.location.href);
           return (
             r.searchParams.delete(`code`),
-            r.searchParams.delete(ab),
+            r.searchParams.delete(ob),
             window.history.replaceState(window.history.state, ``, r.toString()),
             {
               data: {
@@ -46176,7 +46192,7 @@ var uS = {
           expires_at: s,
           token_type: c,
         } = e;
-        if (!i || !o || !a || !c) throw new hb(`No session defined in URL`);
+        if (!i || !o || !a || !c) throw new gb(`No session defined in URL`);
         let l = Math.round(Date.now() / 1e3),
           u = parseInt(o),
           d = l + u;
@@ -46237,10 +46253,10 @@ var uS = {
     }
     async _isPKCECallback(e) {
       if (!e.code) return !1;
-      let t = rx(e[ab]);
-      return t && (await Kb(this.storage, ax(this.storageKey, t)))
+      let t = ix(e[ob]);
+      return t && (await qb(this.storage, ox(this.storageKey, t)))
         ? !0
-        : !!(await Kb(this.storage, `${this.storageKey}-code-verifier`));
+        : !!(await qb(this.storage, `${this.storageKey}-code-verifier`));
     }
     async signOut(e = { scope: `global` }) {
       return (
@@ -46259,16 +46275,16 @@ var uS = {
             await this._removeSession();
           },
           { data: r, error: i } = t;
-        if (i && !fb(i)) return this._returnResult({ error: i });
+        if (i && !pb(i)) return this._returnResult({ error: i });
         let a = r.session?.access_token;
         if (a) {
           let { error: t } = await this.admin.signOut(a, e);
           if (
             t &&
             !(
-              (cb(t) &&
+              (lb(t) &&
                 (t.status === 404 || t.status === 401 || t.status === 403)) ||
-              fb(t)
+              pb(t)
             )
           )
             return (
@@ -46283,7 +46299,7 @@ var uS = {
       });
     }
     onAuthStateChange(e) {
-      let t = Rb(),
+      let t = zb(),
         n = {
           id: t,
           callback: e,
@@ -46327,9 +46343,9 @@ var uS = {
             .get(e)
             ?.callback(`INITIAL_SESSION`, null),
             this._debug(`INITIAL_SESSION`, `callback id`, e, `error`, t),
-            fb(t) ||
-            bb(t) ||
-            (cb(t) &&
+            pb(t) ||
+            xb(t) ||
+            (lb(t) &&
               (t.code === `refresh_token_not_found` ||
                 t.code === `refresh_token_already_used` ||
                 t.code === `session_expired`))
@@ -46356,7 +46372,7 @@ var uS = {
           redirectTo: this._maybeAppendFlowIdToRedirect(t.redirectTo, i),
         });
       } catch (e) {
-        if ((await ux(this.storage, this.storageKey, i), J(e)))
+        if ((await dx(this.storage, this.storageKey, i), J(e)))
           return this._returnResult({ data: null, error: e });
         throw e;
       }
@@ -46405,7 +46421,7 @@ var uS = {
         });
         if (r) throw r;
         return (
-          zb() &&
+          Bb() &&
             !e.options?.skipBrowserRedirect &&
             window.location.assign(n?.url),
           this._returnResult({
@@ -46452,7 +46468,7 @@ var uS = {
                   link_identity: !0,
                   gotrue_meta_security: { captcha_token: i?.captchaToken },
                 },
-                xform: kx,
+                xform: Ax,
               },
             );
           return u
@@ -46463,14 +46479,14 @@ var uS = {
             : !l || !l.session || !l.user
               ? this._returnResult({
                   data: { user: null, session: null },
-                  error: new pb(),
+                  error: new mb(),
                 })
               : (l.session &&
                   (await this._saveSession(l.session),
                   await this._notifyAllSubscribers(`USER_UPDATED`, l.session)),
                 this._returnResult({ data: l, error: u }));
         } catch (e) {
-          if ((await ux(this.storage, this.storageKey, null), J(e)))
+          if ((await dx(this.storage, this.storageKey, null), J(e)))
             return this._returnResult({
               data: { user: null, session: null },
               error: e,
@@ -46501,20 +46517,20 @@ var uS = {
       this._debug(t, `begin`);
       try {
         let n = Date.now();
-        return await Zb(
+        return await Qb(
           async (n) => (
-            n > 0 && (await Xb(200 * 2 ** (n - 1))),
+            n > 0 && (await Zb(200 * 2 ** (n - 1))),
             this._debug(t, `refreshing attempt`, n),
             await Y(
               this.fetch,
               `POST`,
               `${this.url}/token?grant_type=refresh_token`,
-              { body: { refresh_token: e }, headers: this.headers, xform: kx },
+              { body: { refresh_token: e }, headers: this.headers, xform: Ax },
             )
           ),
           (e, t) => {
             let r = 200 * 2 ** e;
-            return t && bb(t) && Date.now() + r - n < 3e4;
+            return t && xb(t) && Date.now() + r - n < 3e4;
           },
         );
       } catch (e) {
@@ -46557,7 +46573,7 @@ var uS = {
           `url`,
           n,
         ),
-        zb() && !t.skipBrowserRedirect && window.location.assign(n),
+        Bb() && !t.skipBrowserRedirect && window.location.assign(n),
         { data: { provider: e, url: n, flowId: r }, error: null }
       );
     }
@@ -46565,22 +46581,22 @@ var uS = {
       let e = `#_recoverAndRefresh()`;
       this._debug(e, `begin`);
       try {
-        let t = await Kb(this.storage, this.storageKey);
+        let t = await qb(this.storage, this.storageKey);
         if (t && this.userStorage) {
-          let e = await Kb(this.userStorage, this.storageKey + `-user`);
+          let e = await qb(this.userStorage, this.storageKey + `-user`);
           (!this.storage.isServer &&
             Object.is(this.storage, this.userStorage) &&
             !e &&
             ((e = { user: t.user }),
-            await Gb(this.userStorage, this.storageKey + `-user`, e)),
-            (t.user = e?.user ?? xx()));
+            await Kb(this.userStorage, this.storageKey + `-user`, e)),
+            (t.user = e?.user ?? Sx()));
         } else if (t && !t.user && !t.user) {
-          let e = await Kb(this.storage, this.storageKey + `-user`);
+          let e = await qb(this.storage, this.storageKey + `-user`);
           e && e?.user
             ? ((t.user = e.user),
-              await qb(this.storage, this.storageKey + `-user`),
-              await Gb(this.storage, this.storageKey, t))
-            : (t.user = xx());
+              await Jb(this.storage, this.storageKey + `-user`),
+              await Kb(this.storage, this.storageKey, t))
+            : (t.user = Sx());
         }
         if (
           (this._debug(e, `session from storage`, t), !this._isValidSession(t))
@@ -46589,18 +46605,18 @@ var uS = {
             t !== null && (await this._removeSession()));
           return;
         }
-        let n = (t.expires_at ?? 1 / 0) * 1e3 - Date.now() < Zy;
+        let n = (t.expires_at ?? 1 / 0) * 1e3 - Date.now() < Qy;
         if (
           (this._debug(
             e,
-            `session has${n ? `` : ` not`} expired with margin of ${Zy}s`,
+            `session has${n ? `` : ` not`} expired with margin of ${Qy}s`,
           ),
           n)
         ) {
           if (this.autoRefreshToken && t.refresh_token) {
             let { error: n } = await this._callRefreshToken(t.refresh_token);
             n &&
-              (Sb(n)
+              (Cb(n)
                 ? this._debug(e, `refresh discarded by commit guard`, n)
                 : this._debug(e, `refresh failed`, n));
           }
@@ -46626,7 +46642,7 @@ var uS = {
         else await this._notifyAllSubscribers(`SIGNED_IN`, t);
       } catch (t) {
         (this._debug(e, `error`, t),
-          bb(t) ? console.warn(t) : console.error(t));
+          xb(t) ? console.warn(t) : console.error(t));
         return;
       } finally {
         this._debug(e, `end`);
@@ -46634,7 +46650,7 @@ var uS = {
     }
     async _callRefreshToken(e) {
       var t, n;
-      if (!e) throw new db();
+      if (!e) throw new fb();
       if (this.refreshingDeferred) return this.refreshingDeferred.promise;
       if (
         this.lastRefreshFailure &&
@@ -46651,19 +46667,19 @@ var uS = {
       let r = `#_callRefreshToken()`;
       this._debug(r, `begin`);
       try {
-        this.refreshingDeferred = new Jb();
-        let t = await Kb(this.storage, this.storageKey),
+        this.refreshingDeferred = new Yb();
+        let t = await qb(this.storage, this.storageKey),
           { data: n, error: i } = await this._refreshAccessToken(e);
         if (i) throw i;
-        if (!n.session) throw new db();
-        let a = await Kb(this.storage, this.storageKey);
+        if (!n.session) throw new fb();
+        let a = await qb(this.storage, this.storageKey);
         if (t !== null && (a === null || a.refresh_token !== t.refresh_token)) {
           this._debug(
             r,
             `commit guard: storage changed since refresh started, discarding rotated tokens`,
             { startedWith: `present`, nowHolds: a ? `replaced` : `cleared` },
           );
-          let e = { data: null, error: new xb() };
+          let e = { data: null, error: new Sb() };
           return (this.refreshingDeferred.resolve(e), e);
         }
         let o = this._sessionRemovalEpoch;
@@ -46674,10 +46690,10 @@ var uS = {
             r,
             `commit guard (post-save): _removeSession ran during _saveSession, undoing write`,
           ),
-            await qb(this.storage, this.storageKey),
+            await Jb(this.storage, this.storageKey),
             this.userStorage &&
-              (await qb(this.userStorage, this.storageKey + `-user`)));
-          let e = { data: null, error: new xb() };
+              (await Jb(this.userStorage, this.storageKey + `-user`)));
+          let e = { data: null, error: new Sb() };
           return (this.refreshingDeferred.resolve(e), e);
         }
         await this._notifyAllSubscribers(`TOKEN_REFRESHED`, n.session);
@@ -46690,8 +46706,8 @@ var uS = {
       } catch (i) {
         if ((this._debug(r, `error`, i), J(i))) {
           let n = { data: null, error: i };
-          if (!bb(i)) {
-            let e = await Kb(this.storage, this.storageKey);
+          if (!xb(i)) {
+            let e = await qb(this.storage, this.storageKey);
             e?.expires_at && e.expires_at * 1e3 > Date.now()
               ? this._debug(
                   r,
@@ -46703,7 +46719,7 @@ var uS = {
             (this.lastRefreshFailure = {
               refreshToken: e,
               result: n,
-              expiresAt: Date.now() + Qy,
+              expiresAt: Date.now() + $y,
             }),
             (t = this.refreshingDeferred) == null || t.resolve(n),
             n
@@ -46753,16 +46769,16 @@ var uS = {
       if (this.userStorage) {
         !n &&
           t.user &&
-          (await Gb(this.userStorage, this.storageKey + `-user`, {
+          (await Kb(this.userStorage, this.storageKey + `-user`, {
             user: t.user,
           }));
         let e = Object.assign({}, t);
         delete e.user;
-        let r = Cx(e);
-        await Gb(this.storage, this.storageKey, r);
+        let r = wx(e);
+        await Kb(this.storage, this.storageKey, r);
       } else {
-        let e = Cx(t);
-        await Gb(this.storage, this.storageKey, e);
+        let e = wx(t);
+        await Kb(this.storage, this.storageKey, e);
       }
     }
     async _removeSession() {
@@ -46770,11 +46786,11 @@ var uS = {
         this._debug(`#_removeSession()`),
         (this.lastRefreshFailure = null),
         (this.suppressGetSessionWarning = !1),
-        await qb(this.storage, this.storageKey),
-        await dx(this.storage, this.storageKey),
-        await qb(this.storage, this.storageKey + `-user`),
+        await Jb(this.storage, this.storageKey),
+        await fx(this.storage, this.storageKey),
+        await Jb(this.storage, this.storageKey + `-user`),
         this.userStorage &&
-          (await qb(this.userStorage, this.storageKey + `-user`)),
+          (await Jb(this.userStorage, this.storageKey + `-user`)),
         await this._notifyAllSubscribers(`SIGNED_OUT`, null));
     }
     _removeVisibilityChangedCallback() {
@@ -46783,7 +46799,7 @@ var uS = {
       this.visibilityChangedCallback = null;
       try {
         e &&
-          zb() &&
+          Bb() &&
           window != null &&
           window.removeEventListener &&
           window.removeEventListener(`visibilitychange`, e);
@@ -46793,7 +46809,7 @@ var uS = {
     }
     async _startAutoRefresh() {
       (await this._stopAutoRefresh(), this._debug(`#_startAutoRefresh()`));
-      let e = setInterval(() => this._autoRefreshTokenTick(), Xy);
+      let e = setInterval(() => this._autoRefreshTokenTick(), Zy);
       ((this.autoRefreshTicker = e),
         e && typeof e == `object` && typeof e.unref == `function`
           ? e.unref()
@@ -46848,10 +46864,10 @@ var uS = {
                     this._debug(`#_autoRefreshTokenTick()`, `no session`);
                     return;
                   }
-                  let r = Math.floor((n.expires_at * 1e3 - e) / Xy);
+                  let r = Math.floor((n.expires_at * 1e3 - e) / Zy);
                   (this._debug(
                     `#_autoRefreshTokenTick()`,
-                    `access token expires in ${r} ticks, a tick lasts ${Xy}ms, refresh threshold is 3 ticks`,
+                    `access token expires in ${r} ticks, a tick lasts ${Zy}ms, refresh threshold is 3 ticks`,
                   ),
                     r <= 3 && (await this._callRefreshToken(n.refresh_token)));
                 });
@@ -46866,7 +46882,7 @@ var uS = {
             }
           });
         } catch (e) {
-          if (e instanceof zx)
+          if (e instanceof Bx)
             this._debug(`auto refresh token tick lock not available`);
           else throw e;
         }
@@ -46890,10 +46906,10 @@ var uS = {
               this._debug(`#_autoRefreshTokenTick()`, `no session`);
               return;
             }
-            let r = Math.floor((n.expires_at * 1e3 - e) / Xy);
+            let r = Math.floor((n.expires_at * 1e3 - e) / Zy);
             (this._debug(
               `#_autoRefreshTokenTick()`,
-              `access token expires in ${r} ticks, a tick lasts ${Xy}ms, refresh threshold is 3 ticks`,
+              `access token expires in ${r} ticks, a tick lasts ${Zy}ms, refresh threshold is 3 ticks`,
             ),
               r <= 3 && (await this._callRefreshToken(n.refresh_token)));
           });
@@ -46910,7 +46926,7 @@ var uS = {
     async _handleVisibilityChange() {
       if (
         (this._debug(`#_handleVisibilityChange()`),
-        !zb() || !(window != null && window.addEventListener))
+        !Bb() || !(window != null && window.addEventListener))
       )
         return (this.autoRefreshToken && this.startAutoRefresh(), !1);
       try {
@@ -46998,10 +47014,10 @@ var uS = {
     _maybeAppendFlowIdToRedirect(e, t) {
       return !e || !t || !this.experimental.appendPkceFlowIdToRedirects
         ? (e ?? void 0)
-        : fx(e, t);
+        : px(e, t);
     }
     async _getCodeChallengeAndMethod(e = !1) {
-      return px(this.storage, this.storageKey, e, (e) =>
+      return mx(this.storage, this.storageKey, e, (e) =>
         this._debug(
           `#_getCodeChallengeAndMethod()`,
           `evicted oldest pending PKCE verifier slot`,
@@ -47072,8 +47088,8 @@ var uS = {
                       webauthn: Object.assign(Object.assign({}, e.webauthn), {
                         credential_response:
                           e.webauthn.type === `create`
-                            ? Qx(e.webauthn.credential_response)
-                            : $x(e.webauthn.credential_response),
+                            ? $x(e.webauthn.credential_response)
+                            : eS(e.webauthn.credential_response),
                       }),
                     }
                   : { code: e.code },
@@ -47131,7 +47147,7 @@ var uS = {
                       credential_options: Object.assign(
                         Object.assign({}, a.webauthn.credential_options),
                         {
-                          publicKey: Xx(
+                          publicKey: Zx(
                             a.webauthn.credential_options.publicKey,
                           ),
                         },
@@ -47147,7 +47163,7 @@ var uS = {
                       credential_options: Object.assign(
                         Object.assign({}, a.webauthn.credential_options),
                         {
-                          publicKey: Zx(
+                          publicKey: Qx(
                             a.webauthn.credential_options.publicKey,
                           ),
                         },
@@ -47193,7 +47209,7 @@ var uS = {
     async _getAuthenticatorAssuranceLevel(e) {
       if (e)
         try {
-          let { payload: t } = Yb(e),
+          let { payload: t } = Xb(e),
             n = null;
           t.aal && (n = t.aal);
           let r = n,
@@ -47231,7 +47247,7 @@ var uS = {
           },
           error: null,
         };
-      let { payload: r } = Yb(t.access_token),
+      let { payload: r } = Xb(t.access_token),
         i = null;
       r.aal && (i = r.aal);
       let a = i;
@@ -47267,7 +47283,7 @@ var uS = {
                     xform: (e) => ({ data: e, error: null }),
                   },
                 )
-              : this._returnResult({ data: null, error: new db() });
+              : this._returnResult({ data: null, error: new fb() });
         });
       } catch (e) {
         if (J(e)) return this._returnResult({ data: null, error: e });
@@ -47282,7 +47298,7 @@ var uS = {
             error: i,
           } = n;
           if (i) return this._returnResult({ data: null, error: i });
-          if (!r) return this._returnResult({ data: null, error: new db() });
+          if (!r) return this._returnResult({ data: null, error: new fb() });
           let a = await Y(
             this.fetch,
             `POST`,
@@ -47297,7 +47313,7 @@ var uS = {
           return (
             a.data &&
               a.data.redirect_url &&
-              zb() &&
+              Bb() &&
               !t?.skipBrowserRedirect &&
               window.location.assign(a.data.redirect_url),
             a
@@ -47316,7 +47332,7 @@ var uS = {
             error: i,
           } = n;
           if (i) return this._returnResult({ data: null, error: i });
-          if (!r) return this._returnResult({ data: null, error: new db() });
+          if (!r) return this._returnResult({ data: null, error: new fb() });
           let a = await Y(
             this.fetch,
             `POST`,
@@ -47331,7 +47347,7 @@ var uS = {
           return (
             a.data &&
               a.data.redirect_url &&
-              zb() &&
+              Bb() &&
               !t?.skipBrowserRedirect &&
               window.location.assign(a.data.redirect_url),
             a
@@ -47357,7 +47373,7 @@ var uS = {
                   jwt: t.access_token,
                   xform: (e) => ({ data: e, error: null }),
                 })
-              : this._returnResult({ data: null, error: new db() });
+              : this._returnResult({ data: null, error: new fb() });
         });
       } catch (e) {
         if (J(e)) return this._returnResult({ data: null, error: e });
@@ -47386,7 +47402,7 @@ var uS = {
                   },
                 ),
                 { data: {}, error: null })
-              : this._returnResult({ data: null, error: new db() });
+              : this._returnResult({ data: null, error: new fb() });
         });
       } catch (e) {
         if (J(e)) return this._returnResult({ data: null, error: e });
@@ -47432,12 +47448,12 @@ var uS = {
           payload: i,
           signature: a,
           raw: { header: o, payload: s },
-        } = Yb(n);
+        } = Xb(n);
         if (!t?.allowExpired)
           try {
-            gx(i.exp);
+            _x(i.exp);
           } catch (e) {
-            throw new wb(
+            throw new Tb(
               e instanceof Error ? e.message : `JWT validation failed`,
             );
           }
@@ -47453,10 +47469,10 @@ var uS = {
           if (e) throw e;
           return { data: { claims: i, header: r, signature: a }, error: null };
         }
-        let l = _x(r.alg),
+        let l = vx(r.alg),
           u = await crypto.subtle.importKey(`jwk`, c, l, !0, [`verify`]);
-        if (!(await crypto.subtle.verify(l, u, a, Fb(`${o}.${s}`))))
-          throw new wb(`Invalid JWT signature`);
+        if (!(await crypto.subtle.verify(l, u, a, Ib(`${o}.${s}`))))
+          throw new Tb(`Invalid JWT signature`);
         return { data: { claims: i, header: r, signature: a }, error: null };
       } catch (e) {
         if (J(e)) return this._returnResult({ data: null, error: e });
@@ -47464,27 +47480,27 @@ var uS = {
       }
     }
     async signInWithPasskey(e) {
-      bx(this.experimental);
+      xx(this.experimental);
       try {
-        if (!tS())
+        if (!nS())
           return this._returnResult({
             data: null,
-            error: new lb(`Browser does not support WebAuthn`, null),
+            error: new ub(`Browser does not support WebAuthn`, null),
           });
         let { data: t, error: n } = await this._startPasskeyAuthentication({
           options: { captchaToken: e?.options?.captchaToken },
         });
         if (n || !t) return this._returnResult({ data: null, error: n });
-        let { data: r, error: i } = await rS({
-          publicKey: Zx(t.options),
-          signal: e?.options?.signal ?? Yx.createNewAbortSignal(),
+        let { data: r, error: i } = await iS({
+          publicKey: Qx(t.options),
+          signal: e?.options?.signal ?? Xx.createNewAbortSignal(),
         });
         if (i || !r)
           return this._returnResult({
             data: null,
-            error: i ?? new lb(`WebAuthn ceremony failed`, null),
+            error: i ?? new ub(`WebAuthn ceremony failed`, null),
           });
-        let a = $x(r);
+        let a = eS(r);
         return this._verifyPasskeyAuthentication({
           challengeId: t.challenge_id,
           credential: a,
@@ -47495,25 +47511,25 @@ var uS = {
       }
     }
     async registerPasskey(e) {
-      bx(this.experimental);
+      xx(this.experimental);
       try {
-        if (!tS())
+        if (!nS())
           return this._returnResult({
             data: null,
-            error: new lb(`Browser does not support WebAuthn`, null),
+            error: new ub(`Browser does not support WebAuthn`, null),
           });
         let { data: t, error: n } = await this._startPasskeyRegistration();
         if (n || !t) return this._returnResult({ data: null, error: n });
-        let { data: r, error: i } = await nS({
-          publicKey: Xx(t.options),
-          signal: e?.options?.signal ?? Yx.createNewAbortSignal(),
+        let { data: r, error: i } = await rS({
+          publicKey: Zx(t.options),
+          signal: e?.options?.signal ?? Xx.createNewAbortSignal(),
         });
         if (i || !r)
           return this._returnResult({
             data: null,
-            error: i ?? new lb(`WebAuthn ceremony failed`, null),
+            error: i ?? new ub(`WebAuthn ceremony failed`, null),
           });
-        let a = Qx(r);
+        let a = $x(r);
         return this._verifyPasskeyRegistration({
           challengeId: t.challenge_id,
           credential: a,
@@ -47524,7 +47540,7 @@ var uS = {
       }
     }
     async _startPasskeyRegistration() {
-      bx(this.experimental);
+      xx(this.experimental);
       try {
         return await this._useSession(async (e) => {
           let {
@@ -47532,7 +47548,7 @@ var uS = {
             error: n,
           } = e;
           if (n) return this._returnResult({ data: null, error: n });
-          if (!t) return this._returnResult({ data: null, error: new db() });
+          if (!t) return this._returnResult({ data: null, error: new fb() });
           let { data: r, error: i } = await Y(
             this.fetch,
             `POST`,
@@ -47549,7 +47565,7 @@ var uS = {
       }
     }
     async _verifyPasskeyRegistration(e) {
-      bx(this.experimental);
+      xx(this.experimental);
       try {
         return await this._useSession(async (t) => {
           let {
@@ -47557,7 +47573,7 @@ var uS = {
             error: r,
           } = t;
           if (r) return this._returnResult({ data: null, error: r });
-          if (!n) return this._returnResult({ data: null, error: new db() });
+          if (!n) return this._returnResult({ data: null, error: new fb() });
           let { data: i, error: a } = await Y(
             this.fetch,
             `POST`,
@@ -47578,7 +47594,7 @@ var uS = {
       }
     }
     async _startPasskeyAuthentication(e) {
-      bx(this.experimental);
+      xx(this.experimental);
       try {
         let { data: t, error: n } = await Y(
           this.fetch,
@@ -47600,7 +47616,7 @@ var uS = {
       }
     }
     async _verifyPasskeyAuthentication(e) {
-      bx(this.experimental);
+      xx(this.experimental);
       try {
         let { data: t, error: n } = await Y(
           this.fetch,
@@ -47609,7 +47625,7 @@ var uS = {
           {
             headers: this.headers,
             body: { challenge_id: e.challengeId, credential: e.credential },
-            xform: kx,
+            xform: Ax,
           },
         );
         return n
@@ -47624,7 +47640,7 @@ var uS = {
       }
     }
     async _listPasskeys() {
-      bx(this.experimental);
+      xx(this.experimental);
       try {
         return await this._useSession(async (e) => {
           let {
@@ -47632,7 +47648,7 @@ var uS = {
             error: n,
           } = e;
           if (n) return this._returnResult({ data: null, error: n });
-          if (!t) return this._returnResult({ data: null, error: new db() });
+          if (!t) return this._returnResult({ data: null, error: new fb() });
           let { data: r, error: i } = await Y(
             this.fetch,
             `GET`,
@@ -47653,7 +47669,7 @@ var uS = {
       }
     }
     async _updatePasskey(e) {
-      bx(this.experimental);
+      xx(this.experimental);
       try {
         return await this._useSession(async (t) => {
           let {
@@ -47661,7 +47677,7 @@ var uS = {
             error: r,
           } = t;
           if (r) return this._returnResult({ data: null, error: r });
-          if (!n) return this._returnResult({ data: null, error: new db() });
+          if (!n) return this._returnResult({ data: null, error: new fb() });
           let { data: i, error: a } = await Y(
             this.fetch,
             `PATCH`,
@@ -47682,7 +47698,7 @@ var uS = {
       }
     }
     async _deletePasskey(e) {
-      bx(this.experimental);
+      xx(this.experimental);
       try {
         return await this._useSession(async (t) => {
           let {
@@ -47690,7 +47706,7 @@ var uS = {
             error: r,
           } = t;
           if (r) return this._returnResult({ data: null, error: r });
-          if (!n) return this._returnResult({ data: null, error: new db() });
+          if (!n) return this._returnResult({ data: null, error: new fb() });
           let { error: i } = await Y(
             this.fetch,
             `DELETE`,
@@ -47707,36 +47723,36 @@ var uS = {
       }
     }
   };
-fS.nextInstanceID = {};
-var pS = fS,
-  mS = `2.112.3`,
-  hS = ``,
-  gS;
-if (typeof Deno < `u`) ((hS = `deno`), (gS = Deno.version?.deno));
-else if (typeof document < `u`) hS = `web`;
+pS.nextInstanceID = {};
+var mS = pS,
+  hS = `2.112.3`,
+  gS = ``,
+  _S;
+if (typeof Deno < `u`) ((gS = `deno`), (_S = Deno.version?.deno));
+else if (typeof document < `u`) gS = `web`;
 else if (typeof navigator < `u` && navigator.product === `ReactNative`)
-  hS = `react-native`;
+  gS = `react-native`;
 else {
-  var _S;
-  hS = `node`;
+  var vS;
+  gS = `node`;
   let e = globalThis.process;
-  gS = e == null || (_S = e.version) == null ? void 0 : _S.replace(/^v/, ``);
+  _S = e == null || (vS = e.version) == null ? void 0 : vS.replace(/^v/, ``);
 }
-var vS = [`runtime=${hS}`];
-gS && vS.push(`runtime-version=${gS}`);
-var yS = {
-    headers: { "X-Client-Info": `supabase-js/${mS}; ${vS.join(`; `)}` },
+var yS = [`runtime=${gS}`];
+_S && yS.push(`runtime-version=${_S}`);
+var bS = {
+    headers: { "X-Client-Info": `supabase-js/${hS}; ${yS.join(`; `)}` },
   },
-  bS = { schema: `public` },
-  xS = {
+  xS = { schema: `public` },
+  SS = {
     autoRefreshToken: !0,
     persistSession: !0,
     detectSessionInUrl: !0,
     flowType: `implicit`,
   },
-  SS = {},
-  CS = { enabled: !1, respectSamplingDecision: !0 };
-function wS(e) {
+  CS = {},
+  wS = { enabled: !1, respectSamplingDecision: !0 };
+function TS(e) {
   if (!e || typeof e != `string`) return null;
   let t = e.split(`-`);
   if (t.length !== 4) return null;
@@ -47759,7 +47775,7 @@ function wS(e) {
         isSampled: (parseInt(a, 16) & 1) == 1,
       };
 }
-function TS(e, t) {
+function ES(e, t) {
   if (!e || !t || t.length === 0) return !1;
   let n;
   if (e instanceof URL) n = e;
@@ -47772,7 +47788,7 @@ function TS(e, t) {
   for (let e of t)
     try {
       if (typeof e == `string`) {
-        if (ES(n.hostname, e)) return !0;
+        if (DS(n.hostname, e)) return !0;
       } else if (e instanceof RegExp) {
         if (e.test(n.hostname)) return !0;
       } else if (typeof e == `function` && e(n)) return !0;
@@ -47781,7 +47797,7 @@ function TS(e, t) {
     }
   return !1;
 }
-function ES(e, t) {
+function DS(e, t) {
   if (t === e) return !0;
   if (t.startsWith(`*.`)) {
     let n = t.slice(2);
@@ -47789,7 +47805,7 @@ function ES(e, t) {
   }
   return !1;
 }
-function DS(e) {
+function OS(e) {
   let t = [];
   try {
     let n = new URL(e);
@@ -47801,10 +47817,10 @@ function DS(e) {
     t
   );
 }
-function OS(e) {
+function kS(e) {
   "@babel/helpers - typeof";
   return (
-    (OS =
+    (kS =
       typeof Symbol == `function` && typeof Symbol.iterator == `symbol`
         ? function (e) {
             return typeof e;
@@ -47817,26 +47833,26 @@ function OS(e) {
               ? `symbol`
               : typeof e;
           }),
-    OS(e)
+    kS(e)
   );
 }
-function kS(e, t) {
-  if (OS(e) != `object` || !e) return e;
+function AS(e, t) {
+  if (kS(e) != `object` || !e) return e;
   var n = e[Symbol.toPrimitive];
   if (n !== void 0) {
     var r = n.call(e, t || `default`);
-    if (OS(r) != `object`) return r;
+    if (kS(r) != `object`) return r;
     throw TypeError(`@@toPrimitive must return a primitive value.`);
   }
   return (t === `string` ? String : Number)(e);
 }
-function AS(e) {
-  var t = kS(e, `string`);
-  return OS(t) == `symbol` ? t : t + ``;
+function jS(e) {
+  var t = AS(e, `string`);
+  return kS(t) == `symbol` ? t : t + ``;
 }
-function jS(e, t, n) {
+function MS(e, t, n) {
   return (
-    (t = AS(t)) in e
+    (t = jS(t)) in e
       ? Object.defineProperty(e, t, {
           value: n,
           enumerable: !0,
@@ -47847,7 +47863,7 @@ function jS(e, t, n) {
     e
   );
 }
-function MS(e, t) {
+function NS(e, t) {
   var n = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var r = Object.getOwnPropertySymbols(e);
@@ -47859,42 +47875,42 @@ function MS(e, t) {
   }
   return n;
 }
-function NS(e) {
+function PS(e) {
   for (var t = 1; t < arguments.length; t++) {
     var n = arguments[t] == null ? {} : arguments[t];
     t % 2
-      ? MS(Object(n), !0).forEach(function (t) {
-          jS(e, t, n[t]);
+      ? NS(Object(n), !0).forEach(function (t) {
+          MS(e, t, n[t]);
         })
       : Object.getOwnPropertyDescriptors
         ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(n))
-        : MS(Object(n)).forEach(function (t) {
+        : NS(Object(n)).forEach(function (t) {
             Object.defineProperty(e, t, Object.getOwnPropertyDescriptor(n, t));
           });
   }
   return e;
 }
-var PS = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
-  FS = () => Headers,
-  IS = (e) => e.startsWith(`sb_publishable_`) || e.startsWith(`sb_secret_`),
-  LS = `sb_temp_`,
-  RS = new Set(),
-  zS = (e) => {
-    if (!e.startsWith(`sb_`) || IS(e) || e.startsWith(LS)) return;
+var FS = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
+  IS = () => Headers,
+  LS = (e) => e.startsWith(`sb_publishable_`) || e.startsWith(`sb_secret_`),
+  RS = `sb_temp_`,
+  zS = new Set(),
+  BS = (e) => {
+    if (!e.startsWith(`sb_`) || LS(e) || e.startsWith(RS)) return;
     let t = e.match(/^sb_[a-zA-Z0-9]+_/)?.[0] ?? `unknown`;
-    RS.has(t) ||
-      (RS.add(t),
+    zS.has(t) ||
+      (zS.add(t),
       console.warn(
         `@supabase/supabase-js: Unrecognized Supabase API key format. The client will proceed and send this key as-is; if you see authentication errors you may need to upgrade @supabase/supabase-js to a version that recognizes this key type.`,
       ));
   },
-  BS = (e, t, n, r, i, a) => {
-    let o = PS(r),
-      s = FS(),
+  VS = (e, t, n, r, i, a) => {
+    let o = FS(r),
+      s = IS(),
       c = i?.enabled === !0,
       l = i?.respectSamplingDecision !== !1,
-      u = c ? DS(t) : null,
-      d = !(a?.omitApiKeyAsBearer && IS(e));
+      u = c ? OS(t) : null,
+      d = !(a?.omitApiKeyAsBearer && LS(e));
     return async (t, r) => {
       let i = await n(),
         a = new s(r?.headers);
@@ -47903,7 +47919,7 @@ var PS = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
         t && a.set(`Authorization`, `Bearer ${t}`);
       }
       if (u) {
-        let e = US(t, u, l);
+        let e = WS(t, u, l);
         e &&
           (e.traceparent &&
             !a.has(`traceparent`) &&
@@ -47913,28 +47929,28 @@ var PS = (e) => (e ? (...t) => e(...t) : (...e) => fetch(...e)),
             a.set(`tracestate`, e.tracestate),
           e.baggage && !a.has(`baggage`) && a.set(`baggage`, e.baggage));
       }
-      return o(t, NS(NS({}, r), {}, { headers: a }));
+      return o(t, PS(PS({}, r), {}, { headers: a }));
     };
   },
-  VS = !1,
-  HS = !1;
-function US(e, t, n) {
-  let r = t_();
+  HS = !1,
+  US = !1;
+function WS(e, t, n) {
+  let r = n_();
   if (!r)
     return (
-      VS ||
-        ((VS = !0),
+      HS ||
+        ((HS = !0),
         console.warn(
           "@supabase/supabase-js: tracePropagation is enabled but the tracing runtime is not loaded, so trace headers will not be attached. Add `import '@supabase/supabase-js/tracing'` at your application entry point (requires the OpenTelemetry API package to be installed). The CDN/UMD build does not support trace propagation.",
         )),
       null
     );
-  if (!TS(typeof e == `string` || e instanceof URL ? e : e.url, t)) return null;
+  if (!ES(typeof e == `string` || e instanceof URL ? e : e.url, t)) return null;
   let i = r();
   if (!i || !i.traceparent) {
     var a;
-    if (i != null && (a = i.carrierKeys) != null && a.length && !HS) {
-      HS = !0;
+    if (i != null && (a = i.carrierKeys) != null && a.length && !US) {
+      US = !0;
       let e = i.carrierKeys.includes(`sentry-trace`)
         ? " Sentry detected: set `propagateTraceparent: true` in Sentry.init() to emit it."
         : ` Configure your tracing SDK to emit W3C trace context on outgoing requests.`;
@@ -47946,31 +47962,31 @@ function US(e, t, n) {
     return null;
   }
   if (n) {
-    let e = wS(i.traceparent);
+    let e = TS(i.traceparent);
     if (e && !e.isSampled) return { traceparent: i.traceparent };
   }
   return i;
 }
-function WS(e) {
+function GS(e) {
   return typeof e == `boolean` ? { enabled: e } : e;
 }
-function GS(e) {
+function KS(e) {
   return e.endsWith(`/`) ? e : e + `/`;
 }
-function KS(e, t) {
+function qS(e, t) {
   let { db: n, auth: r, realtime: i, global: a } = e,
     { db: o, auth: s, realtime: c, global: l } = t,
-    u = WS(e.tracePropagation),
-    d = WS(t.tracePropagation),
+    u = GS(e.tracePropagation),
+    d = GS(t.tracePropagation),
     f = {
-      db: NS(NS({}, o), n),
-      auth: NS(NS({}, s), r),
-      realtime: NS(NS({}, c), i),
+      db: PS(PS({}, o), n),
+      auth: PS(PS({}, s), r),
+      realtime: PS(PS({}, c), i),
       storage: {},
-      global: NS(
-        NS(NS({}, l), a),
+      global: PS(
+        PS(PS({}, l), a),
         {},
-        { headers: NS(NS({}, l?.headers ?? {}), a?.headers ?? {}) },
+        { headers: PS(PS({}, l?.headers ?? {}), a?.headers ?? {}) },
       ),
       tracePropagation: {
         enabled: u?.enabled ?? d?.enabled ?? !1,
@@ -47984,28 +48000,28 @@ function KS(e, t) {
     f
   );
 }
-function qS(e) {
+function JS(e) {
   let t = e?.trim();
   if (!t) throw Error(`supabaseUrl is required.`);
   if (!t.match(/^https?:\/\//i))
     throw Error(`Invalid supabaseUrl: Must be a valid HTTP or HTTPS URL.`);
   try {
-    return new URL(GS(t));
+    return new URL(KS(t));
   } catch {
     throw Error(`Invalid supabaseUrl: Provided URL is malformed.`);
   }
 }
-var JS = class extends pS {
+var YS = class extends mS {
     constructor(e) {
       super(e);
     }
   },
-  YS = class {
+  XS = class {
     constructor(e, t, n) {
       ((this.supabaseUrl = e), (this.supabaseKey = t));
-      let r = qS(e);
+      let r = JS(e);
       if (!t) throw Error(`supabaseKey is required.`);
-      (zS(t),
+      (BS(t),
         (this.realtimeUrl = new URL(`realtime/v1`, r)),
         (this.realtimeUrl.protocol = this.realtimeUrl.protocol.replace(
           `http`,
@@ -48016,13 +48032,13 @@ var JS = class extends pS {
         (this.functionsUrl = new URL(`functions/v1`, r)));
       let i = `sb-${r.hostname.split(`.`)[0]}-auth-token`,
         a = {
-          db: bS,
-          realtime: SS,
-          auth: NS(NS({}, xS), {}, { storageKey: i }),
-          global: yS,
-          tracePropagation: CS,
+          db: xS,
+          realtime: CS,
+          auth: PS(PS({}, SS), {}, { storageKey: i }),
+          global: bS,
+          tracePropagation: wS,
         },
-        o = KS(n ?? {}, a);
+        o = qS(n ?? {}, a);
       ((this.settings = o),
         (this.storageKey = o.auth.storageKey ?? ``),
         (this.headers = o.global.headers ?? {}),
@@ -48043,14 +48059,14 @@ var JS = class extends pS {
               this.headers,
               o.global.fetch,
             )),
-        (this.fetch = BS(
+        (this.fetch = VS(
           t,
           e,
           this._getSessionToken.bind(this),
           o.global.fetch,
           o.tracePropagation,
         )),
-        (this.functionsFetch = BS(
+        (this.functionsFetch = VS(
           t,
           e,
           this._getSessionToken.bind(this),
@@ -48059,7 +48075,7 @@ var JS = class extends pS {
           { omitApiKeyAsBearer: !0 },
         )),
         (this.realtime = this._initRealtimeClient(
-          NS(
+          PS(
             {
               headers: this.headers,
               accessToken: this._getAccessToken.bind(this),
@@ -48074,7 +48090,7 @@ var JS = class extends pS {
             .catch((e) =>
               console.warn(`Failed to set initial Realtime auth token:`, e),
             ),
-        (this.rest = new k_(new URL(`rest/v1`, r).href, {
+        (this.rest = new A_(new URL(`rest/v1`, r).href, {
           headers: this.headers,
           schema: o.db.schema,
           fetch: this.fetch,
@@ -48082,7 +48098,7 @@ var JS = class extends pS {
           urlLengthLimit: o.db.urlLengthLimit,
           retry: o.db.retry,
         })),
-        (this.storage = new Jy(
+        (this.storage = new Yy(
           this.storageUrl.href,
           this.headers,
           this.fetch,
@@ -48091,7 +48107,7 @@ var JS = class extends pS {
         o.accessToken || this._listenForAuthEvents());
     }
     get functions() {
-      return new u_(this.functionsUrl.href, {
+      return new d_(this.functionsUrl.href, {
         headers: this.headers,
         customFetch: this.functionsFetch,
       });
@@ -48150,9 +48166,9 @@ var JS = class extends pS {
         Authorization: `Bearer ${this.supabaseKey}`,
         apikey: `${this.supabaseKey}`,
       };
-      return new JS({
+      return new YS({
         url: this.authUrl.href,
-        headers: NS(NS({}, h), p),
+        headers: PS(PS({}, h), p),
         storageKey: a,
         autoRefreshToken: e,
         persistSession: t,
@@ -48173,12 +48189,12 @@ var JS = class extends pS {
       });
     }
     _initRealtimeClient(e) {
-      return new Jv(
+      return new Yv(
         this.realtimeUrl.href,
-        NS(
-          NS({}, e),
+        PS(
+          PS({}, e),
           {},
-          { params: NS(NS({}, { apikey: this.supabaseKey }), e?.params) },
+          { params: PS(PS({}, { apikey: this.supabaseKey }), e?.params) },
         ),
       );
     }
@@ -48199,8 +48215,8 @@ var JS = class extends pS {
           (this.changedAccessToken = void 0));
     }
   },
-  XS = (e, t, n) => new YS(e, t, n);
-function ZS() {
+  ZS = (e, t, n) => new XS(e, t, n);
+function QS() {
   if (typeof window < `u` || globalThis.Deno !== void 0) return !1;
   let e = globalThis.process;
   if (!e) return !1;
@@ -48209,21 +48225,21 @@ function ZS() {
   let n = t.match(/^v(\d+)\./);
   return n ? parseInt(n[1], 10) <= 20 : !1;
 }
-ZS() &&
+QS() &&
   console.warn(
     `⚠️  Node.js 20 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 22 or later. For more information, visit: https://github.com/orgs/supabase/discussions/45715`,
   );
-var QS = `https://ygovtjqzztschecrqufq.supabase.co`,
-  $S = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlnb3Z0anF6enRzY2hlY3JxdWZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDEzODcsImV4cCI6MjA5MzI3NzM4N30._mfykfM1EDgwVMGgUEL-dnkcYUj9wNHZtNCTRPTpsSg`,
-  eC = null;
-function tC() {
-  return ((eC ||= XS(QS, $S, { auth: { persistSession: !1 } })), eC);
+var $S = `https://ygovtjqzztschecrqufq.supabase.co`,
+  eC = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlnb3Z0anF6enRzY2hlY3JxdWZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDEzODcsImV4cCI6MjA5MzI3NzM4N30._mfykfM1EDgwVMGgUEL-dnkcYUj9wNHZtNCTRPTpsSg`,
+  tC = null;
+function nC() {
+  return ((tC ||= ZS($S, eC, { auth: { persistSession: !1 } })), tC);
 }
-var nC = () => !!$S,
-  rC = {
+var rC = () => !!eC,
+  iC = {
     name: `supabase`,
     async load(e) {
-      let t = tC();
+      let t = nC();
       if (!t) return null;
       let { data: n, error: r } = await t
         .from(`thalamus_workspace`)
@@ -48234,7 +48250,7 @@ var nC = () => !!$S,
       return n?.snapshot ?? null;
     },
     async save(e, t) {
-      let n = tC();
+      let n = nC();
       if (!n) throw Error(`supabase is not configured`);
       let { error: r } = await n
         .from(`thalamus_workspace`)
@@ -48250,25 +48266,25 @@ var nC = () => !!$S,
       if (r) throw Error(`supabase save failed: ${r.message}`);
     },
   },
-  iC = {
+  aC = {
     name: `supabase`,
     async load(e) {
       try {
-        let t = await rC.load(e);
+        let t = await iC.load(e);
         if (t) return t;
       } catch {}
-      return Yg.load(e);
+      return Xg.load(e);
     },
     async save(e, t) {
-      (await Yg.save(e, t), await rC.save(e, t));
+      (await Xg.save(e, t), await iC.save(e, t));
     },
   },
-  aC = () => (nC() ? iC : Yg),
-  oC = w((e, t) => {
+  oC = () => (rC() ? aC : Xg),
+  sC = w((e, t) => {
     let n = async (n) => {
-        (await Tg(n),
+        (await Eg(n),
           e({ dataset: n, status: `ready`, error: null }),
-          await Qg.getState().attach(n.fingerprint, aC()),
+          await $g.getState().attach(n.fingerprint, oC()),
           await t().refreshKnown());
       },
       r = async (t) => {
@@ -48296,33 +48312,33 @@ var nC = () => !!$S,
       loadFiles: (e) => r(() => lg(e)),
       loadCached: (e) =>
         r(async () => {
-          let t = await Eg(e);
+          let t = await Dg(e);
           if (!t)
             throw Error(`that dataset is no longer cached in this browser`);
           return t;
         }),
       async refreshKnown() {
-        e({ known: await Dg() });
+        e({ known: await Og() });
       },
       clear: () => e({ dataset: null, status: `empty`, error: null }),
     };
   }),
-  sC = () => {
+  cC = () => {
     let [e, t = ``] = (
       window.location.hash.replace(/^#/, ``) || `/profile/overview`
     ).split(`?`);
     return { path: e, params: new URLSearchParams(t) };
   };
-function cC(e, t) {
+function lC(e, t) {
   let n =
     t && Object.keys(t).length ? `?${new URLSearchParams(t).toString()}` : ``;
   window.location.hash = `${e}${n}`;
 }
-function lC() {
-  let [e, t] = (0, _.useState)(sC);
+function uC() {
+  let [e, t] = (0, _.useState)(cC);
   return (
     (0, _.useEffect)(() => {
-      let e = () => t(sC());
+      let e = () => t(cC());
       return (
         window.addEventListener(`hashchange`, e),
         () => window.removeEventListener(`hashchange`, e)
@@ -48331,9 +48347,9 @@ function lC() {
     e
   );
 }
-var uC = `(max-width: 899px)`,
-  dC = `(max-width: 599px)`;
-function fC(e) {
+var dC = `(max-width: 899px)`,
+  fC = `(max-width: 599px)`;
+function pC(e) {
   let [t, n] = (0, _.useState)(() => window.matchMedia(e).matches);
   return (
     (0, _.useEffect)(() => {
@@ -48348,60 +48364,47 @@ function fC(e) {
     t
   );
 }
-var pC = () => fC(uC),
-  mC = [
+var mC = () => pC(dC),
+  hC = [
     {
-      mode: `profile`,
-      label: `Record`,
-      blurb: `What the documents say`,
-      items: [
-        {
-          path: `/profile/overview`,
-          label: `Overview`,
-          hint: `The record at a glance`,
-        },
-        {
-          path: `/profile/timeline`,
-          label: `Timeline`,
-          hint: `Documents in order`,
-        },
-        {
-          path: `/profile/labs`,
-          label: `Results`,
-          hint: `Every marker over time`,
-        },
-        {
-          path: `/profile/lines`,
-          label: `Profile (L3)`,
-          hint: `The reduced health profile`,
-        },
-      ],
+      path: `/profile/overview`,
+      label: `Overview`,
+      hint: `The record at a glance`,
     },
     {
-      mode: `pipeline`,
-      label: `Reduction`,
-      blurb: `How the profile was built`,
-      items: [
-        {
-          path: `/pipeline/reduction`,
-          label: `Funnel`,
-          hint: `Where every point went`,
-        },
-        {
-          path: `/pipeline/workbench`,
-          label: `Workbench (L2)`,
-          hint: `Query everything`,
-        },
-        {
-          path: `/pipeline/review`,
-          label: `Review queue`,
-          hint: `What needs a human`,
-        },
-      ],
+      path: `/profile/timeline`,
+      label: `All Records (L1)`,
+      hint: `Documents in order`,
+    },
+    {
+      path: `/pipeline/workbench`,
+      label: `Atomic Clinical Data Points (L2)`,
+      hint: `Query everything`,
+    },
+    {
+      path: `/profile/lines`,
+      label: `Health Profile (L3)`,
+      hint: `The reduced health profile`,
+    },
+    {
+      path: `/pipeline/reduction`,
+      label: `Funnel`,
+      hint: `Where every point went`,
+      sub: !0,
+    },
+    {
+      path: `/profile/labs`,
+      label: `Biomarkers`,
+      hint: `Every marker over time`,
+    },
+    {
+      path: `/pipeline/review`,
+      label: `For Review`,
+      hint: `What needs a human`,
     },
   ],
-  hC = mC.flatMap((e) => e.items),
-  gC = {
+  gC = hC,
+  _C = {
     panel: `_panel_1uu0q_1`,
     panelHead: `_panelHead_1uu0q_10`,
     panelTitle: `_panelTitle_1uu0q_19`,
@@ -48434,7 +48437,7 @@ var pC = () => fC(uC),
     rule: `_rule_1uu0q_287`,
     kbd: `_kbd_1uu0q_293`,
   },
-  _C = o((e) => {
+  vC = o((e) => {
     var t = Symbol.for(`react.transitional.element`),
       n = Symbol.for(`react.fragment`);
     function r(e, n, r) {
@@ -48454,9 +48457,9 @@ var pC = () => fC(uC),
     ((e.Fragment = n), (e.jsx = r), (e.jsxs = r));
   }),
   X = o((e, t) => {
-    t.exports = _C();
+    t.exports = vC();
   })();
-function vC({
+function yC({
   title: e,
   eyebrow: t,
   action: n,
@@ -48465,43 +48468,43 @@ function vC({
   flush: a,
 }) {
   return (0, X.jsxs)(`section`, {
-    className: `${gC.panel} ${i ?? ``}`,
+    className: `${_C.panel} ${i ?? ``}`,
     children: [
       (e || n || t) &&
         (0, X.jsxs)(`header`, {
-          className: gC.panelHead,
+          className: _C.panelHead,
           children: [
             (0, X.jsxs)(`div`, {
               children: [
                 t && (0, X.jsx)(`div`, { className: `eyebrow`, children: t }),
                 e &&
-                  (0, X.jsx)(`h2`, { className: gC.panelTitle, children: e }),
+                  (0, X.jsx)(`h2`, { className: _C.panelTitle, children: e }),
               ],
             }),
             n,
           ],
         }),
-      (0, X.jsx)(`div`, { className: a ? `` : gC.panelBody, children: r }),
+      (0, X.jsx)(`div`, { className: a ? `` : _C.panelBody, children: r }),
     ],
   });
 }
-function yC({ label: e, value: t, sub: n, tone: r, onClick: i }) {
+function bC({ label: e, value: t, sub: n, tone: r, onClick: i }) {
   return (0, X.jsxs)(i ? `button` : `div`, {
-    className: `${gC.stat} ${i ? gC.statClickable : ``}`,
+    className: `${_C.stat} ${i ? _C.statClickable : ``}`,
     onClick: i,
     type: i ? `button` : void 0,
     children: [
-      (0, X.jsx)(`div`, { className: gC.statLabel, children: e }),
+      (0, X.jsx)(`div`, { className: _C.statLabel, children: e }),
       (0, X.jsx)(`div`, {
-        className: `${gC.statValue} num`,
+        className: `${_C.statValue} num`,
         "data-tone": r,
         children: t,
       }),
-      n && (0, X.jsx)(`div`, { className: gC.statSub, children: n }),
+      n && (0, X.jsx)(`div`, { className: _C.statSub, children: n }),
     ],
   });
 }
-var bC = {
+var xC = {
   abnormal: `bad`,
   borderline: `warn`,
   normal: `ok`,
@@ -48512,10 +48515,10 @@ var bC = {
   unhandled: `bad`,
   unknown: `warn`,
 };
-function xC({ value: e, tone: t, size: n, title: r, onClick: i }) {
-  let a = t ?? (typeof e == `string` ? bC[e] : void 0) ?? `neutral`;
+function SC({ value: e, tone: t, size: n, title: r, onClick: i }) {
+  let a = t ?? (typeof e == `string` ? xC[e] : void 0) ?? `neutral`;
   return (0, X.jsx)(i ? `button` : `span`, {
-    className: `${gC.tag} ${n === `sm` ? gC.tagSm : ``} ${i ? gC.tagBtn : ``}`,
+    className: `${_C.tag} ${n === `sm` ? _C.tagSm : ``} ${i ? _C.tagBtn : ``}`,
     "data-tone": a,
     title: r,
     onClick: i,
@@ -48523,26 +48526,26 @@ function xC({ value: e, tone: t, size: n, title: r, onClick: i }) {
     children: typeof e == `string` ? e.replace(/_/g, ` `) : e,
   });
 }
-function SC({ tone: e, title: t }) {
+function CC({ tone: e, title: t }) {
   return (0, X.jsx)(`span`, {
-    className: gC.dot,
-    "data-tone": bC[e] ?? e,
+    className: _C.dot,
+    "data-tone": xC[e] ?? e,
     title: t ?? e,
   });
 }
-function CC({ value: e, tone: t, label: n }) {
+function wC({ value: e, tone: t, label: n }) {
   let r = Math.max(0, Math.min(1, e)) * 100;
   return (0, X.jsx)(`div`, {
-    className: gC.meter,
+    className: _C.meter,
     title: n ? String(n) : `${r.toFixed(0)}%`,
     children: (0, X.jsx)(`div`, {
-      className: gC.meterFill,
+      className: _C.meterFill,
       "data-tone": t ?? `acc`,
       style: { width: `${r}%` },
     }),
   });
 }
-function wC({
+function TC({
   children: e,
   onClick: t,
   variant: n = `ghost`,
@@ -48554,59 +48557,58 @@ function wC({
 }) {
   return (0, X.jsx)(`button`, {
     type: s,
-    className: `${gC.btn} ${gC[`btn_${n}`]} ${r === `sm` ? gC.btnSm : ``} ${o ? gC.btnActive : ``}`,
+    className: `${_C.btn} ${_C[`btn_${n}`]} ${r === `sm` ? _C.btnSm : ``} ${o ? _C.btnActive : ``}`,
     onClick: t,
     disabled: i,
     title: a,
     children: e,
   });
 }
-function TC({ title: e, children: t }) {
+function EC({ title: e, children: t }) {
   return (0, X.jsxs)(`div`, {
-    className: gC.empty,
+    className: _C.empty,
     children: [
-      (0, X.jsx)(`div`, { className: gC.emptyTitle, children: e }),
-      t && (0, X.jsx)(`div`, { className: gC.emptyBody, children: t }),
+      (0, X.jsx)(`div`, { className: _C.emptyTitle, children: e }),
+      t && (0, X.jsx)(`div`, { className: _C.emptyBody, children: t }),
     ],
   });
 }
-function EC() {
-  return (0, X.jsx)(`div`, { className: gC.rule });
+function DC() {
+  return (0, X.jsx)(`div`, { className: _C.rule });
 }
-var DC = {
-  app: `_app_1l2yn_1`,
-  rail: `_rail_1l2yn_8`,
-  brand: `_brand_1l2yn_16`,
-  mark: `_mark_1l2yn_21`,
-  markDot: `_markDot_1l2yn_32`,
-  markSub: `_markSub_1l2yn_40`,
-  patient: `_patient_1l2yn_49`,
-  patientName: `_patientName_1l2yn_54`,
-  patientMeta: `_patientMeta_1l2yn_62`,
-  nav: `_nav_1l2yn_69`,
-  navSection: `_navSection_1l2yn_75`,
-  navLabel: `_navLabel_1l2yn_80`,
-  navBlurb: `_navBlurb_1l2yn_89`,
-  navItem: `_navItem_1l2yn_100`,
-  navItemActive: `_navItemActive_1l2yn_116`,
-  navHint: `_navHint_1l2yn_123`,
-  railFoot: `_railFoot_1l2yn_130`,
-  footRow: `_footRow_1l2yn_138`,
-  syncDot: `_syncDot_1l2yn_147`,
-  main: `_main_1l2yn_164`,
-  topbar: `_topbar_1l2yn_172`,
-  crumbs: `_crumbs_1l2yn_184`,
-  title: `_title_1l2yn_191`,
-  subtitle: `_subtitle_1l2yn_198`,
-  topActions: `_topActions_1l2yn_206`,
-  content: `_content_1l2yn_213`,
-  pad: `_pad_1l2yn_219`,
-  loader: `_loader_1l2yn_224`,
-  menuBtn: `_menuBtn_1l2yn_238`,
-  menuIcon: `_menuIcon_1l2yn_255`,
-  scrim: `_scrim_1l2yn_284`,
+var OC = {
+  app: `_app_6gj9n_1`,
+  rail: `_rail_6gj9n_8`,
+  brand: `_brand_6gj9n_16`,
+  mark: `_mark_6gj9n_21`,
+  markDot: `_markDot_6gj9n_32`,
+  markSub: `_markSub_6gj9n_40`,
+  patient: `_patient_6gj9n_49`,
+  patientName: `_patientName_6gj9n_54`,
+  patientMeta: `_patientMeta_6gj9n_62`,
+  nav: `_nav_6gj9n_69`,
+  navSection: `_navSection_6gj9n_75`,
+  navItem: `_navItem_6gj9n_80`,
+  navItemSub: `_navItemSub_6gj9n_93`,
+  navItemActive: `_navItemActive_6gj9n_116`,
+  navHint: `_navHint_6gj9n_122`,
+  railFoot: `_railFoot_6gj9n_129`,
+  footRow: `_footRow_6gj9n_137`,
+  syncDot: `_syncDot_6gj9n_146`,
+  main: `_main_6gj9n_163`,
+  topbar: `_topbar_6gj9n_171`,
+  crumbs: `_crumbs_6gj9n_183`,
+  title: `_title_6gj9n_190`,
+  subtitle: `_subtitle_6gj9n_197`,
+  topActions: `_topActions_6gj9n_205`,
+  content: `_content_6gj9n_212`,
+  pad: `_pad_6gj9n_218`,
+  loader: `_loader_6gj9n_223`,
+  menuBtn: `_menuBtn_6gj9n_237`,
+  menuIcon: `_menuIcon_6gj9n_254`,
+  scrim: `_scrim_6gj9n_283`,
 };
-function OC() {
+function kC() {
   let [e, t] = (0, _.useState)(
     () => localStorage.getItem(`thalamus.theme`) ?? `dark`,
   );
@@ -48618,8 +48620,8 @@ function OC() {
     { theme: e, toggle: () => t((e) => (e === `dark` ? `light` : `dark`)) }
   );
 }
-function kC(e) {
-  let t = pC(),
+function AC(e) {
+  let t = mC(),
     [n, r] = (0, _.useState)(!1);
   return (
     (0, _.useEffect)(() => r(!1), [e]),
@@ -48642,66 +48644,66 @@ function kC(e) {
     { isMobile: t, open: n, setOpen: r }
   );
 }
-var AC = {
+var jC = {
   idle: `saved`,
   saving: `saving…`,
   loading: `loading…`,
   error: `not saved`,
   offline: `local only`,
 };
-function jC({ title: e, subtitle: t, actions: n, children: r }) {
-  let i = lC(),
-    a = oC((e) => e.dataset),
-    o = Qg((e) => e.syncState),
-    s = Qg((e) => e.syncError),
-    { theme: c, toggle: l } = OC(),
-    u = kC(i.path);
+function MC({ title: e, subtitle: t, actions: n, children: r }) {
+  let i = uC(),
+    a = sC((e) => e.dataset),
+    o = $g((e) => e.syncState),
+    s = $g((e) => e.syncError),
+    { theme: c, toggle: l } = kC(),
+    u = AC(i.path);
   return (0, X.jsxs)(`div`, {
-    className: DC.app,
+    className: OC.app,
     "data-drawer": u.open ? `open` : void 0,
     children: [
       u.isMobile &&
         u.open &&
         (0, X.jsx)(`div`, {
-          className: DC.scrim,
+          className: OC.scrim,
           onClick: () => u.setOpen(!1),
           "aria-hidden": !0,
         }),
       (0, X.jsxs)(`aside`, {
-        className: DC.rail,
+        className: OC.rail,
         id: `thalamus-nav`,
         "aria-hidden": u.isMobile && !u.open,
         children: [
           (0, X.jsxs)(`div`, {
-            className: DC.brand,
+            className: OC.brand,
             children: [
               (0, X.jsxs)(`div`, {
-                className: DC.mark,
+                className: OC.mark,
                 children: [
-                  (0, X.jsx)(`span`, { className: DC.markDot }),
+                  (0, X.jsx)(`span`, { className: OC.markDot }),
                   `Thalamus`,
                 ],
               }),
               (0, X.jsx)(`div`, {
-                className: DC.markSub,
+                className: OC.markSub,
                 children: `record workbench`,
               }),
             ],
           }),
           a &&
             (0, X.jsxs)(`button`, {
-              className: DC.patient,
+              className: OC.patient,
               onClick: () => {
-                (u.setOpen(!1), cC(`/data`));
+                (u.setOpen(!1), lC(`/data`));
               },
               title: `Switch dataset`,
               children: [
                 (0, X.jsx)(`div`, {
-                  className: DC.patientName,
+                  className: OC.patientName,
                   children: a.patient.name ?? a.label,
                 }),
                 (0, X.jsxs)(`div`, {
-                  className: DC.patientMeta,
+                  className: OC.patientMeta,
                   children: [
                     [a.patient.age, a.patient.gender]
                       .filter(Boolean)
@@ -48715,81 +48717,63 @@ function jC({ title: e, subtitle: t, actions: n, children: r }) {
               ],
             }),
           (0, X.jsx)(`nav`, {
-            className: DC.nav,
-            children: mC.map((e) =>
-              (0, X.jsxs)(
-                `div`,
-                {
-                  className: DC.navSection,
-                  children: [
-                    (0, X.jsxs)(`div`, {
-                      className: DC.navLabel,
-                      children: [
-                        e.label,
-                        (0, X.jsx)(`span`, {
-                          className: DC.navBlurb,
-                          children: e.blurb,
-                        }),
-                      ],
-                    }),
-                    e.items.map((e) =>
-                      (0, X.jsxs)(
-                        `button`,
-                        {
-                          className: `${DC.navItem} ${i.path === e.path ? DC.navItemActive : ``}`,
-                          onClick: () => {
-                            (u.setOpen(!1), cC(e.path));
-                          },
-                          children: [
-                            e.label,
-                            (0, X.jsx)(`span`, {
-                              className: DC.navHint,
-                              children: e.hint,
-                            }),
-                          ],
-                        },
-                        e.path,
-                      ),
-                    ),
-                  ],
-                },
-                e.mode,
+            className: OC.nav,
+            children: (0, X.jsx)(`div`, {
+              className: OC.navSection,
+              children: hC.map((e) =>
+                (0, X.jsxs)(
+                  `button`,
+                  {
+                    className: `${OC.navItem} ${e.sub ? OC.navItemSub : ``} ${i.path === e.path ? OC.navItemActive : ``}`,
+                    onClick: () => {
+                      (u.setOpen(!1), lC(e.path));
+                    },
+                    children: [
+                      e.label,
+                      (0, X.jsx)(`span`, {
+                        className: OC.navHint,
+                        children: e.hint,
+                      }),
+                    ],
+                  },
+                  e.path,
+                ),
               ),
-            ),
+            }),
           }),
           (0, X.jsxs)(`div`, {
-            className: DC.railFoot,
+            className: OC.railFoot,
             children: [
               (0, X.jsxs)(`div`, {
-                className: DC.footRow,
+                className: OC.footRow,
                 title: s ?? void 0,
                 children: [
                   (0, X.jsxs)(`span`, {
                     children: [
                       (0, X.jsx)(`span`, {
-                        className: DC.syncDot,
+                        className: OC.syncDot,
                         "data-state": o,
                       }),
                       ` `,
-                      nC() ? `supabase` : `this browser`,
+                      rC() ? `supabase` : `this browser`,
                     ],
                   }),
-                  (0, X.jsx)(`span`, { children: AC[o] }),
+                  (0, X.jsx)(`span`, { children: jC[o] }),
                 ],
               }),
               (0, X.jsxs)(`div`, {
-                className: DC.footRow,
+                className: OC.footRow,
                 children: [
-                  (0, X.jsxs)(wC, {
+                  (0, X.jsxs)(TC, {
                     size: `sm`,
                     variant: `quiet`,
                     onClick: l,
                     children: [c === `dark` ? `Light` : `Dark`, ` theme`],
                   }),
-                  (0, X.jsx)(wC, {
+                  (0, X.jsx)(TC, {
                     size: `sm`,
                     variant: `quiet`,
-                    onClick: () => cC(`/data`),
+                    onClick: () => lC(`/data`),
                     children: `Data`,
                   }),
                 ],
@@ -48799,44 +48783,44 @@ function jC({ title: e, subtitle: t, actions: n, children: r }) {
         ],
       }),
       (0, X.jsxs)(`main`, {
-        className: DC.main,
+        className: OC.main,
         children: [
           (0, X.jsxs)(`header`, {
-            className: DC.topbar,
+            className: OC.topbar,
             children: [
               (0, X.jsx)(`button`, {
-                className: DC.menuBtn,
+                className: OC.menuBtn,
                 onClick: () => u.setOpen((e) => !e),
                 "aria-label": u.open ? `Close navigation` : `Open navigation`,
                 "aria-expanded": u.open,
                 "aria-controls": `thalamus-nav`,
                 children: (0, X.jsx)(`span`, {
-                  className: DC.menuIcon,
+                  className: OC.menuIcon,
                   "aria-hidden": !0,
                 }),
               }),
               (0, X.jsxs)(`div`, {
-                className: DC.crumbs,
+                className: OC.crumbs,
                 children: [
-                  (0, X.jsx)(`h1`, { className: DC.title, children: e }),
+                  (0, X.jsx)(`h1`, { className: OC.title, children: e }),
                   t &&
-                    (0, X.jsx)(`span`, { className: DC.subtitle, children: t }),
+                    (0, X.jsx)(`span`, { className: OC.subtitle, children: t }),
                 ],
               }),
-              (0, X.jsx)(`div`, { className: DC.topActions, children: n }),
+              (0, X.jsx)(`div`, { className: OC.topActions, children: n }),
             ],
           }),
-          (0, X.jsx)(`div`, { className: DC.content, children: r }),
+          (0, X.jsx)(`div`, { className: OC.content, children: r }),
         ],
       }),
     ],
   });
 }
-var MC = ({ children: e }) =>
-    (0, X.jsx)(`div`, { className: DC.pad, children: e }),
-  NC = ({ label: e = `loading record` }) =>
-    (0, X.jsx)(`div`, { className: DC.loader, children: e });
-function PC(e, t, n = `application/json`) {
+var NC = ({ children: e }) =>
+    (0, X.jsx)(`div`, { className: OC.pad, children: e }),
+  PC = ({ label: e = `loading record` }) =>
+    (0, X.jsx)(`div`, { className: OC.loader, children: e });
+function FC(e, t, n = `application/json`) {
   let r = URL.createObjectURL(new Blob([t], { type: `${n};charset=utf-8` })),
     i = document.createElement(`a`);
   ((i.href = r),
@@ -48844,19 +48828,19 @@ function PC(e, t, n = `application/json`) {
     i.click(),
     setTimeout(() => URL.revokeObjectURL(r), 1e3));
 }
-var FC = (e) => {
+var IC = (e) => {
   if (e == null) return ``;
   let t = Array.isArray(e) ? e.join(`; `) : String(e);
   return /[",\n]/.test(t) ? `"${t.replace(/"/g, `""`)}"` : t;
 };
-function IC(e, t) {
+function LC(e, t) {
   return [
-    t.map((e) => FC(e.label)).join(`,`),
-    ...e.map((e) => t.map((t) => FC(e[t.key])).join(`,`)),
+    t.map((e) => IC(e.label)).join(`,`),
+    ...e.map((e) => t.map((t) => IC(e[t.key])).join(`,`)),
   ].join(`
 `);
 }
-var LC = {
+var RC = {
     grid: `_grid_1b94r_1`,
     drop: `_drop_1b94r_8`,
     dropActive: `_dropActive_1b94r_18`,
@@ -48875,13 +48859,13 @@ var LC = {
     importBtn: `_importBtn_1b94r_113`,
     table: `_table_1b94r_131`,
   },
-  RC = {
+  zC = {
     input: `_input_laxhc_1`,
     select: `_select_laxhc_2`,
     textarea: `_textarea_laxhc_3`,
     mono: `_mono_laxhc_36`,
   };
-function zC() {
+function BC() {
   let {
       dataset: e,
       status: t,
@@ -48891,12 +48875,12 @@ function zC() {
       loadFiles: a,
       loadCached: o,
       refreshKnown: s,
-    } = oC(),
+    } = sC(),
     [c, l] = (0, _.useState)(!1),
     [u, d] = (0, _.useState)(null),
     [f, p] = (0, _.useState)([]),
     m = (0, _.useRef)(null),
-    h = Qg();
+    h = $g();
   ((0, _.useEffect)(() => {
     s();
   }, [s]),
@@ -48914,7 +48898,7 @@ function zC() {
       (async () => {
         let e = await Promise.all(
           r.map(async (e) => {
-            let t = await Eg(e);
+            let t = await Dg(e);
             return t
               ? {
                   fingerprint: e,
@@ -48933,15 +48917,15 @@ function zC() {
     },
     v = () => {
       let t = h.snapshot();
-      PC(
+      FC(
         `thalamus-workspace-${e?.fingerprint ?? `none`}.json`,
         JSON.stringify(t, null, 2),
       );
     },
     y = () => {
-      PC(
+      FC(
         `thalamus-corrections-${e?.fingerprint ?? `none`}.json`,
-        JSON.stringify($g(h.overrides), null, 2),
+        JSON.stringify(e_(h.overrides), null, 2),
       );
     },
     b = async (e) => {
@@ -48951,19 +48935,19 @@ function zC() {
         alert(`could not read that workspace file: ${e.message}`);
       }
     };
-  return (0, X.jsx)(jC, {
+  return (0, X.jsx)(MC, {
     title: `Data`,
     subtitle: `Load a record, manage the workspace`,
-    children: (0, X.jsx)(MC, {
+    children: (0, X.jsx)(NC, {
       children: (0, X.jsxs)(`div`, {
-        className: LC.grid,
+        className: RC.grid,
         children: [
-          (0, X.jsxs)(vC, {
+          (0, X.jsxs)(yC, {
             title: `Load a record`,
             eyebrow: `L2 + L3`,
             children: [
               (0, X.jsxs)(`div`, {
-                className: `${LC.drop} ${c ? LC.dropActive : ``}`,
+                className: `${RC.drop} ${c ? RC.dropActive : ``}`,
                 onDragOver: (e) => {
                   (e.preventDefault(), l(!0));
                 },
@@ -48975,11 +48959,11 @@ function zC() {
                 onKeyDown: (e) => e.key === `Enter` && m.current?.click(),
                 children: [
                   (0, X.jsx)(`div`, {
-                    className: LC.dropTitle,
+                    className: RC.dropTitle,
                     children: `Drop both files here`,
                   }),
                   (0, X.jsxs)(`div`, {
-                    className: LC.dropHint,
+                    className: RC.dropHint,
                     children: [
                       `the L2 workbook `,
                       (0, X.jsx)(`code`, { children: `name.xlsx` }),
@@ -49000,9 +48984,9 @@ function zC() {
               }),
               u &&
                 (0, X.jsxs)(`div`, {
-                  className: LC.dropRow,
+                  className: RC.dropRow,
                   children: [
-                    (0, X.jsxs)(wC, {
+                    (0, X.jsxs)(TC, {
                       onClick: () => void i(),
                       variant: `solid`,
                       children: [
@@ -49024,40 +49008,40 @@ function zC() {
               t === `loading` &&
                 (0, X.jsx)(`p`, { className: `hint`, children: `reading…` }),
               t === `error` &&
-                (0, X.jsx)(`p`, { className: LC.err, children: n }),
+                (0, X.jsx)(`p`, { className: RC.err, children: n }),
             ],
           }),
-          (0, X.jsx)(vC, {
+          (0, X.jsx)(yC, {
             title: `Current record`,
             eyebrow: `loaded`,
             children: e
               ? (0, X.jsxs)(X.Fragment, {
                   children: [
                     (0, X.jsxs)(`div`, {
-                      className: LC.stats,
+                      className: RC.stats,
                       children: [
-                        (0, X.jsx)(yC, {
+                        (0, X.jsx)(bC, {
                           label: `Documents`,
                           value: e.stats.documents,
                         }),
-                        (0, X.jsx)(yC, {
+                        (0, X.jsx)(bC, {
                           label: `Data points`,
                           value: e.stats.acdps,
                         }),
-                        (0, X.jsx)(yC, {
+                        (0, X.jsx)(bC, {
                           label: `Results`,
                           value: e.stats.biomarkers,
                         }),
-                        (0, X.jsx)(yC, {
+                        (0, X.jsx)(bC, {
                           label: `Profile lines`,
                           value: e.stats.l3_items,
                           tone: `acc`,
                         }),
                       ],
                     }),
-                    (0, X.jsx)(EC, {}),
+                    (0, X.jsx)(DC, {}),
                     (0, X.jsxs)(`dl`, {
-                      className: LC.meta,
+                      className: RC.meta,
                       children: [
                         (0, X.jsx)(`dt`, { children: `Patient` }),
                         (0, X.jsx)(`dd`, { children: e.patient.name ?? `—` }),
@@ -49084,7 +49068,7 @@ function zC() {
                     }),
                     e.issues.length > 0 &&
                       (0, X.jsx)(`ul`, {
-                        className: LC.issues,
+                        className: RC.issues,
                         children: e.issues.map((e, t) =>
                           (0, X.jsxs)(
                             `li`,
@@ -49100,42 +49084,42 @@ function zC() {
                           ),
                         ),
                       }),
-                    (0, X.jsx)(EC, {}),
-                    (0, X.jsx)(wC, {
+                    (0, X.jsx)(DC, {}),
+                    (0, X.jsx)(TC, {
                       variant: `solid`,
-                      onClick: () => cC(`/profile/overview`),
+                      onClick: () => lC(`/profile/overview`),
                       children: `Open overview`,
                     }),
                   ],
                 })
-              : (0, X.jsx)(TC, {
+              : (0, X.jsx)(EC, {
                   title: `Nothing loaded`,
                   children: `Drop a pair of files, or load the seeded record.`,
                 }),
           }),
-          (0, X.jsxs)(vC, {
+          (0, X.jsxs)(yC, {
             title: `Workspace`,
-            eyebrow: nC() ? `supabase + this browser` : `this browser only`,
+            eyebrow: rC() ? `supabase + this browser` : `this browser only`,
             children: [
               (0, X.jsxs)(`p`, {
                 className: `hint`,
                 children: [
                   `Views, columns you add, notes and corrections are stored separately from the record.`,
-                  nC()
+                  rC()
                     ? ` They sync to Supabase under this record’s fingerprint; the clinical rows never leave this machine.`
                     : ` No Supabase key is configured, so they stay in this browser.`,
                 ],
               }),
-              (0, X.jsx)(EC, {}),
+              (0, X.jsx)(DC, {}),
               (0, X.jsxs)(`label`, {
-                className: LC.handle,
+                className: RC.handle,
                 children: [
                   (0, X.jsx)(`span`, {
-                    className: LC.handleLabel,
+                    className: RC.handleLabel,
                     children: `Signed in as`,
                   }),
                   (0, X.jsx)(`input`, {
-                    className: RC.input,
+                    className: zC.input,
                     value: h.handle,
                     placeholder: `your name or initials`,
                     onChange: (e) => h.setHandle(e.target.value),
@@ -49143,15 +49127,15 @@ function zC() {
                 ],
               }),
               (0, X.jsx)(`p`, {
-                className: LC.warn,
+                className: RC.warn,
                 children: `This is a name stamp, not authentication — anyone who can open this page can read and edit the workspace.`,
               }),
-              (0, X.jsx)(EC, {}),
+              (0, X.jsx)(DC, {}),
               (0, X.jsxs)(`div`, {
-                className: LC.actions,
+                className: RC.actions,
                 children: [
-                  (0, X.jsx)(wC, { onClick: v, children: `Export workspace` }),
-                  (0, X.jsxs)(wC, {
+                  (0, X.jsx)(TC, { onClick: v, children: `Export workspace` }),
+                  (0, X.jsxs)(TC, {
                     onClick: y,
                     children: [
                       `Export corrections (`,
@@ -49160,7 +49144,7 @@ function zC() {
                     ],
                   }),
                   (0, X.jsxs)(`label`, {
-                    className: LC.importBtn,
+                    className: RC.importBtn,
                     children: [
                       `Import workspace`,
                       (0, X.jsx)(`input`, {
@@ -49172,7 +49156,7 @@ function zC() {
                       }),
                     ],
                   }),
-                  (0, X.jsx)(wC, {
+                  (0, X.jsx)(TC, {
                     variant: `danger`,
                     onClick: () =>
                       window.confirm(
@@ -49184,14 +49168,14 @@ function zC() {
               }),
             ],
           }),
-          (0, X.jsx)(vC, {
+          (0, X.jsx)(yC, {
             title: `Records in this browser`,
             eyebrow: `cached`,
             children:
               f.length === 0
-                ? (0, X.jsx)(TC, { title: `No cached records` })
+                ? (0, X.jsx)(EC, { title: `No cached records` })
                 : (0, X.jsxs)(`table`, {
-                    className: LC.table,
+                    className: RC.table,
                     children: [
                       (0, X.jsx)(`thead`, {
                         children: (0, X.jsxs)(`tr`, {
@@ -49233,7 +49217,7 @@ function zC() {
                                     : `—`,
                                 }),
                                 (0, X.jsx)(`td`, {
-                                  children: (0, X.jsx)(wC, {
+                                  children: (0, X.jsx)(TC, {
                                     size: `sm`,
                                     onClick: () => void o(e.fingerprint),
                                     children: `Open`,
@@ -49290,13 +49274,13 @@ var Z = {
     timelineWrap: `_timelineWrap_1x0nb_229`,
     timelineReadout: `_timelineReadout_1x0nb_233`,
   },
-  BC = {
+  VC = {
     abnormal: `var(--bad)`,
     borderline: `var(--warn)`,
     normal: `var(--ok)`,
     not_sure: `var(--unk)`,
   },
-  VC = (e, t, n = 4) => {
+  HC = (e, t, n = 4) => {
     if (e === t) return [e];
     let r = (t - e) / n,
       i = 10 ** Math.floor(Math.log10(r)),
@@ -49306,7 +49290,7 @@ var Z = {
       o.push(Math.round(n * 1e6) / 1e6);
     return o;
   };
-function HC({ points: e, width: t = 84, height: n = 22 }) {
+function UC({ points: e, width: t = 84, height: n = 22 }) {
   if (e.length < 2)
     return (0, X.jsx)(`span`, { className: Z.sparkEmpty, children: `—` });
   let r = Math.min(...e),
@@ -49339,7 +49323,7 @@ function HC({ points: e, width: t = 84, height: n = 22 }) {
     ],
   });
 }
-function UC({ series: e, height: t = 190, onPickPoint: n }) {
+function WC({ series: e, height: t = 190, onPickPoint: n }) {
   let [r, i] = (0, _.useState)(null),
     a = t < 150,
     o = { top: 14, right: 54, bottom: 22, left: a ? 30 : 46 },
@@ -49371,7 +49355,7 @@ function UC({ series: e, height: t = 190, onPickPoint: n }) {
         ),
         min: l,
         max: u,
-        ticks: VC(l, u, a ? 2 : 4),
+        ticks: HC(l, u, a ? 2 : 4),
       };
     }, [e, t, a]),
     f = (e) => o.top + (1 - (e - l) / (u - l)) * (t - o.top - o.bottom),
@@ -49497,7 +49481,7 @@ function UC({ series: e, height: t = 190, onPickPoint: n }) {
                     cx: s[t],
                     cy: c[t],
                     r: h === t ? 5 : 3.5,
-                    fill: BC[e.flag ?? `not_sure`],
+                    fill: VC[e.flag ?? `not_sure`],
                     className: Z.point,
                   }),
                   e.date_provenance === `document` &&
@@ -49554,7 +49538,7 @@ function UC({ series: e, height: t = 190, onPickPoint: n }) {
           g.flag &&
             (0, X.jsx)(`span`, {
               className: Z.readoutFlag,
-              style: { color: BC[g.flag] },
+              style: { color: VC[g.flag] },
               children: g.flag.replace(`_`, ` `),
             }),
           g.date_provenance === `document` &&
@@ -49567,7 +49551,7 @@ function UC({ series: e, height: t = 190, onPickPoint: n }) {
     ],
   });
 }
-function WC({ rows: e, total: t, onPick: n, max: r }) {
+function GC({ rows: e, total: t, onPick: n, max: r }) {
   let i = r ?? Math.max(...e.map((e) => e.value), 1);
   return (0, X.jsx)(`div`, {
     className: Z.bars,
@@ -49611,7 +49595,7 @@ function WC({ rows: e, total: t, onPick: n, max: r }) {
     ),
   });
 }
-function GC({ items: e, onPick: t, height: n = 130 }) {
+function KC({ items: e, onPick: t, height: n = 130 }) {
   let [r, i] = (0, _.useState)(null),
     a = e.filter((e) => e.date),
     o = [...new Set(a.map((e) => e.lane))],
@@ -49753,7 +49737,7 @@ function GC({ items: e, onPick: t, height: n = 130 }) {
     ],
   });
 }
-var KC = {
+var qC = {
   hero: `_hero_jwtfc_1`,
   heroMain: `_heroMain_jwtfc_8`,
   heroLine: `_heroLine_jwtfc_15`,
@@ -49787,8 +49771,8 @@ var KC = {
   survivalRow: `_survivalRow_jwtfc_269`,
   survivalName: `_survivalName_jwtfc_277`,
 };
-function qC() {
-  let e = oC((e) => e.dataset),
+function JC() {
+  let e = sC((e) => e.dataset),
     t = (0, _.useMemo)(() => {
       if (!e) return null;
       let { stats: t } = e;
@@ -49825,38 +49809,38 @@ function qC() {
         survived: t.kept + t.merged,
       };
     }, [e]);
-  if (!e || !t) return (0, X.jsx)(NC, {});
+  if (!e || !t) return (0, X.jsx)(PC, {});
   let { stats: n } = e;
-  return (0, X.jsx)(jC, {
+  return (0, X.jsx)(MC, {
     title: e.patient.name ?? e.label,
     subtitle: [e.patient.age, e.patient.gender].filter(Boolean).join(` · `),
     actions: (0, X.jsxs)(X.Fragment, {
       children: [
-        (0, X.jsx)(wC, {
-          onClick: () => cC(`/pipeline/review`),
-          children: `Review queue`,
+        (0, X.jsx)(TC, {
+          onClick: () => lC(`/pipeline/review`),
+          children: `For Review`,
         }),
-        (0, X.jsx)(wC, {
+        (0, X.jsx)(TC, {
           variant: `solid`,
-          onClick: () => cC(`/pipeline/workbench`),
+          onClick: () => lC(`/pipeline/workbench`),
           children: `Open workbench`,
         }),
       ],
     }),
-    children: (0, X.jsxs)(MC, {
+    children: (0, X.jsxs)(NC, {
       children: [
         (0, X.jsxs)(`section`, {
-          className: KC.hero,
+          className: qC.hero,
           children: [
             (0, X.jsxs)(`div`, {
-              className: KC.heroMain,
+              className: qC.heroMain,
               children: [
                 (0, X.jsx)(`div`, {
                   className: `eyebrow`,
                   children: `the record`,
                 }),
                 (0, X.jsxs)(`p`, {
-                  className: KC.heroLine,
+                  className: qC.heroLine,
                   children: [
                     (0, X.jsx)(`b`, { className: `num`, children: n.acdps }),
                     ` data points were read out of `,
@@ -49875,8 +49859,8 @@ function qC() {
                   ],
                 }),
                 (0, X.jsx)(`div`, {
-                  className: KC.funnel,
-                  children: (0, X.jsx)(WC, {
+                  className: qC.funnel,
+                  children: (0, X.jsx)(GC, {
                     rows: [
                       {
                         key: `in`,
@@ -49905,90 +49889,90 @@ function qC() {
                     ],
                     total: n.acdps,
                     max: n.acdps,
-                    onPick: () => cC(`/pipeline/reduction`),
+                    onPick: () => lC(`/pipeline/reduction`),
                   }),
                 }),
               ],
             }),
             (0, X.jsxs)(`div`, {
-              className: KC.heroStats,
+              className: qC.heroStats,
               children: [
-                (0, X.jsx)(yC, {
+                (0, X.jsx)(bC, {
                   label: `Documents`,
                   value: n.documents,
-                  onClick: () => cC(`/profile/timeline`),
+                  onClick: () => lC(`/profile/timeline`),
                 }),
-                (0, X.jsx)(yC, {
+                (0, X.jsx)(bC, {
                   label: `Results`,
                   value: n.biomarkers,
-                  onClick: () => cC(`/profile/labs`),
+                  onClick: () => lC(`/profile/labs`),
                 }),
-                (0, X.jsx)(yC, {
+                (0, X.jsx)(bC, {
                   label: `Abnormal`,
                   value: n.by_flag.abnormal ?? 0,
                   tone: `bad`,
                   onClick: () =>
-                    cC(`/pipeline/workbench`, {
+                    lC(`/pipeline/workbench`, {
                       entity: `biomarker`,
                       view: `biomarker-all`,
                     }),
                 }),
-                (0, X.jsx)(yC, {
+                (0, X.jsx)(bC, {
                   label: `Unclassified`,
                   value: n.by_flag.not_sure ?? 0,
                   tone: `warn`,
                   sub: `no usable range`,
-                  onClick: () => cC(`/pipeline/review`),
+                  onClick: () => lC(`/pipeline/review`),
                 }),
-                (0, X.jsx)(yC, {
+                (0, X.jsx)(bC, {
                   label: `Trends`,
                   value: n.series_count,
                   sub: `${n.dated_by_document} dates inferred`,
-                  onClick: () => cC(`/profile/labs`),
+                  onClick: () => lC(`/profile/labs`),
                 }),
-                (0, X.jsx)(yC, {
+                (0, X.jsx)(bC, {
                   label: `Profile lines`,
                   value: n.l3_items,
                   tone: `acc`,
-                  onClick: () => cC(`/profile/lines`),
+                  onClick: () => lC(`/profile/lines`),
                 }),
               ],
             }),
           ],
         }),
         (0, X.jsxs)(`div`, {
-          className: KC.grid,
+          className: qC.grid,
           children: [
-            (0, X.jsx)(vC, {
+            (0, X.jsx)(yC, {
               title: `Active problems`,
               eyebrow: `${t.active.length} lines`,
-              action: (0, X.jsx)(wC, {
+              action: (0, X.jsx)(TC, {
                 size: `sm`,
                 variant: `quiet`,
-                onClick: () => cC(`/profile/lines`),
+                onClick: () => lC(`/profile/lines`),
                 children: `All lines`,
               }),
               children: (0, X.jsxs)(`ul`, {
-                className: KC.problems,
+                className: qC.problems,
                 children: [
                   t.active.map((e) =>
                     (0, X.jsx)(
                       `li`,
                       {
                         children: (0, X.jsxs)(`button`, {
-                          className: KC.problemBtn,
+                          className: qC.problemBtn,
                           onClick: () =>
-                            cC(`/profile/lines`, { open: e.l3_id }),
+                            lC(`/profile/lines`, { open: e.l3_id }),
                           children: [
                             (0, X.jsx)(`span`, {
-                              className: KC.problemText,
+                              className: qC.problemText,
                               children: e.text,
                             }),
                             (0, X.jsxs)(`span`, {
-                              className: KC.problemMeta,
+                              className: qC.problemMeta,
                               children: [
-                                (0, X.jsx)(xC, {
-                                  value: Pg[e.section],
+                                (0, X.jsx)(SC, {
+                                  value: Fg[e.section],
                                   tone:
                                     e.section === `caution` ? `warn` : `bad`,
                                   size: `sm`,
@@ -49998,7 +49982,7 @@ function qC() {
                                   children: Fh(e.date),
                                 }),
                                 (0, X.jsxs)(`span`, {
-                                  className: KC.provenance,
+                                  className: qC.provenance,
                                   children: [
                                     e.source_count,
                                     ` point`,
@@ -50021,47 +50005,47 @@ function qC() {
                 ],
               }),
             }),
-            (0, X.jsxs)(vC, {
+            (0, X.jsxs)(yC, {
               title: `Watchlist`,
               eyebrow: `latest reading outside its range`,
               children: [
                 (0, X.jsxs)(`div`, {
-                  className: KC.watch,
+                  className: qC.watch,
                   children: [
                     t.watch.map((e) =>
                       (0, X.jsxs)(
                         `button`,
                         {
-                          className: KC.watchRow,
-                          onClick: () => cC(`/profile/labs`, { marker: e.key }),
+                          className: qC.watchRow,
+                          onClick: () => lC(`/profile/labs`, { marker: e.key }),
                           children: [
                             (0, X.jsx)(`span`, {
-                              className: KC.watchName,
+                              className: qC.watchName,
                               title: e.name,
                               children: e.name,
                             }),
                             e.points.length >= 3
-                              ? (0, X.jsx)(HC, {
+                              ? (0, X.jsx)(UC, {
                                   points: e.points.map((e) => e.value),
                                 })
                               : (0, X.jsxs)(`span`, {
-                                  className: KC.watchSpan,
+                                  className: qC.watchSpan,
                                   children: [e.points.length, ` readings`],
                                 }),
                             (0, X.jsxs)(`span`, {
-                              className: `${KC.watchValue} num`,
+                              className: `${qC.watchValue} num`,
                               children: [
                                 e.latest.raw,
                                 (0, X.jsx)(`span`, {
-                                  className: KC.watchUnit,
+                                  className: qC.watchUnit,
                                   children: e.unit,
                                 }),
                               ],
                             }),
                             (0, X.jsxs)(`span`, {
-                              className: KC.watchFlag,
+                              className: qC.watchFlag,
                               children: [
-                                (0, X.jsx)(SC, {
+                                (0, X.jsx)(CC, {
                                   tone: e.latest.flag ?? `not_sure`,
                                 }),
                                 e.latest.flag?.replace(`_`, ` `),
@@ -50083,19 +50067,19 @@ function qC() {
                   (0, X.jsxs)(X.Fragment, {
                     children: [
                       (0, X.jsx)(`div`, {
-                        className: KC.subhead,
+                        className: qC.subhead,
                         children: `Single abnormal findings`,
                       }),
                       (0, X.jsx)(`ul`, {
-                        className: KC.singles,
+                        className: qC.singles,
                         children: t.singleAbnormal.map((e) =>
                           (0, X.jsxs)(
                             `li`,
                             {
                               children: [
-                                (0, X.jsx)(SC, { tone: `abnormal` }),
+                                (0, X.jsx)(CC, { tone: `abnormal` }),
                                 (0, X.jsx)(`span`, {
-                                  className: KC.singleName,
+                                  className: qC.singleName,
                                   children: e.biomarker_name,
                                 }),
                                 (0, X.jsx)(`b`, {
@@ -50116,11 +50100,11 @@ function qC() {
                   }),
               ],
             }),
-            (0, X.jsx)(vC, {
+            (0, X.jsx)(yC, {
               title: `Documents over time`,
               eyebrow: `${n.documents} sources`,
-              className: KC.wide,
-              children: (0, X.jsx)(GC, {
+              className: qC.wide,
+              children: (0, X.jsx)(KC, {
                 items: e.documents.map((e) => ({
                   id: e.source_id,
                   date: e.source_date,
@@ -50129,14 +50113,14 @@ function qC() {
                   count: e.acdp_count,
                   abnormal: e.abnormal_count,
                 })),
-                onPick: (e) => cC(`/profile/timeline`, { doc: String(e) }),
+                onPick: (e) => lC(`/profile/timeline`, { doc: String(e) }),
               }),
             }),
-            (0, X.jsx)(vC, {
+            (0, X.jsx)(yC, {
               title: `Current medications`,
               eyebrow: `${t.meds.length} lines`,
               children: (0, X.jsxs)(`ul`, {
-                className: KC.meds,
+                className: qC.meds,
                 children: [
                   t.meds.map((e) =>
                     (0, X.jsxs)(
@@ -50144,12 +50128,12 @@ function qC() {
                       {
                         children: [
                           (0, X.jsx)(`span`, {
-                            className: KC.medName,
+                            className: qC.medName,
                             children: e.text.replace(/^On /, ``),
                           }),
                           e.detail &&
                             (0, X.jsx)(`span`, {
-                              className: KC.medDetail,
+                              className: qC.medDetail,
                               children: e.detail,
                             }),
                           (0, X.jsx)(`span`, {
@@ -50169,27 +50153,27 @@ function qC() {
                 ],
               }),
             }),
-            (0, X.jsx)(vC, {
+            (0, X.jsx)(yC, {
               title: `Where the record is dense`,
               eyebrow: `data points by body system`,
-              children: (0, X.jsx)(WC, {
+              children: (0, X.jsx)(GC, {
                 rows: t.systems,
                 total: n.acdps,
                 onPick: (e) =>
-                  cC(`/pipeline/workbench`, { entity: `acdp`, system: e }),
+                  lC(`/pipeline/workbench`, { entity: `acdp`, system: e }),
               }),
             }),
-            (0, X.jsx)(vC, {
+            (0, X.jsx)(yC, {
               title: `Needs a human`,
               eyebrow: `cross-checks`,
-              action: (0, X.jsx)(wC, {
+              action: (0, X.jsx)(TC, {
                 size: `sm`,
                 variant: `quiet`,
-                onClick: () => cC(`/pipeline/review`),
+                onClick: () => lC(`/pipeline/review`),
                 children: `Open queue`,
               }),
               children: (0, X.jsx)(`ul`, {
-                className: KC.insights,
+                className: qC.insights,
                 children: e.insights
                   .slice(0, 6)
                   .map((e) =>
@@ -50197,17 +50181,17 @@ function qC() {
                       `li`,
                       {
                         children: (0, X.jsxs)(`button`, {
-                          className: KC.insightRow,
+                          className: qC.insightRow,
                           onClick: () =>
-                            cC(`/pipeline/review`, { insight: e.id }),
+                            lC(`/pipeline/review`, { insight: e.id }),
                           children: [
                             (0, X.jsx)(`span`, {
-                              className: KC.insightCount,
+                              className: qC.insightCount,
                               "data-sev": e.severity,
                               children: e.count,
                             }),
                             (0, X.jsx)(`span`, {
-                              className: KC.insightTitle,
+                              className: qC.insightTitle,
                               children: e.title,
                             }),
                           ],
@@ -50218,28 +50202,28 @@ function qC() {
                   ),
               }),
             }),
-            (0, X.jsxs)(vC, {
+            (0, X.jsxs)(yC, {
               title: `Plan`,
               eyebrow: `${t.plans.length} lines`,
               children: [
                 (0, X.jsxs)(`ul`, {
-                  className: KC.problems,
+                  className: qC.problems,
                   children: [
                     t.plans.map((e) =>
                       (0, X.jsx)(
                         `li`,
                         {
                           children: (0, X.jsxs)(`button`, {
-                            className: KC.problemBtn,
+                            className: qC.problemBtn,
                             onClick: () =>
-                              cC(`/profile/lines`, { open: e.l3_id }),
+                              lC(`/profile/lines`, { open: e.l3_id }),
                             children: [
                               (0, X.jsx)(`span`, {
-                                className: KC.problemText,
+                                className: qC.problemText,
                                 children: e.text,
                               }),
                               (0, X.jsx)(`span`, {
-                                className: KC.problemMeta,
+                                className: qC.problemMeta,
                                 children: (0, X.jsx)(`span`, {
                                   className: `num`,
                                   children: Fh(e.date),
@@ -50259,25 +50243,25 @@ function qC() {
                   ],
                 }),
                 (0, X.jsx)(`div`, {
-                  className: KC.subhead,
+                  className: qC.subhead,
                   children: `How much of each document survived`,
                 }),
                 (0, X.jsx)(`div`, {
-                  className: KC.survival,
+                  className: qC.survival,
                   children: e.documents
                     .slice(0, 8)
                     .map((e) =>
                       (0, X.jsxs)(
                         `div`,
                         {
-                          className: KC.survivalRow,
+                          className: qC.survivalRow,
                           children: [
                             (0, X.jsx)(`span`, {
-                              className: KC.survivalName,
+                              className: qC.survivalName,
                               children:
                                 e.source_subcategory ?? e.source_category,
                             }),
-                            (0, X.jsx)(CC, {
+                            (0, X.jsx)(wC, {
                               value: e.survival,
                               tone: e.survival > 0.25 ? `ok` : `warn`,
                             }),
@@ -50333,8 +50317,8 @@ var Q = {
     readings: `_readings_nvyqk_242`,
     reading: `_reading_nvyqk_242`,
   },
-  JC = (e) => `${Math.round(e * 100)}%`;
-function YC({ label: e, children: t }) {
+  YC = (e) => `${Math.round(e * 100)}%`;
+function XC({ label: e, children: t }) {
   return (0, X.jsxs)(`div`, {
     className: Q.line,
     children: [
@@ -50343,7 +50327,7 @@ function YC({ label: e, children: t }) {
     ],
   });
 }
-function XC({ row: e }) {
+function ZC({ row: e }) {
   if (e.value_num === null || e.lln === null || e.uln === null) return null;
   let t = e.lln,
     n = e.uln,
@@ -50378,7 +50362,7 @@ function XC({ row: e }) {
     ],
   });
 }
-function ZC({ doc: e, onOpen: t }) {
+function QC({ doc: e, onOpen: t }) {
   return (0, X.jsxs)(`button`, {
     className: Q.card,
     onClick: () => t({ entity: `document`, id: e.source_id }),
@@ -50386,7 +50370,7 @@ function ZC({ doc: e, onOpen: t }) {
       (0, X.jsxs)(`div`, {
         className: Q.cardHead,
         children: [
-          (0, X.jsx)(xC, {
+          (0, X.jsx)(SC, {
             value: e.source_category,
             tone: `neutral`,
             size: `sm`,
@@ -50405,14 +50389,14 @@ function ZC({ doc: e, onOpen: t }) {
           ` · `,
           e.acdp_count,
           ` points · `,
-          JC(e.survival),
+          YC(e.survival),
           ` reached the profile`,
         ],
       }),
     ],
   });
 }
-function QC({ row: e, onOpen: t }) {
+function $C({ row: e, onOpen: t }) {
   return (0, X.jsxs)(`button`, {
     className: Q.acdpRow,
     onClick: () => t({ entity: `acdp`, id: e.acdp_id }),
@@ -50422,14 +50406,14 @@ function QC({ row: e, onOpen: t }) {
       (0, X.jsxs)(`span`, {
         className: Q.acdpTail,
         children: [
-          e.flag && (0, X.jsx)(SC, { tone: e.flag, title: e.flag }),
-          (0, X.jsx)(xC, { value: e.fate, size: `sm` }),
+          e.flag && (0, X.jsx)(CC, { tone: e.flag, title: e.flag }),
+          (0, X.jsx)(SC, { value: e.fate, size: `sm` }),
         ],
       }),
     ],
   });
 }
-function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
+function ew({ dataset: e, target: t, onOpen: n, onClose: r }) {
   let { entity: i, id: a } = t,
     o = (() => {
       if (i === `acdp`) {
@@ -50452,41 +50436,41 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
             (0, X.jsxs)(`div`, {
               className: Q.tags,
               children: [
-                (0, X.jsx)(xC, {
+                (0, X.jsx)(SC, {
                   value: t.category,
                   tone: `neutral`,
                   size: `sm`,
                 }),
-                (0, X.jsx)(xC, {
+                (0, X.jsx)(SC, {
                   value: t.body_system,
                   tone: `neutral`,
                   size: `sm`,
                 }),
-                (0, X.jsx)(xC, { value: t.fate, size: `sm` }),
+                (0, X.jsx)(SC, { value: t.fate, size: `sm` }),
                 t.fn &&
-                  (0, X.jsx)(xC, {
+                  (0, X.jsx)(SC, {
                     value: t.fn,
                     tone: `acc`,
                     size: `sm`,
-                    title: Ig[t.fn],
+                    title: Lg[t.fn],
                   }),
               ],
             }),
-            (0, X.jsx)(EC, {}),
+            (0, X.jsx)(DC, {}),
             (0, X.jsx)(`h3`, {
               className: Q.h3,
               children: `What the reduction did`,
             }),
-            (0, X.jsx)(YC, {
+            (0, X.jsx)(XC, {
               label: `Rule`,
-              children: t.fn ? (Ig[t.fn] ?? t.fn) : `—`,
+              children: t.fn ? (Lg[t.fn] ?? t.fn) : `—`,
             }),
             t.rationale &&
               (0, X.jsx)(`p`, { className: Q.quote, children: t.rationale }),
             i &&
               (0, X.jsxs)(X.Fragment, {
                 children: [
-                  (0, X.jsx)(YC, {
+                  (0, X.jsx)(XC, {
                     label: `Became`,
                     children: (0, X.jsx)(`button`, {
                       className: Q.link,
@@ -50494,27 +50478,27 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
                       children: i.text,
                     }),
                   }),
-                  (0, X.jsx)(YC, {
+                  (0, X.jsx)(XC, {
                     label: `Section`,
-                    children: Pg[i.section] ?? i.section,
+                    children: Fg[i.section] ?? i.section,
                   }),
                 ],
               }),
             t.drop_reason &&
               !i &&
-              (0, X.jsx)(YC, {
+              (0, X.jsx)(XC, {
                 label: `Dropped because`,
                 children: t.drop_reason,
               }),
             s &&
               (0, X.jsxs)(X.Fragment, {
                 children: [
-                  (0, X.jsx)(EC, {}),
+                  (0, X.jsx)(DC, {}),
                   (0, X.jsx)(`h3`, {
                     className: Q.h3,
                     children: `Measurement`,
                   }),
-                  (0, X.jsxs)(YC, {
+                  (0, X.jsxs)(XC, {
                     label: s.biomarker_name,
                     children: [
                       (0, X.jsx)(`b`, {
@@ -50531,11 +50515,11 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
                         }),
                     ],
                   }),
-                  (0, X.jsx)(XC, { row: s }),
-                  (0, X.jsxs)(YC, {
+                  (0, X.jsx)(ZC, { row: s }),
+                  (0, X.jsxs)(XC, {
                     label: `Flag`,
                     children: [
-                      (0, X.jsx)(xC, {
+                      (0, X.jsx)(SC, {
                         value: s.biomarker_flag ?? `unflagged`,
                         size: `sm`,
                       }),
@@ -50547,7 +50531,7 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
                         }),
                     ],
                   }),
-                  (0, X.jsxs)(YC, {
+                  (0, X.jsxs)(XC, {
                     label: `Date`,
                     children: [
                       Fh(s.date),
@@ -50561,19 +50545,19 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
                   }),
                 ],
               }),
-            (0, X.jsx)(EC, {}),
+            (0, X.jsx)(DC, {}),
             (0, X.jsx)(`h3`, {
               className: Q.h3,
               children: `Where it came from`,
             }),
             r
-              ? (0, X.jsx)(ZC, { doc: r, onOpen: n })
+              ? (0, X.jsx)(QC, { doc: r, onOpen: n })
               : (0, X.jsx)(`p`, {
                   className: `hint`,
                   children: `no document linked`,
                 }),
             t.asserter_name &&
-              (0, X.jsxs)(YC, {
+              (0, X.jsxs)(XC, {
                 label: `Asserted by`,
                 children: [
                   t.asserter_name,
@@ -50587,7 +50571,7 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
             o.length > 0 &&
               (0, X.jsxs)(X.Fragment, {
                 children: [
-                  (0, X.jsx)(EC, {}),
+                  (0, X.jsx)(DC, {}),
                   (0, X.jsxs)(`h3`, {
                     className: Q.h3,
                     children: [
@@ -50603,7 +50587,7 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
                     children: o
                       .slice(0, 40)
                       .map((e) =>
-                        (0, X.jsx)(QC, { row: e, onOpen: n }, e.acdp_id),
+                        (0, X.jsx)($C, { row: e, onOpen: n }, e.acdp_id),
                       ),
                   }),
                 ],
@@ -50627,15 +50611,15 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
             (0, X.jsxs)(`div`, {
               className: Q.tags,
               children: [
-                (0, X.jsx)(xC, {
-                  value: Pg[t.section] ?? t.section,
+                (0, X.jsx)(SC, {
+                  value: Fg[t.section] ?? t.section,
                   tone: `acc`,
                   size: `sm`,
                 }),
                 t.functions.map((e) =>
                   (0, X.jsx)(
-                    xC,
-                    { value: e, tone: `neutral`, size: `sm`, title: Ig[e] },
+                    SC,
+                    { value: e, tone: `neutral`, size: `sm`, title: Lg[e] },
                     e,
                   ),
                 ),
@@ -50647,7 +50631,7 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
             }),
             t.rationale &&
               (0, X.jsx)(`p`, { className: Q.quote, children: t.rationale }),
-            (0, X.jsx)(EC, {}),
+            (0, X.jsx)(DC, {}),
             (0, X.jsxs)(`h3`, {
               className: Q.h3,
               children: [
@@ -50659,10 +50643,10 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
             (0, X.jsx)(`div`, {
               className: Q.list,
               children: r.map((e) =>
-                (0, X.jsx)(QC, { row: e, onOpen: n }, e.acdp_id),
+                (0, X.jsx)($C, { row: e, onOpen: n }, e.acdp_id),
               ),
             }),
-            (0, X.jsx)(EC, {}),
+            (0, X.jsx)(DC, {}),
             (0, X.jsxs)(`h3`, {
               className: Q.h3,
               children: [
@@ -50674,7 +50658,7 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
             (0, X.jsx)(`div`, {
               className: Q.cards,
               children: i.map((e) =>
-                (0, X.jsx)(ZC, { doc: e, onOpen: n }, e.source_id),
+                (0, X.jsx)(QC, { doc: e, onOpen: n }, e.source_id),
               ),
             }),
           ],
@@ -50707,23 +50691,23 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
             (0, X.jsxs)(`div`, {
               className: Q.tags,
               children: [
-                (0, X.jsx)(xC, {
+                (0, X.jsx)(SC, {
                   value: t.biomarker_flag ?? `unflagged`,
                   size: `sm`,
                 }),
-                (0, X.jsx)(xC, { value: t.panel, tone: `neutral`, size: `sm` }),
+                (0, X.jsx)(SC, { value: t.panel, tone: `neutral`, size: `sm` }),
                 (0, X.jsx)(`span`, {
                   className: `hint num`,
                   children: Fh(t.date),
                 }),
               ],
             }),
-            (0, X.jsx)(XC, { row: t }),
-            (0, X.jsx)(YC, {
+            (0, X.jsx)(ZC, { row: t }),
+            (0, X.jsx)(XC, {
               label: `Reference range`,
               children: t.biomarker_reference_range ?? `none printed`,
             }),
-            (0, X.jsx)(YC, {
+            (0, X.jsx)(XC, {
               label: `Date from`,
               children:
                 t.date_provenance === `printed`
@@ -50736,7 +50720,7 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
               r.points.length > 1 &&
               (0, X.jsxs)(X.Fragment, {
                 children: [
-                  (0, X.jsx)(EC, {}),
+                  (0, X.jsx)(DC, {}),
                   (0, X.jsxs)(`h3`, {
                     className: Q.h3,
                     children: [r.points.length, ` readings · `, r.direction],
@@ -50757,22 +50741,22 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
                               className: `num`,
                               children: e.raw,
                             }),
-                            e.flag && (0, X.jsx)(SC, { tone: e.flag }),
+                            e.flag && (0, X.jsx)(CC, { tone: e.flag }),
                           ],
                         },
                         t,
                       ),
                     ),
                   }),
-                  (0, X.jsx)(CC, {
+                  (0, X.jsx)(wC, {
                     value: r.time_in_range ?? 0,
                     tone: `ok`,
-                    label: `${JC(r.time_in_range ?? 0)} in range`,
+                    label: `${YC(r.time_in_range ?? 0)} in range`,
                   }),
                   (0, X.jsxs)(`p`, {
                     className: `hint`,
                     children: [
-                      JC(r.time_in_range ?? 0),
+                      YC(r.time_in_range ?? 0),
                       ` of readings inside the range`,
                     ],
                   }),
@@ -50781,12 +50765,12 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
             i.length > 0 &&
               (0, X.jsxs)(X.Fragment, {
                 children: [
-                  (0, X.jsx)(EC, {}),
+                  (0, X.jsx)(DC, {}),
                   (0, X.jsx)(`h3`, { className: Q.h3, children: `Stated by` }),
                   (0, X.jsx)(`div`, {
                     className: Q.list,
                     children: i.map((e) =>
-                      (0, X.jsx)(QC, { row: e, onOpen: n }, e.acdp_id),
+                      (0, X.jsx)($C, { row: e, onOpen: n }, e.acdp_id),
                     ),
                   }),
                 ],
@@ -50808,7 +50792,7 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
             (0, X.jsxs)(`div`, {
               className: Q.tags,
               children: [
-                (0, X.jsx)(xC, {
+                (0, X.jsx)(SC, {
                   value: t.source_category,
                   tone: `acc`,
                   size: `sm`,
@@ -50818,14 +50802,14 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
                   children: Fh(t.source_date),
                 }),
                 t.source_digitization &&
-                  (0, X.jsx)(xC, {
+                  (0, X.jsx)(SC, {
                     value: t.source_digitization,
                     tone: `neutral`,
                     size: `sm`,
                   }),
               ],
             }),
-            (0, X.jsxs)(YC, {
+            (0, X.jsxs)(XC, {
               label: `Asserted by`,
               children: [
                 t.asserter_name ?? `—`,
@@ -50836,7 +50820,7 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
                 }),
               ],
             }),
-            (0, X.jsxs)(YC, {
+            (0, X.jsxs)(XC, {
               label: `Identifier`,
               children: [
                 t.user_identification ?? `—`,
@@ -50847,7 +50831,7 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
                 }),
               ],
             }),
-            (0, X.jsxs)(YC, {
+            (0, X.jsxs)(XC, {
               label: `Yield`,
               children: [
                 t.acdp_count,
@@ -50858,20 +50842,20 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
                 ` abnormal`,
               ],
             }),
-            (0, X.jsxs)(YC, {
+            (0, X.jsxs)(XC, {
               label: `Reached the profile`,
               children: [
-                (0, X.jsx)(CC, {
+                (0, X.jsx)(wC, {
                   value: t.survival,
                   tone: t.survival > 0.3 ? `ok` : `warn`,
                 }),
                 (0, X.jsx)(`span`, {
                   className: `num`,
-                  children: JC(t.survival),
+                  children: YC(t.survival),
                 }),
               ],
             }),
-            (0, X.jsx)(EC, {}),
+            (0, X.jsx)(DC, {}),
             (0, X.jsxs)(`h3`, {
               className: Q.h3,
               children: [
@@ -50883,7 +50867,7 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
               className: Q.list,
               children: r
                 .slice(0, 200)
-                .map((e) => (0, X.jsx)(QC, { row: e, onOpen: n }, e.acdp_id)),
+                .map((e) => (0, X.jsx)($C, { row: e, onOpen: n }, e.acdp_id)),
             }),
           ],
         });
@@ -50904,7 +50888,7 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
             children: i === `l3` ? `profile line` : i,
           }),
           (0, X.jsx)(`span`, { className: `${Q.id} num`, children: a }),
-          (0, X.jsx)(wC, {
+          (0, X.jsx)(TC, {
             size: `sm`,
             variant: `quiet`,
             onClick: r,
@@ -50916,33 +50900,36 @@ function $C({ dataset: e, target: t, onOpen: n, onClose: r }) {
     ],
   });
 }
-var ew = {
-  layout: `_layout_4q5c0_1`,
-  main: `_main_4q5c0_7`,
-  strip: `_strip_4q5c0_13`,
-  gapNote: `_gapNote_4q5c0_17`,
-  year: `_year_4q5c0_23`,
-  yearHead: `_yearHead_4q5c0_27`,
-  yearTitle: `_yearTitle_4q5c0_36`,
-  doc: `_doc_4q5c0_47`,
-  docOpen: `_docOpen_4q5c0_55`,
-  docHead: `_docHead_4q5c0_59`,
-  docDate: `_docDate_4q5c0_73`,
-  docTitle: `_docTitle_4q5c0_78`,
-  docBy: `_docBy_4q5c0_86`,
-  docCounts: `_docCounts_4q5c0_92`,
-  docAbnormal: `_docAbnormal_4q5c0_100`,
-  docSurvival: `_docSurvival_4q5c0_107`,
-  docBody: `_docBody_4q5c0_115`,
-  acdps: `_acdps_4q5c0_123`,
-  acdp: `_acdp_4q5c0_123`,
-  acdpId: `_acdpId_4q5c0_145`,
-  acdpText: `_acdpText_4q5c0_150`,
-  acdpTail: `_acdpTail_4q5c0_157`,
+var tw = {
+  layout: `_layout_1hqwu_1`,
+  main: `_main_1hqwu_7`,
+  strip: `_strip_1hqwu_13`,
+  gapNote: `_gapNote_1hqwu_17`,
+  year: `_year_1hqwu_23`,
+  yearHead: `_yearHead_1hqwu_27`,
+  yearTitle: `_yearTitle_1hqwu_36`,
+  doc: `_doc_1hqwu_47`,
+  docOpen: `_docOpen_1hqwu_55`,
+  docRow: `_docRow_1hqwu_62`,
+  docHead: `_docHead_1hqwu_67`,
+  docFile: `_docFile_1hqwu_83`,
+  docFileOff: `_docFileOff_1hqwu_99`,
+  docDate: `_docDate_1hqwu_113`,
+  docTitle: `_docTitle_1hqwu_118`,
+  docBy: `_docBy_1hqwu_126`,
+  docCounts: `_docCounts_1hqwu_132`,
+  docAbnormal: `_docAbnormal_1hqwu_140`,
+  docSurvival: `_docSurvival_1hqwu_147`,
+  docBody: `_docBody_1hqwu_155`,
+  acdps: `_acdps_1hqwu_163`,
+  acdp: `_acdp_1hqwu_163`,
+  acdpId: `_acdpId_1hqwu_185`,
+  acdpText: `_acdpText_1hqwu_190`,
+  acdpTail: `_acdpTail_1hqwu_197`,
 };
-function tw() {
-  let e = oC((e) => e.dataset),
-    t = lC(),
+function nw() {
+  let e = sC((e) => e.dataset),
+    t = uC(),
     [n, r] = (0, _.useState)(
       t.params.get(`doc`) ? Number(t.params.get(`doc`)) : null,
     ),
@@ -50973,25 +50960,25 @@ function tw() {
       return n;
     }, [e]);
   return e
-    ? (0, X.jsx)(jC, {
-        title: `Timeline`,
+    ? (0, X.jsx)(MC, {
+        title: `All Records (L1)`,
         subtitle: `${e.stats.documents} documents, ${Fh(e.stats.date_range[0])} → ${Fh(e.stats.date_range[1])}`,
-        actions: (0, X.jsx)(wC, {
-          onClick: () => cC(`/pipeline/workbench`, { entity: `document` }),
+        actions: (0, X.jsx)(TC, {
+          onClick: () => lC(`/pipeline/workbench`, { entity: `document` }),
           children: `Open as a table`,
         }),
         children: (0, X.jsxs)(`div`, {
-          className: ew.layout,
+          className: tw.layout,
           children: [
             (0, X.jsx)(`div`, {
-              className: ew.main,
-              children: (0, X.jsxs)(MC, {
+              className: tw.main,
+              children: (0, X.jsxs)(NC, {
                 children: [
-                  (0, X.jsx)(vC, {
+                  (0, X.jsx)(yC, {
                     title: `Documents over time`,
                     eyebrow: `by kind`,
-                    className: ew.strip,
-                    children: (0, X.jsx)(GC, {
+                    className: tw.strip,
+                    children: (0, X.jsx)(KC, {
                       items: e.documents.map((e) => ({
                         id: e.source_id,
                         date: e.source_date,
@@ -51006,7 +50993,7 @@ function tw() {
                   }),
                   s.length > 0 &&
                     (0, X.jsxs)(`p`, {
-                      className: ew.gapNote,
+                      className: tw.gapNote,
                       children: [
                         `Nothing was recorded during`,
                         ` `,
@@ -51035,13 +51022,13 @@ function tw() {
                     (0, X.jsxs)(
                       `section`,
                       {
-                        className: ew.year,
+                        className: tw.year,
                         children: [
                           (0, X.jsxs)(`header`, {
-                            className: ew.yearHead,
+                            className: tw.yearHead,
                             children: [
                               (0, X.jsx)(`h2`, {
-                                className: ew.yearTitle,
+                                className: tw.yearTitle,
                                 children: t,
                               }),
                               (0, X.jsxs)(`span`, {
@@ -51056,80 +51043,94 @@ function tw() {
                                 ? e.acdps.filter(
                                     (e) => e.source_id === t.source_id,
                                   )
-                                : [];
+                                : [],
+                              s = gg(t.source_file);
                             return (0, X.jsxs)(
                               `article`,
                               {
-                                className: `${ew.doc} ${i ? ew.docOpen : ``}`,
+                                className: `${tw.doc} ${i ? tw.docOpen : ``}`,
                                 children: [
-                                  (0, X.jsxs)(`button`, {
-                                    className: ew.docHead,
-                                    onClick: () => r(i ? null : t.source_id),
+                                  (0, X.jsxs)(`div`, {
+                                    className: tw.docRow,
                                     children: [
-                                      (0, X.jsx)(`span`, {
-                                        className: `${ew.docDate} num`,
-                                        children: Fh(t.source_date),
-                                      }),
-                                      (0, X.jsxs)(`span`, {
-                                        className: ew.docTitle,
-                                        children: [
-                                          t.source_subcategory ??
-                                            t.source_category,
-                                          (0, X.jsx)(`span`, {
-                                            className: ew.docBy,
-                                            children:
-                                              t.asserter_name ?? `unattributed`,
-                                          }),
-                                        ],
-                                      }),
-                                      (0, X.jsx)(xC, {
-                                        value: t.source_category,
-                                        tone: `neutral`,
-                                        size: `sm`,
-                                      }),
-                                      (0, X.jsxs)(`span`, {
-                                        className: ew.docCounts,
+                                      (0, X.jsxs)(`button`, {
+                                        className: tw.docHead,
+                                        onClick: () =>
+                                          r(i ? null : t.source_id),
                                         children: [
                                           (0, X.jsx)(`span`, {
-                                            className: `num`,
-                                            children: t.acdp_count,
-                                          }),
-                                          ` points`,
-                                          t.abnormal_count > 0 &&
-                                            (0, X.jsxs)(`span`, {
-                                              className: ew.docAbnormal,
-                                              children: [
-                                                (0, X.jsx)(SC, {
-                                                  tone: `abnormal`,
-                                                }),
-                                                ` `,
-                                                t.abnormal_count,
-                                              ],
-                                            }),
-                                        ],
-                                      }),
-                                      (0, X.jsxs)(`span`, {
-                                        className: ew.docSurvival,
-                                        children: [
-                                          (0, X.jsx)(CC, {
-                                            value: t.survival,
-                                            tone:
-                                              t.survival > 0.25 ? `ok` : `warn`,
+                                            className: `${tw.docDate} num`,
+                                            children: Fh(t.source_date),
                                           }),
                                           (0, X.jsxs)(`span`, {
-                                            className: `num`,
+                                            className: tw.docTitle,
                                             children: [
-                                              Math.round(t.survival * 100),
-                                              `%`,
+                                              t.source_subcategory ??
+                                                t.source_category,
+                                              (0, X.jsx)(`span`, {
+                                                className: tw.docBy,
+                                                children:
+                                                  t.asserter_name ??
+                                                  `unattributed`,
+                                              }),
+                                            ],
+                                          }),
+                                          (0, X.jsx)(SC, {
+                                            value: t.source_category,
+                                            tone: `neutral`,
+                                            size: `sm`,
+                                          }),
+                                          (0, X.jsxs)(`span`, {
+                                            className: tw.docCounts,
+                                            children: [
+                                              (0, X.jsx)(`span`, {
+                                                className: `num`,
+                                                children: t.acdp_count,
+                                              }),
+                                              ` points`,
+                                              t.abnormal_count > 0 &&
+                                                (0, X.jsxs)(`span`, {
+                                                  className: tw.docAbnormal,
+                                                  children: [
+                                                    (0, X.jsx)(CC, {
+                                                      tone: `abnormal`,
+                                                    }),
+                                                    ` `,
+                                                    t.abnormal_count,
+                                                  ],
+                                                }),
+                                            ],
+                                          }),
+                                          (0, X.jsxs)(`span`, {
+                                            className: tw.docSurvival,
+                                            children: [
+                                              (0, X.jsx)(wC, {
+                                                value: t.survival,
+                                                tone:
+                                                  t.survival > 0.25
+                                                    ? `ok`
+                                                    : `warn`,
+                                              }),
+                                              (0, X.jsxs)(`span`, {
+                                                className: `num`,
+                                                children: [
+                                                  Math.round(t.survival * 100),
+                                                  `%`,
+                                                ],
+                                              }),
                                             ],
                                           }),
                                         ],
+                                      }),
+                                      (0, X.jsx)(rw, {
+                                        file: t.source_file,
+                                        url: s,
                                       }),
                                     ],
                                   }),
                                   i &&
                                     (0, X.jsxs)(`div`, {
-                                      className: ew.docBody,
+                                      className: tw.docBody,
                                       children: [
                                         o.length === 0 &&
                                           (0, X.jsx)(`p`, {
@@ -51137,7 +51138,7 @@ function tw() {
                                             children: `nothing was extracted from this document`,
                                           }),
                                         (0, X.jsx)(`ul`, {
-                                          className: ew.acdps,
+                                          className: tw.acdps,
                                           children: o.map((e) =>
                                             (0, X.jsx)(
                                               `li`,
@@ -51145,7 +51146,7 @@ function tw() {
                                                 children: (0, X.jsxs)(
                                                   `button`,
                                                   {
-                                                    className: ew.acdp,
+                                                    className: tw.acdp,
                                                     onClick: () =>
                                                       a({
                                                         entity: `acdp`,
@@ -51153,22 +51154,22 @@ function tw() {
                                                       }),
                                                     children: [
                                                       (0, X.jsx)(`span`, {
-                                                        className: `${ew.acdpId} num`,
+                                                        className: `${tw.acdpId} num`,
                                                         children: e.acdp_id,
                                                       }),
                                                       (0, X.jsx)(`span`, {
-                                                        className: ew.acdpText,
+                                                        className: tw.acdpText,
                                                         children: e.acdp,
                                                       }),
                                                       (0, X.jsxs)(`span`, {
-                                                        className: ew.acdpTail,
+                                                        className: tw.acdpTail,
                                                         children: [
                                                           e.flag &&
-                                                            (0, X.jsx)(SC, {
+                                                            (0, X.jsx)(CC, {
                                                               tone: e.flag,
                                                               title: e.flag,
                                                             }),
-                                                          (0, X.jsx)(xC, {
+                                                          (0, X.jsx)(SC, {
                                                             value: e.fate,
                                                             size: `sm`,
                                                           }),
@@ -51198,7 +51199,7 @@ function tw() {
               }),
             }),
             i &&
-              (0, X.jsx)($C, {
+              (0, X.jsx)(ew, {
                 dataset: e,
                 target: i,
                 onOpen: a,
@@ -51207,9 +51208,31 @@ function tw() {
           ],
         }),
       })
-    : (0, X.jsx)(NC, {});
+    : (0, X.jsx)(PC, {});
 }
-var nw = {
+function rw({ file: e, url: t }) {
+  return e
+    ? t
+      ? (0, X.jsxs)(`a`, {
+          className: tw.docFile,
+          href: t,
+          target: `_blank`,
+          rel: `noreferrer`,
+          title: `Open ${e} in a new tab`,
+          onClick: (e) => e.stopPropagation(),
+          children: [
+            (0, X.jsx)(`span`, { "aria-hidden": !0, children: `↗` }),
+            ` open`,
+          ],
+        })
+      : (0, X.jsx)(`span`, {
+          className: `${tw.docFile} ${tw.docFileOff}`,
+          title: `${e} — this build has no Supabase URL, so the original cannot be opened`,
+          children: e,
+        })
+    : null;
+}
+var iw = {
   layout: `_layout_1p117_1`,
   rail: `_rail_1p117_8`,
   railHead: `_railHead_1p117_16`,
@@ -51238,9 +51261,9 @@ var nw = {
   singleValue: `_singleValue_1p117_235`,
   singleMeta: `_singleMeta_1p117_239`,
 };
-function rw() {
-  let e = oC((e) => e.dataset),
-    t = lC(),
+function aw() {
+  let e = sC((e) => e.dataset),
+    t = uC(),
     [n, r] = (0, _.useState)(``),
     [i, a] = (0, _.useState)(`all`),
     [o, s] = (0, _.useState)(t.params.get(`marker`)),
@@ -51270,32 +51293,32 @@ function rw() {
         ),
       };
     }, [e, n, i]);
-  if (!e || !c) return (0, X.jsx)(NC, {});
+  if (!e || !c) return (0, X.jsx)(PC, {});
   let l = c.series.find((e) => e.key === o) ?? c.series[0];
-  return (0, X.jsx)(jC, {
-    title: `Results`,
+  return (0, X.jsx)(MC, {
+    title: `Biomarkers`,
     subtitle: `${e.stats.biomarkers} readings · ${e.stats.series_count} markers with more than one`,
-    actions: (0, X.jsx)(wC, {
-      onClick: () => cC(`/pipeline/workbench`, { entity: `biomarker` }),
+    actions: (0, X.jsx)(TC, {
+      onClick: () => lC(`/pipeline/workbench`, { entity: `biomarker` }),
       children: `Open as a table`,
     }),
     children: (0, X.jsxs)(`div`, {
-      className: nw.layout,
+      className: iw.layout,
       children: [
         (0, X.jsxs)(`aside`, {
-          className: nw.rail,
+          className: iw.rail,
           children: [
             (0, X.jsxs)(`div`, {
-              className: nw.railHead,
+              className: iw.railHead,
               children: [
                 (0, X.jsx)(`input`, {
-                  className: RC.input,
+                  className: zC.input,
                   placeholder: `Find a marker…`,
                   value: n,
                   onChange: (e) => r(e.target.value),
                 }),
                 (0, X.jsx)(`div`, {
-                  className: nw.filters,
+                  className: iw.filters,
                   children: [
                     [`all`, `All`],
                     [`out`, `Out of range`],
@@ -51304,7 +51327,7 @@ function rw() {
                     (0, X.jsx)(
                       `button`,
                       {
-                        className: i === e ? nw.filterActive : nw.filter,
+                        className: i === e ? iw.filterActive : iw.filter,
                         onClick: () => a(e),
                         children: t,
                       },
@@ -51315,7 +51338,7 @@ function rw() {
               ],
             }),
             (0, X.jsxs)(`div`, {
-              className: nw.railList,
+              className: iw.railList,
               children: [
                 c.panels.map(([e, t]) =>
                   (0, X.jsxs)(
@@ -51323,7 +51346,7 @@ function rw() {
                     {
                       children: [
                         (0, X.jsxs)(`header`, {
-                          className: nw.panelHead,
+                          className: iw.panelHead,
                           children: [
                             (0, X.jsx)(`span`, { children: e }),
                             (0, X.jsx)(`span`, {
@@ -51336,29 +51359,29 @@ function rw() {
                           (0, X.jsxs)(
                             `button`,
                             {
-                              className: `${nw.marker} ${l?.key === e.key ? nw.markerActive : ``}`,
+                              className: `${iw.marker} ${l?.key === e.key ? iw.markerActive : ``}`,
                               onClick: () => s(e.key),
                               children: [
                                 (0, X.jsx)(`span`, {
-                                  className: nw.markerName,
+                                  className: iw.markerName,
                                   title: e.name,
                                   children: e.name,
                                 }),
                                 e.points.length >= 3
-                                  ? (0, X.jsx)(HC, {
+                                  ? (0, X.jsx)(UC, {
                                       points: e.points.map((e) => e.value),
                                       width: 54,
                                       height: 16,
                                     })
                                   : (0, X.jsxs)(`span`, {
-                                      className: nw.markerPoints,
+                                      className: iw.markerPoints,
                                       children: [e.points.length, `×`],
                                     }),
                                 (0, X.jsx)(`span`, {
-                                  className: `${nw.markerValue} num`,
+                                  className: `${iw.markerValue} num`,
                                   children: e.latest.raw,
                                 }),
-                                (0, X.jsx)(SC, {
+                                (0, X.jsx)(CC, {
                                   tone: e.latest.flag ?? `not_sure`,
                                   title: e.latest.flag ?? `unclassified`,
                                 }),
@@ -51373,34 +51396,34 @@ function rw() {
                   ),
                 ),
                 c.series.length === 0 &&
-                  (0, X.jsx)(TC, { title: `No markers match` }),
+                  (0, X.jsx)(EC, { title: `No markers match` }),
               ],
             }),
           ],
         }),
         (0, X.jsx)(`div`, {
-          className: nw.main,
-          children: (0, X.jsx)(MC, {
+          className: iw.main,
+          children: (0, X.jsx)(NC, {
             children: l
               ? (0, X.jsxs)(X.Fragment, {
                   children: [
                     (0, X.jsxs)(`div`, {
-                      className: nw.chartRow,
+                      className: iw.chartRow,
                       children: [
-                        (0, X.jsx)(UC, {
+                        (0, X.jsx)(WC, {
                           series: l,
                           onPickPoint: (e) =>
-                            cC(`/pipeline/workbench`, {
+                            lC(`/pipeline/workbench`, {
                               entity: `biomarker`,
                               row: e,
                             }),
                         }),
-                        (0, X.jsxs)(vC, {
+                        (0, X.jsxs)(yC, {
                           title: `This marker`,
                           eyebrow: l.panel,
                           children: [
                             (0, X.jsxs)(`dl`, {
-                              className: nw.facts,
+                              className: iw.facts,
                               children: [
                                 (0, X.jsx)(`dt`, { children: `Latest` }),
                                 (0, X.jsxs)(`dd`, {
@@ -51410,7 +51433,7 @@ function rw() {
                                     ` `,
                                     l.unit,
                                     ` `,
-                                    (0, X.jsx)(xC, {
+                                    (0, X.jsx)(SC, {
                                       value: l.latest.flag ?? `not_sure`,
                                       size: `sm`,
                                     }),
@@ -51442,7 +51465,7 @@ function rw() {
                                         ],
                                       }),
                                     ` `,
-                                    (0, X.jsx)(xC, {
+                                    (0, X.jsx)(SC, {
                                       value: l.direction,
                                       tone: `neutral`,
                                       size: `sm`,
@@ -51457,7 +51480,7 @@ function rw() {
                                 (0, X.jsx)(`dt`, { children: `In range` }),
                                 (0, X.jsxs)(`dd`, {
                                   children: [
-                                    (0, X.jsx)(CC, {
+                                    (0, X.jsx)(wC, {
                                       value: l.time_in_range ?? 0,
                                       tone: `ok`,
                                     }),
@@ -51476,14 +51499,14 @@ function rw() {
                               ],
                             }),
                             (0, X.jsx)(`div`, {
-                              className: nw.readings,
+                              className: iw.readings,
                               children: [...l.points]
                                 .reverse()
                                 .map((e, t) =>
                                   (0, X.jsxs)(
                                     `div`,
                                     {
-                                      className: nw.reading,
+                                      className: iw.reading,
                                       children: [
                                         (0, X.jsx)(`span`, {
                                           className: `num`,
@@ -51493,12 +51516,12 @@ function rw() {
                                           className: `num`,
                                           children: e.raw,
                                         }),
-                                        (0, X.jsx)(SC, {
+                                        (0, X.jsx)(CC, {
                                           tone: e.flag ?? `not_sure`,
                                         }),
                                         e.date_provenance === `document` &&
                                           (0, X.jsx)(`span`, {
-                                            className: nw.inferred,
+                                            className: iw.inferred,
                                             children: `inferred date`,
                                           }),
                                       ],
@@ -51515,7 +51538,7 @@ function rw() {
                       (0, X.jsxs)(X.Fragment, {
                         children: [
                           (0, X.jsxs)(`h2`, {
-                            className: nw.sectionTitle,
+                            className: iw.sectionTitle,
                             children: [
                               i === `all`
                                 ? `Every marker with more than one reading`
@@ -51527,16 +51550,16 @@ function rw() {
                             ],
                           }),
                           (0, X.jsx)(`div`, {
-                            className: nw.smallMultiples,
+                            className: iw.smallMultiples,
                             children: c.series
                               .slice(0, 60)
                               .map((e) =>
                                 (0, X.jsx)(
                                   `button`,
                                   {
-                                    className: nw.mini,
+                                    className: iw.mini,
                                     onClick: () => s(e.key),
-                                    children: (0, X.jsx)(UC, {
+                                    children: (0, X.jsx)(WC, {
                                       series: e,
                                       height: 120,
                                     }),
@@ -51551,7 +51574,7 @@ function rw() {
                       (0, X.jsxs)(X.Fragment, {
                         children: [
                           (0, X.jsxs)(`h2`, {
-                            className: nw.sectionTitle,
+                            className: iw.sectionTitle,
                             children: [
                               `Measured once`,
                               (0, X.jsx)(`span`, {
@@ -51561,22 +51584,22 @@ function rw() {
                             ],
                           }),
                           (0, X.jsx)(`div`, {
-                            className: nw.singles,
+                            className: iw.singles,
                             children: c.singles
                               .slice(0, 120)
                               .map((e) =>
                                 (0, X.jsxs)(
                                   `div`,
                                   {
-                                    className: nw.single,
+                                    className: iw.single,
                                     "data-flag": e.biomarker_flag ?? `none`,
                                     children: [
                                       (0, X.jsx)(`span`, {
-                                        className: nw.singleName,
+                                        className: iw.singleName,
                                         children: e.biomarker_name,
                                       }),
                                       (0, X.jsxs)(`span`, {
-                                        className: `${nw.singleValue} num`,
+                                        className: `${iw.singleValue} num`,
                                         children: [
                                           e.biomarker_value,
                                           ` `,
@@ -51587,9 +51610,9 @@ function rw() {
                                         ],
                                       }),
                                       (0, X.jsxs)(`span`, {
-                                        className: nw.singleMeta,
+                                        className: iw.singleMeta,
                                         children: [
-                                          (0, X.jsx)(SC, {
+                                          (0, X.jsx)(CC, {
                                             tone:
                                               e.biomarker_flag ?? `not_sure`,
                                           }),
@@ -51609,14 +51632,14 @@ function rw() {
                       }),
                   ],
                 })
-              : (0, X.jsx)(TC, { title: `No marker selected` }),
+              : (0, X.jsx)(EC, { title: `No marker selected` }),
           }),
         }),
       ],
     }),
   });
 }
-var iw = {
+var ow = {
     layout: `_layout_1joku_1`,
     main: `_main_1joku_7`,
     section: `_section_1joku_13`,
@@ -51632,7 +51655,7 @@ var iw = {
     itemSources: `_itemSources_1joku_93`,
     dropLinks: `_dropLinks_1joku_97`,
   },
-  aw = [
+  sw = [
     `active_problem`,
     `plan`,
     `medication`,
@@ -51642,77 +51665,77 @@ var iw = {
     `past_episode`,
     `contested`,
   ];
-function ow() {
-  let e = oC((e) => e.dataset),
-    t = lC(),
+function cw() {
+  let e = sC((e) => e.dataset),
+    t = uC(),
     [n, r] = (0, _.useState)(
       t.params.get(`open`) ? { entity: `l3`, id: t.params.get(`open`) } : null,
     ),
     i = (0, _.useMemo)(
       () =>
         e
-          ? aw
+          ? sw
               .map((t) => [t, e.l3.filter((e) => e.section === t)])
               .filter(([, e]) => e.length > 0)
           : [],
       [e],
     );
-  if (!e) return (0, X.jsx)(NC, {});
+  if (!e) return (0, X.jsx)(PC, {});
   let a = e.l3.reduce((e, t) => e + t.source_count, 0);
-  return (0, X.jsx)(jC, {
-    title: `Health profile`,
+  return (0, X.jsx)(MC, {
+    title: `Health Profile (L3)`,
     subtitle: `${e.stats.l3_items} lines standing in for ${a} data points`,
-    actions: (0, X.jsx)(wC, {
-      onClick: () => cC(`/pipeline/workbench`, { entity: `l3` }),
+    actions: (0, X.jsx)(TC, {
+      onClick: () => lC(`/pipeline/workbench`, { entity: `l3` }),
       children: `Open as a table`,
     }),
     children: (0, X.jsxs)(`div`, {
-      className: iw.layout,
+      className: ow.layout,
       children: [
         (0, X.jsx)(`div`, {
-          className: iw.main,
-          children: (0, X.jsxs)(MC, {
+          className: ow.main,
+          children: (0, X.jsxs)(NC, {
             children: [
               i.map(([e, t]) =>
                 (0, X.jsxs)(
                   `section`,
                   {
-                    className: iw.section,
+                    className: ow.section,
                     children: [
                       (0, X.jsxs)(`header`, {
-                        className: iw.sectionHead,
+                        className: ow.sectionHead,
                         children: [
                           (0, X.jsx)(`h2`, {
-                            className: iw.sectionTitle,
-                            children: Pg[e],
+                            className: ow.sectionTitle,
+                            children: Fg[e],
                           }),
                           (0, X.jsx)(`span`, {
-                            className: `${iw.sectionCount} num`,
+                            className: `${ow.sectionCount} num`,
                             children: t.length,
                           }),
                         ],
                       }),
                       (0, X.jsx)(`ul`, {
-                        className: iw.items,
+                        className: ow.items,
                         children: t.map((e) =>
                           (0, X.jsx)(
                             `li`,
                             {
                               children: (0, X.jsxs)(`button`, {
-                                className: `${iw.item} ${n?.id === e.l3_id ? iw.itemActive : ``}`,
+                                className: `${ow.item} ${n?.id === e.l3_id ? ow.itemActive : ``}`,
                                 onClick: () => r({ entity: `l3`, id: e.l3_id }),
                                 children: [
                                   (0, X.jsx)(`span`, {
-                                    className: iw.itemText,
+                                    className: ow.itemText,
                                     children: e.text,
                                   }),
                                   e.detail &&
                                     (0, X.jsx)(`span`, {
-                                      className: iw.itemDetail,
+                                      className: ow.itemDetail,
                                       children: e.detail,
                                     }),
                                   (0, X.jsxs)(`span`, {
-                                    className: iw.itemMeta,
+                                    className: ow.itemMeta,
                                     children: [
                                       (0, X.jsx)(`span`, {
                                         className: `num`,
@@ -51720,18 +51743,18 @@ function ow() {
                                       }),
                                       e.functions.map((e) =>
                                         (0, X.jsx)(
-                                          xC,
+                                          SC,
                                           {
                                             value: e,
                                             tone: `neutral`,
                                             size: `sm`,
-                                            title: Ig[e] ?? e,
+                                            title: Lg[e] ?? e,
                                           },
                                           e,
                                         ),
                                       ),
                                       (0, X.jsxs)(`span`, {
-                                        className: iw.itemSources,
+                                        className: ow.itemSources,
                                         children: [
                                           `built from `,
                                           e.source_count,
@@ -51755,7 +51778,7 @@ function ow() {
                   e,
                 ),
               ),
-              (0, X.jsxs)(vC, {
+              (0, X.jsxs)(yC, {
                 title: `What did not make the page`,
                 eyebrow: `lossy by design`,
                 children: [
@@ -51769,15 +51792,15 @@ function ow() {
                     ],
                   }),
                   (0, X.jsxs)(`div`, {
-                    className: iw.dropLinks,
+                    className: ow.dropLinks,
                     children: [
-                      (0, X.jsx)(wC, {
-                        onClick: () => cC(`/pipeline/reduction`),
+                      (0, X.jsx)(TC, {
+                        onClick: () => lC(`/pipeline/reduction`),
                         children: `See where they went`,
                       }),
-                      (0, X.jsx)(wC, {
+                      (0, X.jsx)(TC, {
                         onClick: () =>
-                          cC(`/pipeline/workbench`, { view: `acdp-dropped` }),
+                          lC(`/pipeline/workbench`, { view: `acdp-dropped` }),
                         children: `Open the dropped points`,
                       }),
                     ],
@@ -51788,7 +51811,7 @@ function ow() {
           }),
         }),
         n &&
-          (0, X.jsx)($C, {
+          (0, X.jsx)(ew, {
             dataset: e,
             target: n,
             onOpen: r,
@@ -51798,7 +51821,7 @@ function ow() {
     }),
   });
 }
-var sw = {
+var lw = {
   layout: `_layout_43w9g_1`,
   main: `_main_43w9g_7`,
   funnelRow: `_funnelRow_43w9g_13`,
@@ -51814,19 +51837,19 @@ var sw = {
   focusText: `_focusText_43w9g_106`,
   focusWhy: `_focusWhy_43w9g_112`,
 };
-function cw() {
-  let e = oC((e) => e.dataset),
+function uw() {
+  let e = sC((e) => e.dataset),
     [t, n] = (0, _.useState)(null),
     [r, i] = (0, _.useState)(null),
     a = (0, _.useMemo)(() => {
       if (!e) return null;
       let { stats: t } = e,
         n = Object.entries(t.by_drop_fn)
-          .map(([e, t]) => ({ key: e, label: Fg[e] ?? e, value: t }))
+          .map(([e, t]) => ({ key: e, label: Ig[e] ?? e, value: t }))
           .sort((e, t) => t.value - e.value),
         i = Object.entries(t.by_fn)
           .filter(([e]) => !/^D\d$|^DROP/i.test(e) && e !== `(none)`)
-          .map(([e, t]) => ({ key: e, label: Fg[e] ?? e, value: t }))
+          .map(([e, t]) => ({ key: e, label: Ig[e] ?? e, value: t }))
           .sort((e, t) => t.value - e.value),
         a = new Map();
       for (let t of e.acdps) {
@@ -51857,32 +51880,32 @@ function cw() {
           : [],
       };
     }, [e, r]);
-  if (!e || !a) return (0, X.jsx)(NC, {});
+  if (!e || !a) return (0, X.jsx)(PC, {});
   let { stats: o } = e,
     s = o.kept + o.merged,
     c = o.acdps - s - o.dropped;
-  return (0, X.jsx)(jC, {
-    title: `Reduction`,
+  return (0, X.jsx)(MC, {
+    title: `Funnel`,
     subtitle: `${o.acdps} data points → ${o.l3_items} lines`,
-    actions: (0, X.jsx)(wC, {
-      onClick: () => cC(`/pipeline/workbench`, { view: `acdp-dropped` }),
+    actions: (0, X.jsx)(TC, {
+      onClick: () => lC(`/pipeline/workbench`, { view: `acdp-dropped` }),
       children: `Open in workbench`,
     }),
     children: (0, X.jsxs)(`div`, {
-      className: sw.layout,
+      className: lw.layout,
       children: [
         (0, X.jsx)(`div`, {
-          className: sw.main,
-          children: (0, X.jsxs)(MC, {
+          className: lw.main,
+          children: (0, X.jsxs)(NC, {
             children: [
               (0, X.jsxs)(`section`, {
-                className: sw.funnelRow,
+                className: lw.funnelRow,
                 children: [
-                  (0, X.jsxs)(vC, {
+                  (0, X.jsxs)(yC, {
                     title: `The funnel`,
                     eyebrow: `every point is accounted for`,
                     children: [
-                      (0, X.jsx)(WC, {
+                      (0, X.jsx)(GC, {
                         rows: [
                           {
                             key: `in`,
@@ -51923,7 +51946,7 @@ function cw() {
                         max: o.acdps,
                       }),
                       (0, X.jsxs)(`p`, {
-                        className: sw.reconcile,
+                        className: lw.reconcile,
                         children: [
                           o.merged,
                           ` merged + `,
@@ -51947,24 +51970,24 @@ function cw() {
                     ],
                   }),
                   (0, X.jsxs)(`div`, {
-                    className: sw.stats,
+                    className: lw.stats,
                     children: [
-                      (0, X.jsx)(yC, {
+                      (0, X.jsx)(bC, {
                         label: `Dropped`,
                         value: o.dropped,
                         sub: `${Math.round((o.dropped / o.acdps) * 100)}% of the record`,
                       }),
-                      (0, X.jsx)(yC, {
+                      (0, X.jsx)(bC, {
                         label: `Merged`,
                         value: o.merged,
                         tone: `acc`,
                       }),
-                      (0, X.jsx)(yC, {
+                      (0, X.jsx)(bC, {
                         label: `Kept`,
                         value: o.kept,
                         tone: `ok`,
                       }),
-                      (0, X.jsx)(yC, {
+                      (0, X.jsx)(bC, {
                         label: `Undecided`,
                         value: o.unhandled + c,
                         tone: o.unhandled + c > 0 ? `bad` : void 0,
@@ -51974,21 +51997,21 @@ function cw() {
                 ],
               }),
               (0, X.jsxs)(`div`, {
-                className: sw.cols,
+                className: lw.cols,
                 children: [
-                  (0, X.jsx)(vC, {
+                  (0, X.jsx)(yC, {
                     title: `Why points were dropped`,
                     eyebrow: `${o.dropped} points`,
-                    children: (0, X.jsx)(WC, {
+                    children: (0, X.jsx)(GC, {
                       rows: a.drops,
                       total: o.dropped,
                       onPick: (e) => i(e),
                     }),
                   }),
-                  (0, X.jsx)(vC, {
+                  (0, X.jsx)(yC, {
                     title: `How points were combined`,
                     eyebrow: `merge and summarise rules`,
-                    children: (0, X.jsx)(WC, {
+                    children: (0, X.jsx)(GC, {
                       rows: a.merges,
                       total: o.acdps,
                       onPick: (e) => i(e),
@@ -51996,12 +52019,12 @@ function cw() {
                   }),
                 ],
               }),
-              (0, X.jsx)(vC, {
+              (0, X.jsx)(yC, {
                 title: `The biggest collapses`,
                 eyebrow: `one line standing in for many points`,
-                className: sw.groups,
+                className: lw.groups,
                 children: (0, X.jsxs)(`table`, {
-                  className: sw.table,
+                  className: lw.table,
                   children: [
                     (0, X.jsx)(`thead`, {
                       children: (0, X.jsxs)(`tr`, {
@@ -52027,8 +52050,8 @@ function cw() {
                                 children: [
                                   e,
                                   ` `,
-                                  (0, X.jsx)(xC, {
-                                    value: Fg[t.fn] ?? t.fn,
+                                  (0, X.jsx)(SC, {
+                                    value: Ig[t.fn] ?? t.fn,
                                     tone: `neutral`,
                                     size: `sm`,
                                   }),
@@ -52039,13 +52062,13 @@ function cw() {
                                 children: t.rows,
                               }),
                               (0, X.jsx)(`td`, {
-                                className: sw.becomes,
+                                className: lw.becomes,
                                 children: t.text || `—`,
                               }),
                               (0, X.jsx)(`td`, {
                                 children:
                                   t.l3 &&
-                                  (0, X.jsx)(wC, {
+                                  (0, X.jsx)(TC, {
                                     size: `sm`,
                                     variant: `quiet`,
                                     onClick: () =>
@@ -52063,10 +52086,10 @@ function cw() {
                 }),
               }),
               r &&
-                (0, X.jsxs)(vC, {
-                  title: Ig[r] ?? r,
+                (0, X.jsxs)(yC, {
+                  title: Lg[r] ?? r,
                   eyebrow: `${a.focusRows.length} points`,
-                  action: (0, X.jsx)(wC, {
+                  action: (0, X.jsx)(TC, {
                     size: `sm`,
                     variant: `quiet`,
                     onClick: () => i(null),
@@ -52074,7 +52097,7 @@ function cw() {
                   }),
                   children: [
                     (0, X.jsx)(`ul`, {
-                      className: sw.focusList,
+                      className: lw.focusList,
                       children: a.focusRows
                         .slice(0, 200)
                         .map((e) =>
@@ -52082,20 +52105,20 @@ function cw() {
                             `li`,
                             {
                               children: (0, X.jsxs)(`button`, {
-                                className: sw.focusRow,
+                                className: lw.focusRow,
                                 onClick: () =>
                                   n({ entity: `acdp`, id: e.acdp_id }),
                                 children: [
                                   (0, X.jsx)(`span`, {
-                                    className: `${sw.focusId} num`,
+                                    className: `${lw.focusId} num`,
                                     children: e.acdp_id,
                                   }),
                                   (0, X.jsx)(`span`, {
-                                    className: sw.focusText,
+                                    className: lw.focusText,
                                     children: e.acdp,
                                   }),
                                   (0, X.jsx)(`span`, {
-                                    className: sw.focusWhy,
+                                    className: lw.focusWhy,
                                     children: e.rationale ?? e.drop_reason,
                                   }),
                                 ],
@@ -52116,7 +52139,7 @@ function cw() {
           }),
         }),
         t &&
-          (0, X.jsx)($C, {
+          (0, X.jsx)(ew, {
             dataset: e,
             target: t,
             onOpen: n,
@@ -52126,44 +52149,46 @@ function cw() {
     }),
   });
 }
-var lw = {
-  wrap: `_wrap_i8du3_1`,
-  scroll: `_scroll_i8du3_12`,
-  head: `_head_i8du3_18`,
-  headCell: `_headCell_i8du3_29`,
-  headLabel: `_headLabel_i8du3_54`,
-  headBadge: `_headBadge_i8du3_59`,
-  sortMark: `_sortMark_i8du3_69`,
-  body: `_body_i8du3_74`,
-  row: `_row_i8du3_80`,
-  rowActive: `_rowActive_i8du3_95`,
-  cell: `_cell_i8du3_99`,
-  cellInner: `_cellInner_i8du3_112`,
-  editable: `_editable_i8du3_126`,
-  overridden: `_overridden_i8du3_135`,
-  editor: `_editor_i8du3_151`,
-  blank: `_blank_i8du3_156`,
-  multi: `_multi_i8du3_160`,
-  groupRow: `_groupRow_i8du3_166`,
-  groupLabel: `_groupLabel_i8du3_184`,
-  groupCount: `_groupCount_i8du3_189`,
-  groupCalc: `_groupCalc_i8du3_199`,
-  foot: `_foot_i8du3_209`,
-  footCell: `_footCell_i8du3_218`,
-  calcSelect: `_calcSelect_i8du3_232`,
-  calcValue: `_calcValue_i8du3_246`,
+var dw = {
+  wrap: `_wrap_15bh4_1`,
+  scroll: `_scroll_15bh4_12`,
+  head: `_head_15bh4_18`,
+  headCell: `_headCell_15bh4_29`,
+  headLabel: `_headLabel_15bh4_54`,
+  headBadge: `_headBadge_15bh4_59`,
+  sortMark: `_sortMark_15bh4_69`,
+  body: `_body_15bh4_74`,
+  row: `_row_15bh4_80`,
+  rowActive: `_rowActive_15bh4_95`,
+  cell: `_cell_15bh4_99`,
+  cellInner: `_cellInner_15bh4_112`,
+  editable: `_editable_15bh4_126`,
+  overridden: `_overridden_15bh4_135`,
+  editor: `_editor_15bh4_151`,
+  blank: `_blank_15bh4_156`,
+  multi: `_multi_15bh4_160`,
+  groupRow: `_groupRow_15bh4_166`,
+  groupLabel: `_groupLabel_15bh4_184`,
+  groupCount: `_groupCount_15bh4_189`,
+  groupCalc: `_groupCalc_15bh4_199`,
+  foot: `_foot_15bh4_209`,
+  footCell: `_footCell_15bh4_218`,
+  calcSelect: `_calcSelect_15bh4_232`,
+  calcValue: `_calcValue_15bh4_246`,
+  serialHead: `_serialHead_15bh4_316`,
+  serialCell: `_serialCell_15bh4_323`,
 };
-function uw({ field: e, value: t }) {
+function fw({ field: e, value: t }) {
   if (t == null || t === ``)
-    return (0, X.jsx)(`span`, { className: lw.blank, children: `—` });
+    return (0, X.jsx)(`span`, { className: dw.blank, children: `—` });
   switch (e.type) {
     case `bool`:
       return t === !0 || t === `true`
-        ? (0, X.jsx)(xC, { value: `yes`, tone: `warn`, size: `sm` })
-        : (0, X.jsx)(`span`, { className: lw.blank, children: `—` });
+        ? (0, X.jsx)(SC, { value: `yes`, tone: `warn`, size: `sm` })
+        : (0, X.jsx)(`span`, { className: dw.blank, children: `—` });
     case `select`: {
       let n = e.options?.find((e) => e.value === String(t));
-      return (0, X.jsx)(xC, {
+      return (0, X.jsx)(SC, {
         value: String(t),
         tone: n ? void 0 : `neutral`,
         size: `sm`,
@@ -52172,20 +52197,20 @@ function uw({ field: e, value: t }) {
     case `multiselect`: {
       let e = Array.isArray(t) ? t : String(t).split(`,`);
       return (0, X.jsxs)(`span`, {
-        className: lw.multi,
+        className: dw.multi,
         children: [
           e
             .slice(0, 3)
             .map((e, t) =>
               (0, X.jsx)(
-                xC,
+                SC,
                 { value: String(e).trim(), tone: `neutral`, size: `sm` },
                 t,
               ),
             ),
           e.length > 3 &&
             (0, X.jsxs)(`span`, {
-              className: lw.blank,
+              className: dw.blank,
               children: [`+`, e.length - 3],
             }),
         ],
@@ -52205,7 +52230,7 @@ function uw({ field: e, value: t }) {
       });
   }
 }
-function dw({ field: e, value: t, editable: n, overridden: r, onCommit: i }) {
+function pw({ field: e, value: t, editable: n, overridden: r, onCommit: i }) {
   let [a, o] = (0, _.useState)(!1),
     [s, c] = (0, _.useState)(``),
     l = (0, _.useRef)(null);
@@ -52232,7 +52257,7 @@ function dw({ field: e, value: t, editable: n, overridden: r, onCommit: i }) {
   if (a) {
     let t = {
       ref: l,
-      className: `${RC.input} ${lw.editor}`,
+      className: `${zC.input} ${dw.editor}`,
       defaultValue: s,
       onBlur: (e) => d(e.currentTarget.value),
       onKeyDown: (e) => {
@@ -52245,7 +52270,7 @@ function dw({ field: e, value: t, editable: n, overridden: r, onCommit: i }) {
     return e.type === `select` && e.options?.length
       ? (0, X.jsxs)(`select`, {
           ...t,
-          className: `${RC.select} ${lw.editor}`,
+          className: `${zC.select} ${dw.editor}`,
           onChange: (e) => d(e.currentTarget.value),
           children: [
             (0, X.jsx)(`option`, { value: `` }),
@@ -52261,7 +52286,7 @@ function dw({ field: e, value: t, editable: n, overridden: r, onCommit: i }) {
       : e.type === `bool`
         ? (0, X.jsxs)(`select`, {
             ...t,
-            className: `${RC.select} ${lw.editor}`,
+            className: `${zC.select} ${dw.editor}`,
             onChange: (e) => d(e.currentTarget.value),
             children: [
               (0, X.jsx)(`option`, { value: ``, children: `—` }),
@@ -52272,7 +52297,7 @@ function dw({ field: e, value: t, editable: n, overridden: r, onCommit: i }) {
         : (0, X.jsx)(`input`, { ...t, type: (e.type, `text`) });
   }
   return (0, X.jsx)(`div`, {
-    className: `${lw.cellInner} ${n ? lw.editable : ``} ${r ? lw.overridden : ``}`,
+    className: `${dw.cellInner} ${n ? dw.editable : ``} ${r ? dw.overridden : ``}`,
     onDoubleClick: u,
     onKeyDown: (e) => {
       e.key === `Enter` && u();
@@ -52281,10 +52306,10 @@ function dw({ field: e, value: t, editable: n, overridden: r, onCommit: i }) {
     title: r
       ? `corrected — double-click to change, the extracted value is kept`
       : void 0,
-    children: (0, X.jsx)(uw, { field: e, value: t }),
+    children: (0, X.jsx)(fw, { field: e, value: t }),
   });
 }
-var fw = {
+var mw = {
     wrap: `_wrap_1myl4_1`,
     controls: `_controls_1myl4_9`,
     select: `_select_1myl4_15`,
@@ -52300,8 +52325,8 @@ var fw = {
     metaItem: `_metaItem_1myl4_100`,
     more: `_more_1myl4_105`,
   },
-  pw = 60;
-function mw({ api: e, onOpenRow: t }) {
+  hw = 60;
+function gw({ api: e, onOpenRow: t }) {
   let { view: n, setView: r, result: i, fieldMap: a, visible: o } = e,
     s = n.boardBy ?? n.groupBy ?? `body_system`,
     c = o[0],
@@ -52319,14 +52344,14 @@ function mw({ api: e, onOpenRow: t }) {
       return [...e.entries()].sort((e, t) => t[1].length - e[1].length);
     }, [i.rows, s]);
   return (0, X.jsxs)(`div`, {
-    className: fw.wrap,
+    className: mw.wrap,
     children: [
       (0, X.jsxs)(`div`, {
-        className: fw.controls,
+        className: mw.controls,
         children: [
           (0, X.jsx)(`span`, { className: `eyebrow`, children: `stack by` }),
           (0, X.jsx)(`select`, {
-            className: fw.select,
+            className: mw.select,
             value: s,
             onChange: (e) => r({ ...n, boardBy: e.target.value }),
             children: e.fields
@@ -52345,42 +52370,42 @@ function mw({ api: e, onOpenRow: t }) {
         ],
       }),
       (0, X.jsx)(`div`, {
-        className: fw.board,
+        className: mw.board,
         children: u.map(([e, n]) =>
           (0, X.jsxs)(
             `section`,
             {
-              className: fw.stack,
+              className: mw.stack,
               children: [
                 (0, X.jsxs)(`header`, {
-                  className: fw.stackHead,
+                  className: mw.stackHead,
                   children: [
                     (0, X.jsx)(`span`, {
-                      className: fw.stackTitle,
+                      className: mw.stackTitle,
                       children: e.replace(/_/g, ` `),
                     }),
                     (0, X.jsx)(`span`, {
-                      className: `${fw.stackCount} num`,
+                      className: `${mw.stackCount} num`,
                       children: n.length,
                     }),
                   ],
                 }),
                 (0, X.jsxs)(`div`, {
-                  className: fw.cards,
+                  className: mw.cards,
                   children: [
-                    n.slice(0, pw).map((e) =>
+                    n.slice(0, hw).map((e) =>
                       (0, X.jsxs)(
                         `button`,
                         {
-                          className: fw.card,
+                          className: mw.card,
                           onClick: () => t?.(e),
                           children: [
                             (0, X.jsx)(`div`, {
-                              className: fw.cardTitle,
+                              className: mw.cardTitle,
                               children: String(e[c?.key ?? ``] ?? `—`),
                             }),
                             (0, X.jsx)(`div`, {
-                              className: fw.cardMeta,
+                              className: mw.cardMeta,
                               children: l.map((t) => {
                                 let n = e[t.key];
                                 return n == null || n === ``
@@ -52388,8 +52413,8 @@ function mw({ api: e, onOpenRow: t }) {
                                   : (0, X.jsx)(
                                       `span`,
                                       {
-                                        className: fw.metaItem,
-                                        children: (0, X.jsx)(uw, {
+                                        className: mw.metaItem,
+                                        children: (0, X.jsx)(fw, {
                                           field: a.get(t.key),
                                           value: n,
                                         }),
@@ -52403,12 +52428,12 @@ function mw({ api: e, onOpenRow: t }) {
                         String(e.__id),
                       ),
                     ),
-                    n.length > pw &&
+                    n.length > hw &&
                       (0, X.jsxs)(`div`, {
-                        className: fw.more,
+                        className: mw.more,
                         children: [
                           `+`,
-                          n.length - pw,
+                          n.length - hw,
                           ` more — filter to see them`,
                         ],
                       }),
@@ -52423,8 +52448,8 @@ function mw({ api: e, onOpenRow: t }) {
     ],
   });
 }
-var hw = m();
-function gw(e, t, n) {
+var _w = m();
+function vw(e, t, n) {
   let r = Array(e);
   return new Proxy(r, {
     get(r, i, a) {
@@ -52454,7 +52479,7 @@ function gw(e, t, n) {
     },
   });
 }
-function _w(e, t, n) {
+function yw(e, t, n) {
   let r = n.initialDeps ?? [],
     i,
     a = !0;
@@ -52475,12 +52500,12 @@ function _w(e, t, n) {
     o
   );
 }
-function vw(e, t) {
+function bw(e, t) {
   if (e === void 0) throw Error(`Unexpected undefined${t ? `: ${t}` : ``}`);
   return e;
 }
-var yw = (e, t) => Math.abs(e - t) < 1.01,
-  bw = (e, t, n) => {
+var xw = (e, t) => Math.abs(e - t) < 1.01,
+  Sw = (e, t, n) => {
     let r;
     return Object.assign(
       function (...i) {
@@ -52493,27 +52518,27 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
       },
     );
   },
-  xw,
-  Sw = () => {
-    if (xw !== void 0) return xw;
-    if (typeof navigator > `u`) return (xw = !1);
-    if (/iP(hone|od|ad)/.test(navigator.userAgent)) return (xw = !0);
+  Cw,
+  ww = () => {
+    if (Cw !== void 0) return Cw;
+    if (typeof navigator > `u`) return (Cw = !1);
+    if (/iP(hone|od|ad)/.test(navigator.userAgent)) return (Cw = !0);
     let e = navigator.maxTouchPoints;
-    return (xw = navigator.platform === `MacIntel` && e !== void 0 && e > 0);
+    return (Cw = navigator.platform === `MacIntel` && e !== void 0 && e > 0);
   },
-  Cw = (e) => {
+  Tw = (e) => {
     let { offsetWidth: t, offsetHeight: n } = e;
     return { width: t, height: n };
   },
-  ww = (e) => e,
-  Tw = (e) => {
+  Ew = (e) => e,
+  Dw = (e) => {
     let t = Math.max(e.startIndex - e.overscan, 0),
       n = Math.min(e.endIndex + e.overscan, e.count - 1) - t + 1,
       r = Array(n);
     for (let e = 0; e < n; e++) r[e] = t + e;
     return r;
   },
-  Ew = (e, t) => {
+  Ow = (e, t) => {
     let n = e.scrollElement;
     if (!n) return;
     let r = e.targetWindow;
@@ -52522,7 +52547,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
       let { width: n, height: r } = e;
       t({ width: Math.round(n), height: Math.round(r) });
     };
-    if ((i(Cw(n)), !r.ResizeObserver)) return () => {};
+    if ((i(Tw(n)), !r.ResizeObserver)) return () => {};
     let a = new r.ResizeObserver((t) => {
       let r = () => {
         let e = t[0];
@@ -52533,7 +52558,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
             return;
           }
         }
-        i(Cw(n));
+        i(Tw(n));
       };
       e.options.useAnimationFrameWithResizeObserver
         ? requestAnimationFrame(r)
@@ -52546,24 +52571,24 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
       }
     );
   },
-  Dw = { passive: !0 },
-  Ow = typeof window > `u` || `onscrollend` in window,
-  kw = (e, t, n) => {
+  kw = { passive: !0 },
+  Aw = typeof window > `u` || `onscrollend` in window,
+  jw = (e, t, n) => {
     let r = e.scrollElement;
     if (!r) return;
     let i = e.targetWindow;
     if (!i) return;
-    let a = e.options.useScrollendEvent && Ow,
+    let a = e.options.useScrollendEvent && Aw,
       o = 0,
-      s = a ? null : bw(i, () => t(o, !1), e.options.isScrollingResetDelay),
+      s = a ? null : Sw(i, () => t(o, !1), e.options.isScrollingResetDelay),
       c = (e) => () => {
         ((o = n(r)), s?.(), t(o, e));
       },
       l = c(!0),
       u = c(!1);
     return (
-      r.addEventListener(`scroll`, l, Dw),
-      a && r.addEventListener(`scrollend`, u, Dw),
+      r.addEventListener(`scroll`, l, kw),
+      a && r.addEventListener(`scrollend`, u, kw),
       () => {
         (r.removeEventListener(`scroll`, l),
           a && r.removeEventListener(`scrollend`, u),
@@ -52571,12 +52596,12 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
       }
     );
   },
-  Aw = (e, t) =>
-    kw(e, t, (t) => {
+  Mw = (e, t) =>
+    jw(e, t, (t) => {
       let { horizontal: n, isRtl: r } = e.options;
       return n ? t.scrollLeft * ((r && -1) || 1) : t.scrollTop;
     }),
-  jw = (e, t, n) => {
+  Nw = (e, t, n) => {
     if (n.options.useCachedMeasurements) {
       let t = n.indexFromElement(e),
         r = n.options.getItemKey(t);
@@ -52595,7 +52620,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
     }
     return e[n.options.horizontal ? `offsetWidth` : `offsetHeight`];
   },
-  Mw = (e, { adjustments: t = 0, behavior: n }, r) => {
+  Pw = (e, { adjustments: t = 0, behavior: n }, r) => {
     var i, a;
     (a = (i = r.scrollElement)?.scrollTo) == null ||
       a.call(i, {
@@ -52603,7 +52628,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
         behavior: n,
       });
   },
-  Nw = class {
+  Fw = class {
     constructor(e) {
       ((this.unsubs = []),
         (this.scrollElement = null),
@@ -52688,10 +52713,10 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
             scrollPaddingStart: 0,
             scrollPaddingEnd: 0,
             horizontal: !1,
-            getItemKey: ww,
-            rangeExtractor: Tw,
+            getItemKey: Ew,
+            rangeExtractor: Dw,
             onChange: () => {},
-            measureElement: jw,
+            measureElement: Nw,
             initialRect: { width: 0, height: 0 },
             scrollMargin: 0,
             gap: 0,
@@ -52779,7 +52804,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
           var t, n;
           (n = (t = this.options).onChange) == null || n.call(t, this, e);
         }),
-        (this.maybeNotify = _w(
+        (this.maybeNotify = yw(
           () => (
             this.calculateRange(),
             [
@@ -52883,7 +52908,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
                 },
                 n = () => {
                   ((this._iosTouching = !1),
-                    !(!Sw() || this.targetWindow == null) &&
+                    !(!ww() || this.targetWindow == null) &&
                       ((this._iosJustTouchEnded = !0),
                       (this._iosTouchEndTimerId = this.targetWindow.setTimeout(
                         () => {
@@ -52894,8 +52919,8 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
                         150,
                       ))));
                 };
-              (e.addEventListener(`touchstart`, t, Dw),
-                e.addEventListener(`touchend`, n, Dw),
+              (e.addEventListener(`touchstart`, t, kw),
+                e.addEventListener(`touchend`, n, kw),
                 this.unsubs.push(() => {
                   (e.removeEventListener(`touchstart`, t),
                     e.removeEventListener(`touchend`, n),
@@ -52918,7 +52943,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
             let [e, n, r, i] = t;
             (e !== null &&
               !r &&
-              (Sw() &&
+              (ww() &&
               (this.isScrolling || this._iosTouching || this._iosJustTouchEnded)
                 ? i !== 0 && (this._iosDeferredAdjustment += i)
                 : this._scrollToOffset(this.getScrollOffset(), {
@@ -52965,7 +52990,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
                   : this.options.initialOffset)),
               this.scrollOffset)
             : ((this.scrollOffset = null), 0)),
-        (this.getMeasurementOptions = _w(
+        (this.getMeasurementOptions = yw(
           () => [
             this.options.count,
             this.options.paddingStart,
@@ -52996,7 +53021,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
           { key: !1 },
         )),
         (this.isIndexInRange = (e) => e >= 0 && e < this.options.count),
-        (this.getMeasurements = _w(
+        (this.getMeasurements = yw(
           () => [this.getMeasurementOptions(), this.itemSizeCacheVersion],
           (
             {
@@ -53064,7 +53089,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
                   i = typeof n == `number` ? n : this.options.estimateSize(t);
                 ((a[t * 2] = o), (a[t * 2 + 1] = i), (o += i + s));
               }
-              let c = gw(e, a, r);
+              let c = vw(e, a, r);
               return ((this.measurementsCache = c), c);
             }
             let d = this.measurementsCache.slice(0, u),
@@ -53122,7 +53147,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
           },
           { key: !1, debug: () => this.options.debug },
         )),
-        (this.calculateRange = _w(
+        (this.calculateRange = yw(
           () => [
             this.getMeasurements(),
             this.getSize(),
@@ -53132,7 +53157,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
           (e, t, n, r) =>
             e.length === 0 || t === 0
               ? ((this.range = null), null)
-              : ((this.range = Iw(
+              : ((this.range = Rw(
                   e,
                   t,
                   n,
@@ -53144,7 +53169,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
                 this.range),
           { key: !1, debug: () => this.options.debug },
         )),
-        (this.getVirtualIndexes = _w(
+        (this.getVirtualIndexes = yw(
           () => {
             let e = null,
               t = null,
@@ -53270,7 +53295,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
               this.notify(f));
           }
         }),
-        (this.getVirtualItems = _w(
+        (this.getVirtualItems = yw(
           () => [this.getVirtualIndexes(), this.getMeasurements()],
           (e, t) => {
             let n = [];
@@ -53287,12 +53312,12 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
           if (t.length === 0) return;
           let n = this._flatMeasurements,
             r = this.options.lanes === 1 && n != null;
-          return vw(
+          return bw(
             t[
-              Pw(
+              Iw(
                 0,
                 t.length - 1,
-                r ? (e) => n[e * 2] : (e) => vw(t[e]).start,
+                r ? (e) => n[e * 2] : (e) => bw(t[e]).start,
                 e,
               )
             ],
@@ -53471,7 +53496,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
     applyScrollAdjustment(e, t) {
       return e === 0
         ? !1
-        : Sw() &&
+        : ww() &&
             (this.isScrolling || this._iosTouching || this._iosJustTouchEnded)
           ? ((this._iosDeferredAdjustment += e), !1)
           : (this._scrollToOffset(this.getScrollOffset(), {
@@ -53508,7 +53533,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
               ),
         t = e ? e[0] : this.scrollState.lastTargetOffset,
         n = t !== this.scrollState.lastTargetOffset;
-      if (!n && yw(t, this.getScrollOffset())) {
+      if (!n && xw(t, this.getScrollOffset())) {
         if (
           (this.scrollState.stableFrames++, this.scrollState.stableFrames >= 1)
         ) {
@@ -53531,7 +53556,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
       this.scheduleScrollReconcile();
     }
   },
-  Pw = (e, t, n, r) => {
+  Iw = (e, t, n, r) => {
     for (; e <= t; ) {
       let i = ((e + t) / 2) | 0,
         a = n(i);
@@ -53541,7 +53566,7 @@ var yw = (e, t) => Math.abs(e - t) < 1.01,
     }
     return e > 0 ? e - 1 : 0;
   };
-function Fw(e, t, n) {
+function Lw(e, t, n) {
   let r = 0;
   for (; r <= t; ) {
     let i = ((r + t) / 2) | 0,
@@ -53552,17 +53577,17 @@ function Fw(e, t, n) {
   }
   return r > 0 ? r - 1 : 0;
 }
-function Iw(e, t, n, r, i) {
+function Rw(e, t, n, r, i) {
   let a = e.length - 1;
   if (e.length <= r) return { startIndex: 0, endIndex: a };
   if (r === 1 && i !== null) {
-    let e = Fw(i, a, n),
+    let e = Lw(i, a, n),
       r = e,
       o = n + t;
     for (; r < a && i[r * 2] + i[r * 2 + 1] < o; ) r++;
     return { startIndex: e, endIndex: r };
   }
-  let o = Pw(0, a, (t) => e[t].start, n),
+  let o = Iw(0, a, (t) => e[t].start, n),
     s = o;
   if (r === 1) for (; s < a && e[s].end < n + t; ) s++;
   else if (r > 1) {
@@ -53580,8 +53605,8 @@ function Iw(e, t, n, r, i) {
   }
   return { startIndex: o, endIndex: s };
 }
-var Lw = typeof document < `u` ? _.useLayoutEffect : _.useEffect;
-function Rw({
+var zw = typeof document < `u` ? _.useLayoutEffect : _.useEffect;
+function Bw({
   useFlushSync: e = !0,
   directDomUpdates: t = !1,
   directDomUpdatesMode: n = `transform`,
@@ -53653,12 +53678,12 @@ function Rw({
                   }
                 : null));
         }
-        (l && (e && n ? (0, hw.flushSync)(i) : i()),
+        (l && (e && n ? (0, _w.flushSync)(i) : i()),
           (o = r.onChange) == null || o.call(r, t, n));
       },
     },
     [l] = _.useState(() => {
-      let e = new Nw(c);
+      let e = new Fw(c);
       return Object.assign(e, {
         containerRef: (t) => {
           let n = a.current;
@@ -53673,24 +53698,24 @@ function Rw({
     });
   return (
     l.setOptions(c),
-    Lw(() => l._didMount(), []),
-    Lw(() => (o(l), l._willUpdate())),
-    Lw(() => {
+    zw(() => l._didMount(), []),
+    zw(() => (o(l), l._willUpdate())),
+    zw(() => {
       s(l);
     }),
     l
   );
 }
-function zw(e) {
-  return Rw({
-    observeElementRect: Ew,
-    observeElementOffset: Aw,
-    scrollToFn: Mw,
+function Vw(e) {
+  return Bw({
+    observeElementRect: Ow,
+    observeElementOffset: Mw,
+    scrollToFn: Pw,
     ...e,
   });
 }
-var Bw = `38px`,
-  Vw = [
+var Hw = `38px`,
+  Uw = [
     `none`,
     `count`,
     `filled`,
@@ -53702,7 +53727,7 @@ var Bw = `38px`,
     `min`,
     `max`,
   ];
-function Hw({ api: e, onOpenRow: t, activeRowId: n, compact: r = !1 }) {
+function Ww({ api: e, onOpenRow: t, activeRowId: n, compact: r = !1 }) {
   let {
       view: i,
       setView: a,
@@ -53738,19 +53763,22 @@ function Hw({ api: e, onOpenRow: t, activeRowId: n, compact: r = !1 }) {
         e
       );
     }, [d]),
-    p = fC(dC),
+    p = pC(fC),
     m = r ? (p ? 58 : 40) : 32,
-    h = zw({
+    h = Vw({
       count: d.length,
       getScrollElement: () => u.current,
       estimateSize: (e) => (d[e].kind === `group` ? 30 : m),
       overscan: 12,
     }),
-    g = r ? h.measureElement : void 0,
-    v = (e) => i.widths[e.key] ?? e.width ?? 150,
+    g = r ? h.measureElement : void 0;
+  (0, _.useEffect)(() => {
+    h.measure();
+  }, [r, p]);
+  let v = (e) => i.widths[e.key] ?? e.width ?? 150,
     y = r
       ? [
-          Bw,
+          Hw,
           ...o.map((e, t) =>
             t === 0 ? `minmax(0, 1fr)` : `${Math.min(v(e), 108)}px`,
           ),
@@ -53767,23 +53795,23 @@ function Hw({ api: e, onOpenRow: t, activeRowId: n, compact: r = !1 }) {
     },
     x = (e, t) => a({ ...i, calcs: { ...i.calcs, [e]: t } });
   return (0, X.jsxs)(`div`, {
-    className: lw.wrap,
+    className: dw.wrap,
     "data-compact": r ? `` : void 0,
     children: [
       (0, X.jsxs)(`div`, {
-        className: lw.scroll,
+        className: dw.scroll,
         ref: u,
         role: `grid`,
         "aria-rowcount": s.filtered,
         children: [
           (0, X.jsxs)(`div`, {
-            className: lw.head,
+            className: dw.head,
             style: { gridTemplateColumns: y },
             role: `row`,
             children: [
               r &&
                 (0, X.jsx)(`span`, {
-                  className: `${lw.headCell} ${lw.serialHead}`,
+                  className: `${dw.headCell} ${dw.serialHead}`,
                   children: `#`,
                 }),
               o.map((e) => {
@@ -53791,28 +53819,28 @@ function Hw({ api: e, onOpenRow: t, activeRowId: n, compact: r = !1 }) {
                 return (0, X.jsxs)(
                   `button`,
                   {
-                    className: lw.headCell,
+                    className: dw.headCell,
                     onClick: () => b(e.key),
                     title: e.help ?? e.label,
                     "data-source": e.source,
                     children: [
                       (0, X.jsx)(`span`, {
-                        className: lw.headLabel,
+                        className: dw.headLabel,
                         children: e.label,
                       }),
                       e.source === `formula` &&
                         (0, X.jsx)(`span`, {
-                          className: lw.headBadge,
+                          className: dw.headBadge,
                           children: `fx`,
                         }),
                       e.source === `manual` &&
                         (0, X.jsx)(`span`, {
-                          className: lw.headBadge,
+                          className: dw.headBadge,
                           children: `+`,
                         }),
                       t &&
                         (0, X.jsx)(`span`, {
-                          className: lw.sortMark,
+                          className: dw.sortMark,
                           children: t.dir === `asc` ? `↑` : `↓`,
                         }),
                     ],
@@ -53823,7 +53851,7 @@ function Hw({ api: e, onOpenRow: t, activeRowId: n, compact: r = !1 }) {
             ],
           }),
           (0, X.jsx)(`div`, {
-            className: lw.body,
+            className: dw.body,
             style: { height: h.getTotalSize() },
             children: h.getVirtualItems().map((i) => {
               let a = d[i.index];
@@ -53831,16 +53859,16 @@ function Hw({ api: e, onOpenRow: t, activeRowId: n, compact: r = !1 }) {
                 return (0, X.jsxs)(
                   `div`,
                   {
-                    className: lw.groupRow,
+                    className: dw.groupRow,
                     style: { transform: `translateY(${i.start}px)` },
                     children: [
                       (0, X.jsx)(`span`, {
-                        className: lw.groupLabel,
+                        className: dw.groupLabel,
                         "data-group": a.key,
                         children: a.label,
                       }),
                       (0, X.jsx)(`span`, {
-                        className: lw.groupCount,
+                        className: dw.groupCount,
                         children: a.count,
                       }),
                       Object.entries(a.calcs)
@@ -53850,7 +53878,7 @@ function Hw({ api: e, onOpenRow: t, activeRowId: n, compact: r = !1 }) {
                           (0, X.jsxs)(
                             `span`,
                             {
-                              className: lw.groupCalc,
+                              className: dw.groupCalc,
                               children: [
                                 e.fieldMap.get(t)?.label ?? t,
                                 ` `,
@@ -53873,7 +53901,7 @@ function Hw({ api: e, onOpenRow: t, activeRowId: n, compact: r = !1 }) {
                 {
                   ref: g,
                   "data-index": i.index,
-                  className: `${lw.row} ${n === s ? lw.rowActive : ``}`,
+                  className: `${dw.row} ${n === s ? dw.rowActive : ``}`,
                   style: {
                     transform: `translateY(${i.start}px)`,
                     gridTemplateColumns: y,
@@ -53885,7 +53913,7 @@ function Hw({ api: e, onOpenRow: t, activeRowId: n, compact: r = !1 }) {
                   children: [
                     r &&
                       (0, X.jsx)(`div`, {
-                        className: `${lw.cell} ${lw.serialCell}`,
+                        className: `${dw.cell} ${dw.serialCell}`,
                         role: `gridcell`,
                         children: f.get(i.index),
                       }),
@@ -53893,11 +53921,11 @@ function Hw({ api: e, onOpenRow: t, activeRowId: n, compact: r = !1 }) {
                       (0, X.jsx)(
                         `div`,
                         {
-                          className: lw.cell,
+                          className: dw.cell,
                           "data-align": e.align,
                           role: `gridcell`,
                           "data-field": e.key,
-                          children: (0, X.jsx)(dw, {
+                          children: (0, X.jsx)(pw, {
                             field: e,
                             value: a.row[e.key],
                             editable:
@@ -53919,21 +53947,21 @@ function Hw({ api: e, onOpenRow: t, activeRowId: n, compact: r = !1 }) {
       }),
       !r &&
         (0, X.jsx)(`div`, {
-          className: lw.foot,
+          className: dw.foot,
           style: { gridTemplateColumns: y },
           children: o.map((e) =>
             (0, X.jsxs)(
               `label`,
               {
-                className: lw.footCell,
+                className: dw.footCell,
                 "data-align": e.align,
                 children: [
                   (0, X.jsx)(`select`, {
-                    className: lw.calcSelect,
+                    className: dw.calcSelect,
                     value: i.calcs[e.key] ?? `none`,
                     onChange: (t) => x(e.key, t.target.value),
                     title: `summary for ${e.label}`,
-                    children: Vw.map((e) =>
+                    children: Uw.map((e) =>
                       (0, X.jsx)(
                         `option`,
                         {
@@ -53947,7 +53975,7 @@ function Hw({ api: e, onOpenRow: t, activeRowId: n, compact: r = !1 }) {
                   i.calcs[e.key] &&
                     i.calcs[e.key] !== `none` &&
                     (0, X.jsx)(`span`, {
-                      className: `${lw.calcValue} num`,
+                      className: `${dw.calcValue} num`,
                       children: String(s.calcs[e.key] ?? `—`),
                     }),
                 ],
@@ -53959,7 +53987,7 @@ function Hw({ api: e, onOpenRow: t, activeRowId: n, compact: r = !1 }) {
     ],
   });
 }
-var Uw = {
+var Gw = {
   wrap: `_wrap_1w2ou_1`,
   controls: `_controls_1w2ou_9`,
   select: `_select_1w2ou_15`,
@@ -53972,7 +54000,7 @@ var Uw = {
   cell: `_cell_1w2ou_82`,
   total: `_total_1w2ou_59`,
 };
-function Ww({ api: e, onPick: t }) {
+function Kw({ api: e, onPick: t }) {
   let { view: n, setView: r, result: i, fields: a } = e,
     o = n.matrixRow ?? `body_system`,
     s = n.matrixCol ?? `category`,
@@ -54003,14 +54031,14 @@ function Ww({ api: e, onPick: t }) {
       (e) => e.type === `select` || e.type === `text` || e.type === `bool`,
     );
   return (0, X.jsxs)(`div`, {
-    className: Uw.wrap,
+    className: Gw.wrap,
     children: [
       (0, X.jsxs)(`div`, {
-        className: Uw.controls,
+        className: Gw.controls,
         children: [
           (0, X.jsx)(`span`, { className: `eyebrow`, children: `rows` }),
           (0, X.jsx)(`select`, {
-            className: Uw.select,
+            className: Gw.select,
             value: o,
             onChange: (e) => r({ ...n, matrixRow: e.target.value }),
             children: f.map((e) =>
@@ -54019,7 +54047,7 @@ function Ww({ api: e, onPick: t }) {
           }),
           (0, X.jsx)(`span`, { className: `eyebrow`, children: `columns` }),
           (0, X.jsx)(`select`, {
-            className: Uw.select,
+            className: Gw.select,
             value: s,
             onChange: (e) => r({ ...n, matrixCol: e.target.value }),
             children: f.map((e) =>
@@ -54029,19 +54057,19 @@ function Ww({ api: e, onPick: t }) {
         ],
       }),
       (0, X.jsx)(`div`, {
-        className: Uw.scroll,
+        className: Gw.scroll,
         children: (0, X.jsxs)(`table`, {
-          className: Uw.table,
+          className: Gw.table,
           children: [
             (0, X.jsx)(`thead`, {
               children: (0, X.jsxs)(`tr`, {
                 children: [
-                  (0, X.jsx)(`th`, { className: Uw.corner }),
+                  (0, X.jsx)(`th`, { className: Gw.corner }),
                   l.map(([e, t]) =>
                     (0, X.jsx)(
                       `th`,
                       {
-                        className: Uw.colHead,
+                        className: Gw.colHead,
                         title: `${e} — ${t}`,
                         children: (0, X.jsx)(`span`, {
                           children: e.replace(/_/g, ` `),
@@ -54051,7 +54079,7 @@ function Ww({ api: e, onPick: t }) {
                     ),
                   ),
                   (0, X.jsx)(`th`, {
-                    className: Uw.totalHead,
+                    className: Gw.totalHead,
                     children: `all`,
                   }),
                 ],
@@ -54064,7 +54092,7 @@ function Ww({ api: e, onPick: t }) {
                   {
                     children: [
                       (0, X.jsx)(`th`, {
-                        className: Uw.rowHead,
+                        className: Gw.rowHead,
                         children: e.replace(/_/g, ` `),
                       }),
                       l.map(([n]) => {
@@ -54072,7 +54100,7 @@ function Ww({ api: e, onPick: t }) {
                         return (0, X.jsx)(
                           `td`,
                           {
-                            className: Uw.cell,
+                            className: Gw.cell,
                             style: { "--w": r / d },
                             onClick: () => r > 0 && t?.(e, n),
                             title: `${e} × ${n}: ${r}`,
@@ -54087,7 +54115,7 @@ function Ww({ api: e, onPick: t }) {
                         );
                       }),
                       (0, X.jsx)(`td`, {
-                        className: `${Uw.total} num`,
+                        className: `${Gw.total} num`,
                         children: n,
                       }),
                     ],
@@ -54102,14 +54130,14 @@ function Ww({ api: e, onPick: t }) {
     ],
   });
 }
-var Gw = {
+var qw = {
   wrap: `_wrap_fc298_1`,
   trigger: `_trigger_fc298_5`,
   triggerOpen: `_triggerOpen_fc298_22`,
   triggerActive: `_triggerActive_fc298_28`,
   panel: `_panel_fc298_34`,
 };
-function Kw({
+function Jw({
   label: e,
   children: t,
   active: n,
@@ -54135,17 +54163,17 @@ function Kw({
       );
     }, [a]),
     (0, X.jsxs)(`div`, {
-      className: Gw.wrap,
+      className: qw.wrap,
       ref: s,
       children: [
         (0, X.jsx)(`button`, {
-          className: `${Gw.trigger} ${n ? Gw.triggerActive : ``} ${a ? Gw.triggerOpen : ``}`,
+          className: `${qw.trigger} ${n ? qw.triggerActive : ``} ${a ? qw.triggerOpen : ``}`,
           onClick: () => o((e) => !e),
           children: e,
         }),
         a &&
           (0, X.jsx)(`div`, {
-            className: Gw.panel,
+            className: qw.panel,
             "data-align": i,
             style: { "--pop-w": `${r}px` },
             children: typeof t == `function` ? t(() => o(!1)) : t,
@@ -54154,7 +54182,7 @@ function Kw({
     })
   );
 }
-var qw = {
+var Yw = {
     group: `_group_1azze_1`,
     groupHead: `_groupHead_1azze_15`,
     conj: `_conj_1azze_21`,
@@ -54163,7 +54191,7 @@ var qw = {
     remove: `_remove_1azze_52`,
     groupFoot: `_groupFoot_1azze_65`,
   },
-  Jw = {
+  Xw = {
     text: [
       { op: `contains`, label: `contains`, args: 1 },
       { op: `not_contains`, label: `does not contain`, args: 1 },
@@ -54199,48 +54227,48 @@ var qw = {
       { op: `is_false`, label: `is no`, args: 0 },
     ],
   },
-  Yw = (e) =>
+  Zw = (e) =>
     e
       ? e.type === `number`
-        ? Jw.number
+        ? Xw.number
         : e.type === `date`
-          ? Jw.date
+          ? Xw.date
           : e.type === `select` || e.type === `multiselect`
-            ? Jw.select
+            ? Xw.select
             : e.type === `bool`
-              ? Jw.bool
-              : Jw.text
-      : Jw.text;
-function Xw(e, t, n) {
+              ? Xw.bool
+              : Xw.text
+      : Xw.text;
+function Qw(e, t, n) {
   return {
     ...e,
     children: e.children.flatMap((e) =>
-      e.id === t ? (n ? [n] : []) : e.kind === `group` ? [Xw(e, t, n)] : [e],
+      e.id === t ? (n ? [n] : []) : e.kind === `group` ? [Qw(e, t, n)] : [e],
     ),
   };
 }
-function Zw({ condition: e, fields: t, values: n, onChange: r, onRemove: i }) {
+function $w({ condition: e, fields: t, values: n, onChange: r, onRemove: i }) {
   let a = t.find((t) => t.key === e.field),
-    o = Yw(a),
+    o = Zw(a),
     s = o.find((t) => t.op === e.op) ?? o[0],
     c =
       a && (a.type === `select` || a.type === `multiselect`) ? n(a.key) : null;
   return (0, X.jsxs)(`div`, {
-    className: qw.row,
+    className: Yw.row,
     children: [
       (0, X.jsx)(`select`, {
-        className: RC.select,
+        className: zC.select,
         value: e.field,
         onChange: (n) => {
           let i = t.find((e) => e.key === n.target.value);
-          r({ ...e, field: n.target.value, op: Yw(i)[0].op, value: void 0 });
+          r({ ...e, field: n.target.value, op: Zw(i)[0].op, value: void 0 });
         },
         children: t.map((e) =>
           (0, X.jsx)(`option`, { value: e.key, children: e.label }, e.key),
         ),
       }),
       (0, X.jsx)(`select`, {
-        className: RC.select,
+        className: zC.select,
         value: e.op,
         onChange: (t) => r({ ...e, op: t.target.value }),
         children: o.map((e) =>
@@ -54250,7 +54278,7 @@ function Zw({ condition: e, fields: t, values: n, onChange: r, onRemove: i }) {
       s.args > 0 &&
         (c
           ? (0, X.jsxs)(`select`, {
-              className: RC.select,
+              className: zC.select,
               value: String(e.value ?? ``),
               onChange: (t) => r({ ...e, value: t.target.value }),
               children: [
@@ -54261,20 +54289,20 @@ function Zw({ condition: e, fields: t, values: n, onChange: r, onRemove: i }) {
               ],
             })
           : (0, X.jsx)(`input`, {
-              className: RC.input,
+              className: zC.input,
               value: String(e.value ?? ``),
               placeholder: a?.type === `date` ? `YYYY-MM-DD` : `value`,
               onChange: (t) => r({ ...e, value: t.target.value }),
             })),
       s.args === 2 &&
         (0, X.jsx)(`input`, {
-          className: RC.input,
+          className: zC.input,
           value: String(e.value2 ?? ``),
           placeholder: `and`,
           onChange: (t) => r({ ...e, value2: t.target.value }),
         }),
       (0, X.jsx)(`button`, {
-        className: qw.remove,
+        className: Yw.remove,
         onClick: i,
         title: `remove`,
         children: `×`,
@@ -54282,7 +54310,7 @@ function Zw({ condition: e, fields: t, values: n, onChange: r, onRemove: i }) {
     ],
   });
 }
-function Qw({
+function eT({
   group: e,
   fields: t,
   values: n,
@@ -54291,19 +54319,19 @@ function Qw({
   onRemove: a,
 }) {
   return (0, X.jsxs)(`div`, {
-    className: qw.group,
+    className: Yw.group,
     "data-depth": r,
     children: [
       (0, X.jsxs)(`div`, {
-        className: qw.groupHead,
+        className: Yw.groupHead,
         children: [
           (0, X.jsx)(`div`, {
-            className: qw.conj,
+            className: Yw.conj,
             children: [`and`, `or`].map((t) =>
               (0, X.jsx)(
                 `button`,
                 {
-                  className: e.conj === t ? qw.conjActive : ``,
+                  className: e.conj === t ? Yw.conjActive : ``,
                   onClick: () => i({ ...e, conj: t }),
                   children: t,
                 },
@@ -54313,7 +54341,7 @@ function Qw({
           }),
           a &&
             (0, X.jsx)(`button`, {
-              className: qw.remove,
+              className: Yw.remove,
               onClick: a,
               children: `×`,
             }),
@@ -54322,33 +54350,33 @@ function Qw({
       e.children.map((a) =>
         a.kind === `group`
           ? (0, X.jsx)(
-              Qw,
+              eT,
               {
                 group: a,
                 fields: t,
                 values: n,
                 depth: r + 1,
-                onChange: (t) => i(Xw(e, a.id, t)),
-                onRemove: () => i(Xw(e, a.id, null)),
+                onChange: (t) => i(Qw(e, a.id, t)),
+                onRemove: () => i(Qw(e, a.id, null)),
               },
               a.id,
             )
           : (0, X.jsx)(
-              Zw,
+              $w,
               {
                 condition: a,
                 fields: t,
                 values: n,
-                onChange: (t) => i(Xw(e, a.id, t)),
-                onRemove: () => i(Xw(e, a.id, null)),
+                onChange: (t) => i(Qw(e, a.id, t)),
+                onRemove: () => i(Qw(e, a.id, null)),
               },
               a.id,
             ),
       ),
       (0, X.jsxs)(`div`, {
-        className: qw.groupFoot,
+        className: Yw.groupFoot,
         children: [
-          (0, X.jsx)(wC, {
+          (0, X.jsx)(TC, {
             size: `sm`,
             variant: `quiet`,
             onClick: () =>
@@ -54357,17 +54385,17 @@ function Qw({
                 children: [
                   ...e.children,
                   {
-                    id: kg(),
+                    id: Ag(),
                     kind: `condition`,
                     field: t[0].key,
-                    op: Yw(t[0])[0].op,
+                    op: Zw(t[0])[0].op,
                   },
                 ],
               }),
             children: `+ condition`,
           }),
           r < 2 &&
-            (0, X.jsx)(wC, {
+            (0, X.jsx)(TC, {
               size: `sm`,
               variant: `quiet`,
               onClick: () =>
@@ -54375,7 +54403,7 @@ function Qw({
                   ...e,
                   children: [
                     ...e.children,
-                    { id: kg(), kind: `group`, conj: `or`, children: [] },
+                    { id: Ag(), kind: `group`, conj: `or`, children: [] },
                   ],
                 }),
               children: `+ nested group`,
@@ -54385,11 +54413,11 @@ function Qw({
     ],
   });
 }
-function $w({ view: e, fields: t, rows: n, onChange: r }) {
+function tT({ view: e, fields: t, rows: n, onChange: r }) {
   let i = t.filter(
-    (t) => !t.internal || Lg[e.entity].some((e) => e.key === t.key),
+    (t) => !t.internal || Rg[e.entity].some((e) => e.key === t.key),
   );
-  return (0, X.jsx)(Qw, {
+  return (0, X.jsx)(eT, {
     group: e.filters,
     fields: i,
     values: (e) =>
@@ -54407,67 +54435,67 @@ function $w({ view: e, fields: t, rows: n, onChange: r }) {
     onChange: (t) => r({ ...e, filters: t }),
   });
 }
-var eT = `INUMBER`,
-  tT = `IOP1`,
-  nT = `IOP2`,
-  rT = `IOP3`,
-  iT = `IVAR`,
-  aT = `IVARNAME`,
-  oT = `IFUNCALL`,
-  sT = `IFUNDEF`,
-  cT = `IEXPR`,
-  lT = `IEXPREVAL`,
-  uT = `IMEMBER`,
-  dT = `IENDSTATEMENT`,
-  fT = `IARRAY`;
-function pT(e, t) {
+var nT = `INUMBER`,
+  rT = `IOP1`,
+  iT = `IOP2`,
+  aT = `IOP3`,
+  oT = `IVAR`,
+  sT = `IVARNAME`,
+  cT = `IFUNCALL`,
+  lT = `IFUNDEF`,
+  uT = `IEXPR`,
+  dT = `IEXPREVAL`,
+  fT = `IMEMBER`,
+  pT = `IENDSTATEMENT`,
+  mT = `IARRAY`;
+function hT(e, t) {
   ((this.type = e), (this.value = t ?? 0));
 }
-pT.prototype.toString = function () {
+hT.prototype.toString = function () {
   switch (this.type) {
-    case eT:
-    case tT:
     case nT:
     case rT:
     case iT:
     case aT:
-    case dT:
-      return this.value;
     case oT:
-      return `CALL ` + this.value;
     case sT:
+    case pT:
+      return this.value;
+    case cT:
+      return `CALL ` + this.value;
+    case lT:
       return `DEF ` + this.value;
-    case fT:
+    case mT:
       return `ARRAY ` + this.value;
-    case uT:
+    case fT:
       return `.` + this.value;
     default:
       return `Invalid Instruction`;
   }
 };
-function mT(e) {
-  return new pT(tT, e);
-}
-function hT(e) {
-  return new pT(nT, e);
-}
 function gT(e) {
-  return new pT(rT, e);
+  return new hT(rT, e);
 }
-function _T(e, t, n, r, i) {
+function _T(e) {
+  return new hT(iT, e);
+}
+function vT(e) {
+  return new hT(aT, e);
+}
+function yT(e, t, n, r, i) {
   for (var a = [], o = [], s, c, l, u, d = 0; d < e.length; d++) {
     var f = e[d],
       p = f.type;
-    if (p === eT || p === aT)
+    if (p === nT || p === sT)
       Array.isArray(f.value)
         ? a.push.apply(
             a,
-            _T(
+            yT(
               f.value
                 .map(function (e) {
-                  return new pT(eT, e);
+                  return new hT(nT, e);
                 })
-                .concat(new pT(fT, f.value.length)),
+                .concat(new hT(mT, f.value.length)),
               t,
               n,
               r,
@@ -54475,33 +54503,33 @@ function _T(e, t, n, r, i) {
             ),
           )
         : a.push(f);
-    else if (p === iT && i.hasOwnProperty(f.value))
-      ((f = new pT(eT, i[f.value])), a.push(f));
-    else if (p === nT && a.length > 1)
+    else if (p === oT && i.hasOwnProperty(f.value))
+      ((f = new hT(nT, i[f.value])), a.push(f));
+    else if (p === iT && a.length > 1)
       ((c = a.pop()),
         (s = a.pop()),
         (u = n[f.value]),
-        (f = new pT(eT, u(s.value, c.value))),
+        (f = new hT(nT, u(s.value, c.value))),
         a.push(f));
-    else if (p === rT && a.length > 2)
+    else if (p === aT && a.length > 2)
       ((l = a.pop()),
         (c = a.pop()),
         (s = a.pop()),
         f.value === `?`
           ? a.push(s.value ? c.value : l.value)
           : ((u = r[f.value]),
-            (f = new pT(eT, u(s.value, c.value, l.value))),
+            (f = new hT(nT, u(s.value, c.value, l.value))),
             a.push(f)));
-    else if (p === tT && a.length > 0)
+    else if (p === rT && a.length > 0)
       ((s = a.pop()),
         (u = t[f.value]),
-        (f = new pT(eT, u(s.value))),
+        (f = new hT(nT, u(s.value))),
         a.push(f));
-    else if (p === cT) {
+    else if (p === uT) {
       for (; a.length > 0; ) o.push(a.shift());
-      o.push(new pT(cT, _T(f.value, t, n, r, i)));
-    } else if (p === uT && a.length > 0)
-      ((s = a.pop()), a.push(new pT(eT, s.value[f.value])));
+      o.push(new hT(uT, yT(f.value, t, n, r, i)));
+    } else if (p === fT && a.length > 0)
+      ((s = a.pop()), a.push(new hT(nT, s.value[f.value])));
     else {
       for (; a.length > 0; ) o.push(a.shift());
       o.push(f);
@@ -54510,28 +54538,28 @@ function _T(e, t, n, r, i) {
   for (; a.length > 0; ) o.push(a.shift());
   return o;
 }
-function vT(e, t, n) {
+function bT(e, t, n) {
   for (var r = [], i = 0; i < e.length; i++) {
     var a = e[i],
       o = a.type;
-    if (o === iT && a.value === t)
+    if (o === oT && a.value === t)
       for (var s = 0; s < n.tokens.length; s++) {
         var c = n.tokens[s],
           l =
-            c.type === tT
-              ? mT(c.value)
-              : c.type === nT
-                ? hT(c.value)
-                : c.type === rT
-                  ? gT(c.value)
-                  : new pT(c.type, c.value);
+            c.type === rT
+              ? gT(c.value)
+              : c.type === iT
+                ? _T(c.value)
+                : c.type === aT
+                  ? vT(c.value)
+                  : new hT(c.type, c.value);
         r.push(l);
       }
-    else o === cT ? r.push(new pT(cT, vT(a.value, t, n))) : r.push(a);
+    else o === uT ? r.push(new hT(uT, bT(a.value, t, n))) : r.push(a);
   }
   return r;
 }
-function yT(e, t, n) {
+function xT(e, t, n) {
   var r = [],
     i,
     a,
@@ -54539,30 +54567,30 @@ function yT(e, t, n) {
     s,
     c,
     l;
-  if (xT(e)) return ST(e, n);
+  if (CT(e)) return wT(e, n);
   for (var u = e.length, d = 0; d < u; d++) {
     var f = e[d],
       p = f.type;
-    if (p === eT || p === aT) r.push(f.value);
-    else if (p === nT)
+    if (p === nT || p === sT) r.push(f.value);
+    else if (p === iT)
       ((a = r.pop()),
         (i = r.pop()),
         f.value === `and`
-          ? r.push(i ? !!yT(a, t, n) : !1)
+          ? r.push(i ? !!xT(a, t, n) : !1)
           : f.value === `or`
-            ? r.push(i ? !0 : !!yT(a, t, n))
+            ? r.push(i ? !0 : !!xT(a, t, n))
             : f.value === `=`
-              ? ((s = t.binaryOps[f.value]), r.push(s(i, yT(a, t, n), n)))
-              : ((s = t.binaryOps[f.value]), r.push(s(ST(i, n), ST(a, n)))));
-    else if (p === rT)
+              ? ((s = t.binaryOps[f.value]), r.push(s(i, xT(a, t, n), n)))
+              : ((s = t.binaryOps[f.value]), r.push(s(wT(i, n), wT(a, n)))));
+    else if (p === aT)
       ((o = r.pop()),
         (a = r.pop()),
         (i = r.pop()),
         f.value === `?`
-          ? r.push(yT(i ? a : o, t, n))
+          ? r.push(xT(i ? a : o, t, n))
           : ((s = t.ternaryOps[f.value]),
-            r.push(s(ST(i, n), ST(a, n), ST(o, n)))));
-    else if (p === iT) {
+            r.push(s(wT(i, n), wT(a, n), wT(o, n)))));
+    else if (p === oT) {
       if (f.value in t.functions) r.push(t.functions[f.value]);
       else if (f.value in t.unaryOps && t.parser.isOperatorEnabled(f.value))
         r.push(t.unaryOps[f.value]);
@@ -54571,13 +54599,13 @@ function yT(e, t, n) {
         if (m !== void 0) r.push(m);
         else throw Error(`undefined variable: ` + f.value);
       }
-    } else if (p === tT)
-      ((i = r.pop()), (s = t.unaryOps[f.value]), r.push(s(ST(i, n))));
-    else if (p === oT) {
-      for (l = f.value, c = []; l-- > 0; ) c.unshift(ST(r.pop(), n));
+    } else if (p === rT)
+      ((i = r.pop()), (s = t.unaryOps[f.value]), r.push(s(wT(i, n))));
+    else if (p === cT) {
+      for (l = f.value, c = []; l-- > 0; ) c.unshift(wT(r.pop(), n));
       if (((s = r.pop()), s.apply && s.call)) r.push(s.apply(void 0, c));
       else throw Error(s + ` is not a function`);
-    } else if (p === sT)
+    } else if (p === lT)
       r.push(
         (function () {
           for (var e = r.pop(), i = [], a = f.value; a-- > 0; )
@@ -54590,7 +54618,7 @@ function yT(e, t, n) {
                 a++
               )
                 r[i[a]] = arguments[a];
-              return yT(e, t, r);
+              return xT(e, t, r);
             };
           return (
             Object.defineProperty(s, "name", { value: o, writable: !1 }),
@@ -54599,45 +54627,45 @@ function yT(e, t, n) {
           );
         })(),
       );
-    else if (p === cT) r.push(bT(f, t));
-    else if (p === lT) r.push(f);
-    else if (p === uT) ((i = r.pop()), r.push(i[f.value]));
-    else if (p === dT) r.pop();
-    else if (p === fT) {
+    else if (p === uT) r.push(ST(f, t));
+    else if (p === dT) r.push(f);
+    else if (p === fT) ((i = r.pop()), r.push(i[f.value]));
+    else if (p === pT) r.pop();
+    else if (p === mT) {
       for (l = f.value, c = []; l-- > 0; ) c.unshift(r.pop());
       r.push(c);
     } else throw Error(`invalid Expression`);
   }
   if (r.length > 1) throw Error(`invalid Expression (parity)`);
-  return r[0] === 0 ? 0 : ST(r[0], n);
+  return r[0] === 0 ? 0 : wT(r[0], n);
 }
-function bT(e, t, n) {
-  return xT(e)
+function ST(e, t, n) {
+  return CT(e)
     ? e
     : {
-        type: lT,
+        type: dT,
         value: function (n) {
-          return yT(e.value, t, n);
+          return xT(e.value, t, n);
         },
       };
 }
-function xT(e) {
-  return e && e.type === lT;
+function CT(e) {
+  return e && e.type === dT;
 }
-function ST(e, t) {
-  return xT(e) ? e.value(t) : e;
+function wT(e, t) {
+  return CT(e) ? e.value(t) : e;
 }
-function CT(e, t) {
+function TT(e, t) {
   for (var n = [], r, i, a, o, s, c, l = 0; l < e.length; l++) {
     var u = e[l],
       d = u.type;
-    if (d === eT)
+    if (d === nT)
       typeof u.value == `number` && u.value < 0
         ? n.push(`(` + u.value + `)`)
         : Array.isArray(u.value)
-          ? n.push(`[` + u.value.map(wT).join(`, `) + `]`)
-          : n.push(wT(u.value));
-    else if (d === nT)
+          ? n.push(`[` + u.value.map(ET).join(`, `) + `]`)
+          : n.push(ET(u.value));
+    else if (d === iT)
       ((i = n.pop()),
         (r = n.pop()),
         (o = u.value),
@@ -54666,14 +54694,14 @@ function CT(e, t) {
           : o === `[`
             ? n.push(r + `[` + i + `]`)
             : n.push(`(` + r + ` ` + o + ` ` + i + `)`));
-    else if (d === rT) {
+    else if (d === aT) {
       if (
         ((a = n.pop()), (i = n.pop()), (r = n.pop()), (o = u.value), o === `?`)
       )
         n.push(`(` + r + ` ? ` + i + ` : ` + a + `)`);
       else throw Error(`invalid Expression`);
-    } else if (d === iT || d === aT) n.push(u.value);
-    else if (d === tT)
+    } else if (d === oT || d === sT) n.push(u.value);
+    else if (d === rT)
       ((r = n.pop()),
         (o = u.value),
         o === `-` || o === `+`
@@ -54687,10 +54715,10 @@ function CT(e, t) {
             : o === `!`
               ? n.push(`(` + r + `!)`)
               : n.push(`(` + o + ` ` + r + `)`));
-    else if (d === oT) {
+    else if (d === cT) {
       for (c = u.value, s = []; c-- > 0; ) s.unshift(n.pop());
       ((o = n.pop()), n.push(o + `(` + s.join(`, `) + `)`));
-    } else if (d === sT) {
+    } else if (d === lT) {
       for (i = n.pop(), c = u.value, s = []; c-- > 0; ) s.unshift(n.pop());
       ((r = n.pop()),
         t
@@ -54704,46 +54732,46 @@ function CT(e, t) {
                 ` })`,
             )
           : n.push(`(` + r + `(` + s.join(`, `) + `) = ` + i + `)`));
-    } else if (d === uT) ((r = n.pop()), n.push(r + `.` + u.value));
-    else if (d === fT) {
+    } else if (d === fT) ((r = n.pop()), n.push(r + `.` + u.value));
+    else if (d === mT) {
       for (c = u.value, s = []; c-- > 0; ) s.unshift(n.pop());
       n.push(`[` + s.join(`, `) + `]`);
-    } else if (d === cT) n.push(`(` + CT(u.value, t) + `)`);
-    else if (d !== dT) throw Error(`invalid Expression`);
+    } else if (d === uT) n.push(`(` + TT(u.value, t) + `)`);
+    else if (d !== pT) throw Error(`invalid Expression`);
   }
   return (
     n.length > 1 && (n = t ? [n.join(`,`)] : [n.join(`;`)]),
     String(n[0])
   );
 }
-function wT(e) {
+function ET(e) {
   return typeof e == `string`
     ? JSON.stringify(e)
         .replace(/\u2028/g, `\\u2028`)
         .replace(/\u2029/g, `\\u2029`)
     : e;
 }
-function TT(e, t) {
+function DT(e, t) {
   for (var n = 0; n < e.length; n++) if (e[n] === t) return !0;
   return !1;
 }
-function ET(e, t, n) {
+function OT(e, t, n) {
   n ||= {};
   for (var r = !!n.withMembers, i = null, a = 0; a < e.length; a++) {
     var o = e[a];
-    o.type === iT || o.type === aT
-      ? !r && !TT(t, o.value)
+    o.type === oT || o.type === sT
+      ? !r && !DT(t, o.value)
         ? t.push(o.value)
-        : (i === null || TT(t, i) || t.push(i), (i = o.value))
-      : o.type === uT && r && i !== null
+        : (i === null || DT(t, i) || t.push(i), (i = o.value))
+      : o.type === fT && r && i !== null
         ? (i += `.` + o.value)
-        : o.type === cT
-          ? ET(o.value, t, n)
-          : i !== null && (TT(t, i) || t.push(i), (i = null));
+        : o.type === uT
+          ? OT(o.value, t, n)
+          : i !== null && (DT(t, i) || t.push(i), (i = null));
   }
-  i !== null && !TT(t, i) && t.push(i);
+  i !== null && !DT(t, i) && t.push(i);
 }
-function DT(e, t) {
+function kT(e, t) {
   ((this.tokens = e),
     (this.parser = t),
     (this.unaryOps = t.unaryOps),
@@ -54751,69 +54779,69 @@ function DT(e, t) {
     (this.ternaryOps = t.ternaryOps),
     (this.functions = t.functions));
 }
-((DT.prototype.simplify = function (e) {
+((kT.prototype.simplify = function (e) {
   return (
     (e ||= {}),
-    new DT(
-      _T(this.tokens, this.unaryOps, this.binaryOps, this.ternaryOps, e),
+    new kT(
+      yT(this.tokens, this.unaryOps, this.binaryOps, this.ternaryOps, e),
       this.parser,
     )
   );
 }),
-  (DT.prototype.substitute = function (e, t) {
+  (kT.prototype.substitute = function (e, t) {
     return (
-      t instanceof DT || (t = this.parser.parse(String(t))),
-      new DT(vT(this.tokens, e, t), this.parser)
+      t instanceof kT || (t = this.parser.parse(String(t))),
+      new kT(bT(this.tokens, e, t), this.parser)
     );
   }),
-  (DT.prototype.evaluate = function (e) {
-    return ((e ||= {}), yT(this.tokens, this, e));
+  (kT.prototype.evaluate = function (e) {
+    return ((e ||= {}), xT(this.tokens, this, e));
   }),
-  (DT.prototype.toString = function () {
-    return CT(this.tokens, !1);
+  (kT.prototype.toString = function () {
+    return TT(this.tokens, !1);
   }),
-  (DT.prototype.symbols = function (e) {
+  (kT.prototype.symbols = function (e) {
     e ||= {};
     var t = [];
-    return (ET(this.tokens, t, e), t);
+    return (OT(this.tokens, t, e), t);
   }),
-  (DT.prototype.variables = function (e) {
+  (kT.prototype.variables = function (e) {
     e ||= {};
     var t = [];
-    ET(this.tokens, t, e);
+    OT(this.tokens, t, e);
     var n = this.functions;
     return t.filter(function (e) {
       return !(e in n);
     });
   }),
-  (DT.prototype.toJSFunction = function (e, t) {
+  (kT.prototype.toJSFunction = function (e, t) {
     var n = this,
       r = Function(
         e,
         `with(this.functions) with (this.ternaryOps) with (this.binaryOps) with (this.unaryOps) { return ` +
-          CT(this.simplify(t).tokens, !0) +
+          TT(this.simplify(t).tokens, !0) +
           `; }`,
       );
     return function () {
       return r.apply(n, arguments);
     };
   }));
-var OT = `TEOF`,
-  kT = `TOP`,
-  AT = `TNUMBER`,
-  jT = `TSTRING`,
-  MT = `TPAREN`,
-  NT = `TBRACKET`,
-  PT = `TCOMMA`,
-  FT = `TNAME`,
-  IT = `TSEMICOLON`;
-function LT(e, t, n) {
+var AT = `TEOF`,
+  jT = `TOP`,
+  MT = `TNUMBER`,
+  NT = `TSTRING`,
+  PT = `TPAREN`,
+  FT = `TBRACKET`,
+  IT = `TCOMMA`,
+  LT = `TNAME`,
+  RT = `TSEMICOLON`;
+function zT(e, t, n) {
   ((this.type = e), (this.value = t), (this.index = n));
 }
-LT.prototype.toString = function () {
+zT.prototype.toString = function () {
   return this.type + `: ` + this.value;
 };
-function RT(e, t) {
+function BT(e, t) {
   ((this.pos = 0),
     (this.current = null),
     (this.unaryOps = e.unaryOps),
@@ -54826,17 +54854,17 @@ function RT(e, t) {
     (this.options = e.options),
     (this.parser = e));
 }
-((RT.prototype.newToken = function (e, t, n) {
-  return new LT(e, t, n ?? this.pos);
+((BT.prototype.newToken = function (e, t, n) {
+  return new zT(e, t, n ?? this.pos);
 }),
-  (RT.prototype.save = function () {
+  (BT.prototype.save = function () {
     ((this.savedPosition = this.pos), (this.savedCurrent = this.current));
   }),
-  (RT.prototype.restore = function () {
+  (BT.prototype.restore = function () {
     ((this.pos = this.savedPosition), (this.current = this.savedCurrent));
   }),
-  (RT.prototype.next = function () {
-    if (this.pos >= this.expression.length) return this.newToken(OT, `EOF`);
+  (BT.prototype.next = function () {
+    if (this.pos >= this.expression.length) return this.newToken(AT, `EOF`);
     if (this.isWhitespace() || this.isComment()) return this.next();
     if (
       this.isRadixInteger() ||
@@ -54856,7 +54884,7 @@ function RT(e, t) {
       `Unknown character "` + this.expression.charAt(this.pos) + `"`,
     );
   }),
-  (RT.prototype.isString = function () {
+  (BT.prototype.isString = function () {
     var e = !1,
       t = this.pos,
       n = this.expression.charAt(t);
@@ -54867,38 +54895,38 @@ function RT(e, t) {
       ) {
         if (((this.pos = r + 1), this.expression.charAt(r - 1) !== `\\`)) {
           var i = this.expression.substring(t + 1, r);
-          ((this.current = this.newToken(jT, this.unescape(i), t)), (e = !0));
+          ((this.current = this.newToken(NT, this.unescape(i), t)), (e = !0));
           break;
         }
         r = this.expression.indexOf(n, r + 1);
       }
     return e;
   }),
-  (RT.prototype.isParen = function () {
+  (BT.prototype.isParen = function () {
     var e = this.expression.charAt(this.pos);
     return e === `(` || e === `)`
-      ? ((this.current = this.newToken(MT, e)), this.pos++, !0)
+      ? ((this.current = this.newToken(PT, e)), this.pos++, !0)
       : !1;
   }),
-  (RT.prototype.isBracket = function () {
+  (BT.prototype.isBracket = function () {
     var e = this.expression.charAt(this.pos);
     return (e === `[` || e === `]`) && this.isOperatorEnabled(`[`)
-      ? ((this.current = this.newToken(NT, e)), this.pos++, !0)
+      ? ((this.current = this.newToken(FT, e)), this.pos++, !0)
       : !1;
   }),
-  (RT.prototype.isComma = function () {
+  (BT.prototype.isComma = function () {
     return (
       this.expression.charAt(this.pos) === `,` &&
-      ((this.current = this.newToken(PT, `,`)), this.pos++, !0)
+      ((this.current = this.newToken(IT, `,`)), this.pos++, !0)
     );
   }),
-  (RT.prototype.isSemicolon = function () {
+  (BT.prototype.isSemicolon = function () {
     return (
       this.expression.charAt(this.pos) === `;` &&
-      ((this.current = this.newToken(IT, `;`)), this.pos++, !0)
+      ((this.current = this.newToken(RT, `;`)), this.pos++, !0)
     );
   }),
-  (RT.prototype.isConst = function () {
+  (BT.prototype.isConst = function () {
     for (var e = this.pos, t = e; t < this.expression.length; t++) {
       var n = this.expression.charAt(t);
       if (
@@ -54911,14 +54939,14 @@ function RT(e, t) {
       var r = this.expression.substring(e, t);
       if (r in this.consts)
         return (
-          (this.current = this.newToken(AT, this.consts[r])),
+          (this.current = this.newToken(MT, this.consts[r])),
           (this.pos += r.length),
           !0
         );
     }
     return !1;
   }),
-  (RT.prototype.isNamedOp = function () {
+  (BT.prototype.isNamedOp = function () {
     for (var e = this.pos, t = e; t < this.expression.length; t++) {
       var n = this.expression.charAt(t);
       if (
@@ -54934,14 +54962,14 @@ function RT(e, t) {
         (r in this.binaryOps || r in this.unaryOps || r in this.ternaryOps)
       )
         return (
-          (this.current = this.newToken(kT, r)),
+          (this.current = this.newToken(jT, r)),
           (this.pos += r.length),
           !0
         );
     }
     return !1;
   }),
-  (RT.prototype.isName = function () {
+  (BT.prototype.isName = function () {
     for (var e = this.pos, t = e, n = !1; t < this.expression.length; t++) {
       var r = this.expression.charAt(t);
       if (r.toUpperCase() === r.toLowerCase()) {
@@ -54955,14 +54983,14 @@ function RT(e, t) {
     if (n) {
       var i = this.expression.substring(e, t);
       return (
-        (this.current = this.newToken(FT, i)),
+        (this.current = this.newToken(LT, i)),
         (this.pos += i.length),
         !0
       );
     }
     return !1;
   }),
-  (RT.prototype.isWhitespace = function () {
+  (BT.prototype.isWhitespace = function () {
     for (
       var e = !1, t = this.expression.charAt(this.pos);
       (t === ` ` ||
@@ -54976,8 +55004,8 @@ function RT(e, t) {
       t = this.expression.charAt(this.pos);
     return e;
   }));
-var zT = /^[0-9a-f]{4}$/i;
-((RT.prototype.unescape = function (e) {
+var VT = /^[0-9a-f]{4}$/i;
+((BT.prototype.unescape = function (e) {
   var t = e.indexOf(`\\`);
   if (t < 0) return e;
   for (var n = e.substring(0, t); t >= 0; ) {
@@ -55013,7 +55041,7 @@ var zT = /^[0-9a-f]{4}$/i;
         break;
       case `u`:
         var i = e.substring(t + 1, t + 5);
-        (zT.test(i) || this.parseError(`Illegal escape sequence: \\u` + i),
+        (VT.test(i) || this.parseError(`Illegal escape sequence: \\u` + i),
           (n += String.fromCharCode(parseInt(i, 16))),
           (t += 4));
         break;
@@ -55026,7 +55054,7 @@ var zT = /^[0-9a-f]{4}$/i;
   }
   return n;
 }),
-  (RT.prototype.isComment = function () {
+  (BT.prototype.isComment = function () {
     return (
       this.expression.charAt(this.pos) === `/` &&
       this.expression.charAt(this.pos + 1) === `*` &&
@@ -55035,7 +55063,7 @@ var zT = /^[0-9a-f]{4}$/i;
       !0)
     );
   }),
-  (RT.prototype.isRadixInteger = function () {
+  (BT.prototype.isRadixInteger = function () {
     var e = this.pos;
     if (e >= this.expression.length - 2 || this.expression.charAt(e) !== `0`)
       return !1;
@@ -55052,14 +55080,14 @@ var zT = /^[0-9a-f]{4}$/i;
     return (
       r &&
         ((this.current = this.newToken(
-          AT,
+          MT,
           parseInt(this.expression.substring(i, e), t),
         )),
         (this.pos = e)),
       r
     );
   }),
-  (RT.prototype.isNumber = function () {
+  (BT.prototype.isNumber = function () {
     for (
       var e = !1, t = this.pos, n = t, r = t, i = !1, a = !1, o;
       t < this.expression.length &&
@@ -55081,7 +55109,7 @@ var zT = /^[0-9a-f]{4}$/i;
     return (
       e
         ? ((this.current = this.newToken(
-            AT,
+            MT,
             parseFloat(this.expression.substring(n, t)),
           )),
           (this.pos = t))
@@ -55089,7 +55117,7 @@ var zT = /^[0-9a-f]{4}$/i;
       e
     );
   }),
-  (RT.prototype.isOperator = function () {
+  (BT.prototype.isOperator = function () {
     var e = this.pos,
       t = this.expression.charAt(this.pos);
     if (
@@ -55103,38 +55131,38 @@ var zT = /^[0-9a-f]{4}$/i;
       t === `:` ||
       t === `.`
     )
-      this.current = this.newToken(kT, t);
-    else if (t === `∙` || t === `•`) this.current = this.newToken(kT, `*`);
+      this.current = this.newToken(jT, t);
+    else if (t === `∙` || t === `•`) this.current = this.newToken(jT, `*`);
     else if (t === `>`)
       this.expression.charAt(this.pos + 1) === `=`
-        ? ((this.current = this.newToken(kT, `>=`)), this.pos++)
-        : (this.current = this.newToken(kT, `>`));
+        ? ((this.current = this.newToken(jT, `>=`)), this.pos++)
+        : (this.current = this.newToken(jT, `>`));
     else if (t === `<`)
       this.expression.charAt(this.pos + 1) === `=`
-        ? ((this.current = this.newToken(kT, `<=`)), this.pos++)
-        : (this.current = this.newToken(kT, `<`));
+        ? ((this.current = this.newToken(jT, `<=`)), this.pos++)
+        : (this.current = this.newToken(jT, `<`));
     else if (t === `|`) {
       if (this.expression.charAt(this.pos + 1) === `|`)
-        ((this.current = this.newToken(kT, `||`)), this.pos++);
+        ((this.current = this.newToken(jT, `||`)), this.pos++);
       else return !1;
     } else if (t === `=`)
       this.expression.charAt(this.pos + 1) === `=`
-        ? ((this.current = this.newToken(kT, `==`)), this.pos++)
-        : (this.current = this.newToken(kT, t));
+        ? ((this.current = this.newToken(jT, `==`)), this.pos++)
+        : (this.current = this.newToken(jT, t));
     else if (t === `!`)
       this.expression.charAt(this.pos + 1) === `=`
-        ? ((this.current = this.newToken(kT, `!=`)), this.pos++)
-        : (this.current = this.newToken(kT, t));
+        ? ((this.current = this.newToken(jT, `!=`)), this.pos++)
+        : (this.current = this.newToken(jT, t));
     else return !1;
     return (
       this.pos++,
       this.isOperatorEnabled(this.current.value) ? !0 : ((this.pos = e), !1)
     );
   }),
-  (RT.prototype.isOperatorEnabled = function (e) {
+  (BT.prototype.isOperatorEnabled = function (e) {
     return this.parser.isOperatorEnabled(e);
   }),
-  (RT.prototype.getCoordinates = function () {
+  (BT.prototype.getCoordinates = function () {
     var e = 0,
       t,
       n = -1;
@@ -55149,11 +55177,11 @@ var zT = /^[0-9a-f]{4}$/i;
     while (n >= 0 && n < this.pos);
     return { line: e, column: t };
   }),
-  (RT.prototype.parseError = function (e) {
+  (BT.prototype.parseError = function (e) {
     var t = this.getCoordinates();
     throw Error(`parse error [` + t.line + `:` + t.column + `]: ` + e);
   }));
-function BT(e, t, n) {
+function HT(e, t, n) {
   ((this.parser = e),
     (this.tokens = t),
     (this.current = null),
@@ -55163,37 +55191,37 @@ function BT(e, t, n) {
     (this.savedNextToken = null),
     (this.allowMemberAccess = n.allowMemberAccess !== !1));
 }
-((BT.prototype.next = function () {
+((HT.prototype.next = function () {
   return (
     (this.current = this.nextToken),
     (this.nextToken = this.tokens.next())
   );
 }),
-  (BT.prototype.tokenMatches = function (e, t) {
+  (HT.prototype.tokenMatches = function (e, t) {
     return t === void 0
       ? !0
       : Array.isArray(t)
-        ? TT(t, e.value)
+        ? DT(t, e.value)
         : typeof t == `function`
           ? t(e)
           : e.value === t;
   }),
-  (BT.prototype.save = function () {
+  (HT.prototype.save = function () {
     ((this.savedCurrent = this.current),
       (this.savedNextToken = this.nextToken),
       this.tokens.save());
   }),
-  (BT.prototype.restore = function () {
+  (HT.prototype.restore = function () {
     (this.tokens.restore(),
       (this.current = this.savedCurrent),
       (this.nextToken = this.savedNextToken));
   }),
-  (BT.prototype.accept = function (e, t) {
+  (HT.prototype.accept = function (e, t) {
     return this.nextToken.type === e && this.tokenMatches(this.nextToken, t)
       ? (this.next(), !0)
       : !1;
   }),
-  (BT.prototype.expect = function (e, t) {
+  (HT.prototype.expect = function (e, t) {
     if (!this.accept(e, t)) {
       var n = this.tokens.getCoordinates();
       throw Error(
@@ -55201,294 +55229,294 @@ function BT(e, t, n) {
       );
     }
   }),
-  (BT.prototype.parseAtom = function (e) {
+  (HT.prototype.parseAtom = function (e) {
     var t = this.tokens.unaryOps;
     function n(e) {
       return e.value in t;
     }
-    if (this.accept(FT) || this.accept(kT, n))
-      e.push(new pT(iT, this.current.value));
-    else if (this.accept(AT)) e.push(new pT(eT, this.current.value));
-    else if (this.accept(jT)) e.push(new pT(eT, this.current.value));
-    else if (this.accept(MT, `(`))
-      (this.parseExpression(e), this.expect(MT, `)`));
-    else if (this.accept(NT, `[`)) {
-      if (this.accept(NT, `]`)) e.push(new pT(fT, 0));
+    if (this.accept(LT) || this.accept(jT, n))
+      e.push(new hT(oT, this.current.value));
+    else if (this.accept(MT)) e.push(new hT(nT, this.current.value));
+    else if (this.accept(NT)) e.push(new hT(nT, this.current.value));
+    else if (this.accept(PT, `(`))
+      (this.parseExpression(e), this.expect(PT, `)`));
+    else if (this.accept(FT, `[`)) {
+      if (this.accept(FT, `]`)) e.push(new hT(mT, 0));
       else {
         var r = this.parseArrayList(e);
-        e.push(new pT(fT, r));
+        e.push(new hT(mT, r));
       }
     } else throw Error(`unexpected ` + this.nextToken);
   }),
-  (BT.prototype.parseExpression = function (e) {
+  (HT.prototype.parseExpression = function (e) {
     var t = [];
     this.parseUntilEndStatement(e, t) ||
       (this.parseVariableAssignmentExpression(t),
       !this.parseUntilEndStatement(e, t) && this.pushExpression(e, t));
   }),
-  (BT.prototype.pushExpression = function (e, t) {
+  (HT.prototype.pushExpression = function (e, t) {
     for (var n = 0, r = t.length; n < r; n++) e.push(t[n]);
   }),
-  (BT.prototype.parseUntilEndStatement = function (e, t) {
-    return this.accept(IT)
+  (HT.prototype.parseUntilEndStatement = function (e, t) {
+    return this.accept(RT)
       ? (this.nextToken &&
-          this.nextToken.type !== OT &&
-          (this.nextToken.type !== MT || this.nextToken.value !== `)`) &&
-          t.push(new pT(dT)),
-        this.nextToken.type !== OT && this.parseExpression(t),
-        e.push(new pT(cT, t)),
+          this.nextToken.type !== AT &&
+          (this.nextToken.type !== PT || this.nextToken.value !== `)`) &&
+          t.push(new hT(pT)),
+        this.nextToken.type !== AT && this.parseExpression(t),
+        e.push(new hT(uT, t)),
         !0)
       : !1;
   }),
-  (BT.prototype.parseArrayList = function (e) {
-    for (var t = 0; !this.accept(NT, `]`); )
-      for (this.parseExpression(e), ++t; this.accept(PT); )
+  (HT.prototype.parseArrayList = function (e) {
+    for (var t = 0; !this.accept(FT, `]`); )
+      for (this.parseExpression(e), ++t; this.accept(IT); )
         (this.parseExpression(e), ++t);
     return t;
   }),
-  (BT.prototype.parseVariableAssignmentExpression = function (e) {
-    for (this.parseConditionalExpression(e); this.accept(kT, `=`); ) {
+  (HT.prototype.parseVariableAssignmentExpression = function (e) {
+    for (this.parseConditionalExpression(e); this.accept(jT, `=`); ) {
       var t = e.pop(),
         n = [],
         r = e.length - 1;
-      if (t.type === oT) {
+      if (t.type === cT) {
         if (!this.tokens.isOperatorEnabled(`()=`))
           throw Error(`function definition is not permitted`);
         for (var i = 0, a = t.value + 1; i < a; i++) {
           var o = r - i;
-          e[o].type === iT && (e[o] = new pT(aT, e[o].value));
+          e[o].type === oT && (e[o] = new hT(sT, e[o].value));
         }
         (this.parseVariableAssignmentExpression(n),
-          e.push(new pT(cT, n)),
-          e.push(new pT(sT, t.value)));
+          e.push(new hT(uT, n)),
+          e.push(new hT(lT, t.value)));
         continue;
       }
-      if (t.type !== iT && t.type !== uT)
+      if (t.type !== oT && t.type !== fT)
         throw Error(`expected variable for assignment`);
       (this.parseVariableAssignmentExpression(n),
-        e.push(new pT(aT, t.value)),
-        e.push(new pT(cT, n)),
-        e.push(hT(`=`)));
+        e.push(new hT(sT, t.value)),
+        e.push(new hT(uT, n)),
+        e.push(_T(`=`)));
     }
   }),
-  (BT.prototype.parseConditionalExpression = function (e) {
-    for (this.parseOrExpression(e); this.accept(kT, `?`); ) {
+  (HT.prototype.parseConditionalExpression = function (e) {
+    for (this.parseOrExpression(e); this.accept(jT, `?`); ) {
       var t = [],
         n = [];
       (this.parseConditionalExpression(t),
-        this.expect(kT, `:`),
+        this.expect(jT, `:`),
         this.parseConditionalExpression(n),
-        e.push(new pT(cT, t)),
-        e.push(new pT(cT, n)),
-        e.push(gT(`?`)));
+        e.push(new hT(uT, t)),
+        e.push(new hT(uT, n)),
+        e.push(vT(`?`)));
     }
   }),
-  (BT.prototype.parseOrExpression = function (e) {
-    for (this.parseAndExpression(e); this.accept(kT, `or`); ) {
+  (HT.prototype.parseOrExpression = function (e) {
+    for (this.parseAndExpression(e); this.accept(jT, `or`); ) {
       var t = [];
-      (this.parseAndExpression(t), e.push(new pT(cT, t)), e.push(hT(`or`)));
+      (this.parseAndExpression(t), e.push(new hT(uT, t)), e.push(_T(`or`)));
     }
   }),
-  (BT.prototype.parseAndExpression = function (e) {
-    for (this.parseComparison(e); this.accept(kT, `and`); ) {
+  (HT.prototype.parseAndExpression = function (e) {
+    for (this.parseComparison(e); this.accept(jT, `and`); ) {
       var t = [];
-      (this.parseComparison(t), e.push(new pT(cT, t)), e.push(hT(`and`)));
+      (this.parseComparison(t), e.push(new hT(uT, t)), e.push(_T(`and`)));
     }
   }));
-var VT = [`==`, `!=`, `<`, `<=`, `>=`, `>`, `in`];
-BT.prototype.parseComparison = function (e) {
-  for (this.parseAddSub(e); this.accept(kT, VT); ) {
+var UT = [`==`, `!=`, `<`, `<=`, `>=`, `>`, `in`];
+HT.prototype.parseComparison = function (e) {
+  for (this.parseAddSub(e); this.accept(jT, UT); ) {
     var t = this.current;
-    (this.parseAddSub(e), e.push(hT(t.value)));
+    (this.parseAddSub(e), e.push(_T(t.value)));
   }
 };
-var HT = [`+`, `-`, `||`];
-BT.prototype.parseAddSub = function (e) {
-  for (this.parseTerm(e); this.accept(kT, HT); ) {
+var WT = [`+`, `-`, `||`];
+HT.prototype.parseAddSub = function (e) {
+  for (this.parseTerm(e); this.accept(jT, WT); ) {
     var t = this.current;
-    (this.parseTerm(e), e.push(hT(t.value)));
+    (this.parseTerm(e), e.push(_T(t.value)));
   }
 };
-var UT = [`*`, `/`, `%`];
-((BT.prototype.parseTerm = function (e) {
-  for (this.parseFactor(e); this.accept(kT, UT); ) {
+var GT = [`*`, `/`, `%`];
+((HT.prototype.parseTerm = function (e) {
+  for (this.parseFactor(e); this.accept(jT, GT); ) {
     var t = this.current;
-    (this.parseFactor(e), e.push(hT(t.value)));
+    (this.parseFactor(e), e.push(_T(t.value)));
   }
 }),
-  (BT.prototype.parseFactor = function (e) {
+  (HT.prototype.parseFactor = function (e) {
     var t = this.tokens.unaryOps;
     function n(e) {
       return e.value in t;
     }
-    if ((this.save(), this.accept(kT, n))) {
+    if ((this.save(), this.accept(jT, n))) {
       if (this.current.value !== `-` && this.current.value !== `+`) {
-        if (this.nextToken.type === MT && this.nextToken.value === `(`) {
+        if (this.nextToken.type === PT && this.nextToken.value === `(`) {
           (this.restore(), this.parseExponential(e));
           return;
         }
         if (
+          this.nextToken.type === RT ||
           this.nextToken.type === IT ||
-          this.nextToken.type === PT ||
-          this.nextToken.type === OT ||
-          (this.nextToken.type === MT && this.nextToken.value === `)`)
+          this.nextToken.type === AT ||
+          (this.nextToken.type === PT && this.nextToken.value === `)`)
         ) {
           (this.restore(), this.parseAtom(e));
           return;
         }
       }
       var r = this.current;
-      (this.parseFactor(e), e.push(mT(r.value)));
+      (this.parseFactor(e), e.push(gT(r.value)));
     } else this.parseExponential(e);
   }),
-  (BT.prototype.parseExponential = function (e) {
-    for (this.parsePostfixExpression(e); this.accept(kT, `^`); )
-      (this.parseFactor(e), e.push(hT(`^`)));
+  (HT.prototype.parseExponential = function (e) {
+    for (this.parsePostfixExpression(e); this.accept(jT, `^`); )
+      (this.parseFactor(e), e.push(_T(`^`)));
   }),
-  (BT.prototype.parsePostfixExpression = function (e) {
-    for (this.parseFunctionCall(e); this.accept(kT, `!`); ) e.push(mT(`!`));
+  (HT.prototype.parsePostfixExpression = function (e) {
+    for (this.parseFunctionCall(e); this.accept(jT, `!`); ) e.push(gT(`!`));
   }),
-  (BT.prototype.parseFunctionCall = function (e) {
+  (HT.prototype.parseFunctionCall = function (e) {
     var t = this.tokens.unaryOps;
     function n(e) {
       return e.value in t;
     }
-    if (this.accept(kT, n)) {
+    if (this.accept(jT, n)) {
       var r = this.current;
-      (this.parseAtom(e), e.push(mT(r.value)));
+      (this.parseAtom(e), e.push(gT(r.value)));
     } else
-      for (this.parseMemberExpression(e); this.accept(MT, `(`); )
-        if (this.accept(MT, `)`)) e.push(new pT(oT, 0));
+      for (this.parseMemberExpression(e); this.accept(PT, `(`); )
+        if (this.accept(PT, `)`)) e.push(new hT(cT, 0));
         else {
           var i = this.parseArgumentList(e);
-          e.push(new pT(oT, i));
+          e.push(new hT(cT, i));
         }
   }),
-  (BT.prototype.parseArgumentList = function (e) {
-    for (var t = 0; !this.accept(MT, `)`); )
-      for (this.parseExpression(e), ++t; this.accept(PT); )
+  (HT.prototype.parseArgumentList = function (e) {
+    for (var t = 0; !this.accept(PT, `)`); )
+      for (this.parseExpression(e), ++t; this.accept(IT); )
         (this.parseExpression(e), ++t);
     return t;
   }),
-  (BT.prototype.parseMemberExpression = function (e) {
-    for (this.parseAtom(e); this.accept(kT, `.`) || this.accept(NT, `[`); ) {
+  (HT.prototype.parseMemberExpression = function (e) {
+    for (this.parseAtom(e); this.accept(jT, `.`) || this.accept(FT, `[`); ) {
       var t = this.current;
       if (t.value === `.`) {
         if (!this.allowMemberAccess)
           throw Error(`unexpected ".", member access is not permitted`);
-        (this.expect(FT), e.push(new pT(uT, this.current.value)));
+        (this.expect(LT), e.push(new hT(fT, this.current.value)));
       } else if (t.value === `[`) {
         if (!this.tokens.isOperatorEnabled(`[`))
           throw Error(`unexpected "[]", arrays are disabled`);
-        (this.parseExpression(e), this.expect(NT, `]`), e.push(hT(`[`)));
+        (this.parseExpression(e), this.expect(FT, `]`), e.push(_T(`[`)));
       } else throw Error(`unexpected symbol: ` + t.value);
     }
   }));
-function WT(e, t) {
+function KT(e, t) {
   return Number(e) + Number(t);
 }
-function GT(e, t) {
+function qT(e, t) {
   return e - t;
 }
-function KT(e, t) {
+function JT(e, t) {
   return e * t;
 }
-function qT(e, t) {
+function YT(e, t) {
   return e / t;
 }
-function JT(e, t) {
+function XT(e, t) {
   return e % t;
 }
-function YT(e, t) {
+function ZT(e, t) {
   return Array.isArray(e) && Array.isArray(t) ? e.concat(t) : `` + e + t;
 }
-function XT(e, t) {
+function QT(e, t) {
   return e === t;
 }
-function ZT(e, t) {
+function $T(e, t) {
   return e !== t;
 }
-function QT(e, t) {
+function eE(e, t) {
   return e > t;
 }
-function $T(e, t) {
+function tE(e, t) {
   return e < t;
 }
-function eE(e, t) {
+function nE(e, t) {
   return e >= t;
 }
-function tE(e, t) {
+function rE(e, t) {
   return e <= t;
 }
-function nE(e, t) {
+function iE(e, t) {
   return !!(e && t);
 }
-function rE(e, t) {
+function aE(e, t) {
   return !!(e || t);
 }
-function iE(e, t) {
-  return TT(t, e);
-}
-function aE(e) {
-  return (Math.exp(e) - Math.exp(-e)) / 2;
-}
-function oE(e) {
-  return (Math.exp(e) + Math.exp(-e)) / 2;
+function oE(e, t) {
+  return DT(t, e);
 }
 function sE(e) {
+  return (Math.exp(e) - Math.exp(-e)) / 2;
+}
+function cE(e) {
+  return (Math.exp(e) + Math.exp(-e)) / 2;
+}
+function lE(e) {
   return e === 1 / 0
     ? 1
     : e === -1 / 0
       ? -1
       : (Math.exp(e) - Math.exp(-e)) / (Math.exp(e) + Math.exp(-e));
 }
-function cE(e) {
+function uE(e) {
   return e === -1 / 0 ? e : Math.log(e + Math.sqrt(e * e + 1));
 }
-function lE(e) {
+function dE(e) {
   return Math.log(e + Math.sqrt(e * e - 1));
 }
-function uE(e) {
+function fE(e) {
   return Math.log((1 + e) / (1 - e)) / 2;
 }
-function dE(e) {
+function pE(e) {
   return Math.log(e) * Math.LOG10E;
 }
-function fE(e) {
+function mE(e) {
   return -e;
 }
-function pE(e) {
+function hE(e) {
   return !e;
 }
-function mE(e) {
+function gE(e) {
   return e < 0 ? Math.ceil(e) : Math.floor(e);
 }
-function hE(e) {
+function _E(e) {
   return Math.random() * (e || 1);
 }
-function gE(e) {
-  return bE(e + 1);
+function vE(e) {
+  return SE(e + 1);
 }
-function _E(e) {
+function yE(e) {
   return isFinite(e) && e === Math.round(e);
 }
-var vE = 4.7421875,
-  yE = [
+var bE = 4.7421875,
+  xE = [
     0.9999999999999971, 57.15623566586292, -59.59796035547549,
     14.136097974741746, -0.4919138160976202, 3399464998481189e-20,
     4652362892704858e-20, -9837447530487956e-20, 0.0001580887032249125,
     -0.00021026444172410488, 0.00021743961811521265, -0.0001643181065367639,
     8441822398385275e-20, -26190838401581408e-21, 36899182659531625e-22,
   ];
-function bE(e) {
+function SE(e) {
   var t, n;
-  if (_E(e)) {
+  if (yE(e)) {
     if (e <= 0) return isFinite(e) ? 1 / 0 : NaN;
     if (e > 171) return 1 / 0;
     for (var r = e - 2, i = e - 1; r > 1; ) ((i *= r), r--);
     return (i === 0 && (i = 1), i);
   }
-  if (e < 0.5) return Math.PI / (Math.sin(Math.PI * e) * bE(1 - e));
+  if (e < 0.5) return Math.PI / (Math.sin(Math.PI * e) * SE(1 - e));
   if (e >= 171.35) return 1 / 0;
   if (e > 85) {
     var a = e * e,
@@ -55507,17 +55535,17 @@ function bE(e) {
         5246819 / (75246796800 * c * e))
     );
   }
-  (--e, (n = yE[0]));
-  for (var l = 1; l < yE.length; ++l) n += yE[l] / (e + l);
+  (--e, (n = xE[0]));
+  for (var l = 1; l < xE.length; ++l) n += xE[l] / (e + l);
   return (
-    (t = e + vE + 0.5),
+    (t = e + bE + 0.5),
     Math.sqrt(2 * Math.PI) * t ** +(e + 0.5) * Math.exp(-t) * n
   );
 }
-function xE(e) {
+function CE(e) {
   return Array.isArray(e) ? e.length : String(e).length;
 }
-function SE() {
+function wE() {
   for (var e = 0, t = 0, n = 0; n < arguments.length; n++) {
     var r = Math.abs(arguments[n]),
       i;
@@ -55529,10 +55557,10 @@ function SE() {
   }
   return t === 1 / 0 ? 1 / 0 : t * Math.sqrt(e);
 }
-function CE(e, t, n) {
+function TE(e, t, n) {
   return e ? t : n;
 }
-function wE(e, t) {
+function EE(e, t) {
   return t === void 0 || +t == 0
     ? Math.round(e)
     : ((e = +e),
@@ -55544,23 +55572,23 @@ function wE(e, t) {
           (e = e.toString().split(`e`)),
           +(e[0] + `e` + (e[1] ? +e[1] + t : t))));
 }
-function TE(e, t, n) {
+function DE(e, t, n) {
   return (n && (n[e] = t), t);
 }
-function EE(e, t) {
+function OE(e, t) {
   return e[t | 0];
 }
-function DE(e) {
+function kE(e) {
   return arguments.length === 1 && Array.isArray(e)
     ? Math.max.apply(Math, e)
     : Math.max.apply(Math, arguments);
 }
-function OE(e) {
+function AE(e) {
   return arguments.length === 1 && Array.isArray(e)
     ? Math.min.apply(Math, e)
     : Math.min.apply(Math, arguments);
 }
-function kE(e, t) {
+function jE(e, t) {
   if (typeof e != `function`)
     throw Error(`First argument to map is not a function`);
   if (!Array.isArray(t)) throw Error(`Second argument to map is not an array`);
@@ -55568,7 +55596,7 @@ function kE(e, t) {
     return e(t, n);
   });
 }
-function AE(e, t, n) {
+function ME(e, t, n) {
   if (typeof e != `function`)
     throw Error(`First argument to fold is not a function`);
   if (!Array.isArray(n)) throw Error(`Second argument to fold is not an array`);
@@ -55576,7 +55604,7 @@ function AE(e, t, n) {
     return e(t, n, r);
   }, t);
 }
-function jE(e, t) {
+function NE(e, t) {
   if (typeof e != `function`)
     throw Error(`First argument to filter is not a function`);
   if (!Array.isArray(t))
@@ -55585,32 +55613,32 @@ function jE(e, t) {
     return e(t, n);
   });
 }
-function ME(e, t) {
+function PE(e, t) {
   if (!(Array.isArray(t) || typeof t == `string`))
     throw Error(`Second argument to indexOf is not a string or array`);
   return t.indexOf(e);
 }
-function NE(e, t) {
+function FE(e, t) {
   if (!Array.isArray(t)) throw Error(`Second argument to join is not an array`);
   return t.join(e);
 }
-function PE(e) {
+function IE(e) {
   return (e > 0) - (e < 0) || +e;
 }
-var FE = 1 / 3;
-function IE(e) {
-  return e < 0 ? -((-e) ** +FE) : e ** +FE;
-}
-function LE(e) {
-  return Math.exp(e) - 1;
-}
+var LE = 1 / 3;
 function RE(e) {
-  return Math.log(1 + e);
+  return e < 0 ? -((-e) ** +LE) : e ** +LE;
 }
 function zE(e) {
-  return Math.log(e) / Math.LN2;
+  return Math.exp(e) - 1;
 }
 function BE(e) {
+  return Math.log(1 + e);
+}
+function VE(e) {
+  return Math.log(e) / Math.LN2;
+}
+function HE(e) {
   ((this.options = e || {}),
     (this.unaryOps = {
       sin: Math.sin,
@@ -55619,93 +55647,93 @@ function BE(e) {
       asin: Math.asin,
       acos: Math.acos,
       atan: Math.atan,
-      sinh: Math.sinh || aE,
-      cosh: Math.cosh || oE,
-      tanh: Math.tanh || sE,
-      asinh: Math.asinh || cE,
-      acosh: Math.acosh || lE,
-      atanh: Math.atanh || uE,
+      sinh: Math.sinh || sE,
+      cosh: Math.cosh || cE,
+      tanh: Math.tanh || lE,
+      asinh: Math.asinh || uE,
+      acosh: Math.acosh || dE,
+      atanh: Math.atanh || fE,
       sqrt: Math.sqrt,
-      cbrt: Math.cbrt || IE,
+      cbrt: Math.cbrt || RE,
       log: Math.log,
-      log2: Math.log2 || zE,
+      log2: Math.log2 || VE,
       ln: Math.log,
-      lg: Math.log10 || dE,
-      log10: Math.log10 || dE,
-      expm1: Math.expm1 || LE,
-      log1p: Math.log1p || RE,
+      lg: Math.log10 || pE,
+      log10: Math.log10 || pE,
+      expm1: Math.expm1 || zE,
+      log1p: Math.log1p || BE,
       abs: Math.abs,
       ceil: Math.ceil,
       floor: Math.floor,
       round: Math.round,
-      trunc: Math.trunc || mE,
-      "-": fE,
+      trunc: Math.trunc || gE,
+      "-": mE,
       "+": Number,
       exp: Math.exp,
-      not: pE,
-      length: xE,
-      "!": gE,
-      sign: Math.sign || PE,
+      not: hE,
+      length: CE,
+      "!": vE,
+      sign: Math.sign || IE,
     }),
     (this.binaryOps = {
-      "+": WT,
-      "-": GT,
-      "*": KT,
-      "/": qT,
-      "%": JT,
+      "+": KT,
+      "-": qT,
+      "*": JT,
+      "/": YT,
+      "%": XT,
       "^": Math.pow,
-      "||": YT,
-      "==": XT,
-      "!=": ZT,
-      ">": QT,
-      "<": $T,
-      ">=": eE,
-      "<=": tE,
-      and: nE,
-      or: rE,
-      in: iE,
-      "=": TE,
-      "[": EE,
+      "||": ZT,
+      "==": QT,
+      "!=": $T,
+      ">": eE,
+      "<": tE,
+      ">=": nE,
+      "<=": rE,
+      and: iE,
+      or: aE,
+      in: oE,
+      "=": DE,
+      "[": OE,
     }),
-    (this.ternaryOps = { "?": CE }),
+    (this.ternaryOps = { "?": TE }),
     (this.functions = {
-      random: hE,
-      fac: gE,
-      min: OE,
-      max: DE,
-      hypot: Math.hypot || SE,
-      pyt: Math.hypot || SE,
+      random: _E,
+      fac: vE,
+      min: AE,
+      max: kE,
+      hypot: Math.hypot || wE,
+      pyt: Math.hypot || wE,
       pow: Math.pow,
       atan2: Math.atan2,
-      if: CE,
-      gamma: bE,
-      roundTo: wE,
-      map: kE,
-      fold: AE,
-      filter: jE,
-      indexOf: ME,
-      join: NE,
+      if: TE,
+      gamma: SE,
+      roundTo: EE,
+      map: jE,
+      fold: ME,
+      filter: NE,
+      indexOf: PE,
+      join: FE,
     }),
     (this.consts = { E: Math.E, PI: Math.PI, true: !0, false: !1 }));
 }
-((BE.prototype.parse = function (e) {
+((HE.prototype.parse = function (e) {
   var t = [],
-    n = new BT(this, new RT(this, e), {
+    n = new HT(this, new BT(this, e), {
       allowMemberAccess: this.options.allowMemberAccess,
     });
-  return (n.parseExpression(t), n.expect(OT, `EOF`), new DT(t, this));
+  return (n.parseExpression(t), n.expect(AT, `EOF`), new kT(t, this));
 }),
-  (BE.prototype.evaluate = function (e, t) {
+  (HE.prototype.evaluate = function (e, t) {
     return this.parse(e).evaluate(t);
   }));
-var VE = new BE();
-((BE.parse = function (e) {
-  return VE.parse(e);
+var UE = new HE();
+((HE.parse = function (e) {
+  return UE.parse(e);
 }),
-  (BE.evaluate = function (e, t) {
-    return VE.parse(e).evaluate(t);
+  (HE.evaluate = function (e, t) {
+    return UE.parse(e).evaluate(t);
   }));
-var HE = {
+var WE = {
   "+": `add`,
   "-": `subtract`,
   "*": `multiply`,
@@ -55729,15 +55757,15 @@ var HE = {
   "[": `array`,
   "()=": `fndef`,
 };
-function UE(e) {
-  return HE.hasOwnProperty(e) ? HE[e] : e;
+function GE(e) {
+  return WE.hasOwnProperty(e) ? WE[e] : e;
 }
-BE.prototype.isOperatorEnabled = function (e) {
-  var t = UE(e),
+HE.prototype.isOperatorEnabled = function (e) {
+  var t = GE(e),
     n = this.options.operators || {};
   return !(t in n) || !!n[t];
 };
-var WE = new BE({
+var KE = new HE({
     operators: {
       logical: !0,
       comparison: !0,
@@ -55748,13 +55776,13 @@ var WE = new BE({
       fndef: !1,
     },
   }),
-  GE = 864e5,
-  KE = (e) => {
+  qE = 864e5,
+  JE = (e) => {
     if (e == null || e === ``) return null;
     let t = Date.parse(String(e));
     return Number.isFinite(t) ? t : null;
   },
-  qE = {
+  YE = {
     lower: (e) => String(e ?? ``).toLowerCase(),
     upper: (e) => String(e ?? ``).toUpperCase(),
     len: (e) => (e == null ? 0 : String(e).length),
@@ -55772,34 +55800,34 @@ var WE = new BE({
       return Math.round(Number(e ?? 0) * n) / n;
     },
     days_since: (e) => {
-      let t = KE(e);
-      return t === null ? 0 : Math.round((Date.now() - t) / GE);
+      let t = JE(e);
+      return t === null ? 0 : Math.round((Date.now() - t) / qE);
     },
     days_between: (e, t) => {
-      let n = KE(e),
-        r = KE(t);
-      return n === null || r === null ? 0 : Math.round((r - n) / GE);
+      let n = JE(e),
+        r = JE(t);
+      return n === null || r === null ? 0 : Math.round((r - n) / qE);
     },
     year: (e) => {
-      let t = KE(e);
+      let t = JE(e);
       return t === null ? 0 : new Date(t).getUTCFullYear();
     },
     coalesce: (...e) => e.find((e) => e != null && e !== ``) ?? ``,
   },
-  JE = new Map();
-function YE(e) {
-  let t = JE.get(e);
+  XE = new Map();
+function ZE(e) {
+  let t = XE.get(e);
   if (t) return t;
   let n;
   try {
-    let t = WE.parse(e),
-      r = t.variables({ withMembers: !1 }).filter((e) => !(e in qE));
+    let t = KE.parse(e),
+      r = t.variables({ withMembers: !1 }).filter((e) => !(e in YE));
     n = {
       fields: r,
       error: null,
       evaluate: (e) => {
         try {
-          let n = { ...qE };
+          let n = { ...YE };
           for (let t of r) n[t] = e[t] ?? ``;
           return t.evaluate(n);
         } catch (e) {
@@ -55811,9 +55839,9 @@ function YE(e) {
     let t = e.message;
     n = { fields: [], error: t, evaluate: () => `#BAD ${t}` };
   }
-  return (JE.set(e, n), n);
+  return (XE.set(e, n), n);
 }
-var XE = [
+var QE = [
     { name: `lower`, sig: `lower(text)`, what: `lowercase` },
     { name: `upper`, sig: `upper(text)`, what: `uppercase` },
     { name: `len`, sig: `len(text)`, what: `character count` },
@@ -55838,9 +55866,9 @@ var XE = [
     { name: `year`, sig: `year(date)`, what: `four-digit year` },
     { name: `coalesce`, sig: `coalesce(a, b, ...)`, what: `first non-blank` },
   ],
-  ZE = (e) => e.kind === `group`,
-  QE = (e) => (e == null ? `` : String(e)).toLowerCase(),
-  $E = (e) => {
+  $E = (e) => e.kind === `group`,
+  eD = (e) => (e == null ? `` : String(e)).toLowerCase(),
+  tD = (e) => {
     if (typeof e == `number`) return Number.isFinite(e) ? e : null;
     if (e == null || e === ``) return null;
     let t = Number(e);
@@ -55848,49 +55876,49 @@ var XE = [
     let n = /-?\d[\d,]*\.?\d*/.exec(String(e));
     return n ? Number(n[0].replace(/,/g, ``)) : null;
   },
-  eD = (e) =>
+  nD = (e) =>
     e == null || e === `` || (Array.isArray(e) && e.length === 0) || e === !1;
-function tD(e, t) {
+function rD(e, t) {
   let n = t.idOf(e),
     r = { ...e, __id: n };
   for (let e of t.fields)
     if (e.source === `manual`)
-      r[e.key] = t.cells[Og(t.entity, n, e.key)] ?? null;
+      r[e.key] = t.cells[kg(t.entity, n, e.key)] ?? null;
     else if (e.source === `source` || e.source === `derived`) {
-      let i = t.overrides[Og(t.entity, n, e.key)];
+      let i = t.overrides[kg(t.entity, n, e.key)];
       i && (r[e.key] = i.value);
     }
   for (let e of t.fields)
     e.source === `formula` &&
       e.formula &&
-      (r[e.key] = YE(e.formula).evaluate(r));
+      (r[e.key] = ZE(e.formula).evaluate(r));
   return r;
 }
-function nD(e, t) {
+function iD(e, t) {
   let n = e[t.field];
   switch (t.op) {
     case `is`:
-      return QE(n) === QE(t.value);
+      return eD(n) === eD(t.value);
     case `is_not`:
-      return QE(n) !== QE(t.value);
+      return eD(n) !== eD(t.value);
     case `contains`:
-      return QE(n).includes(QE(t.value));
+      return eD(n).includes(eD(t.value));
     case `not_contains`:
-      return !QE(n).includes(QE(t.value));
+      return !eD(n).includes(eD(t.value));
     case `starts_with`:
-      return QE(n).startsWith(QE(t.value));
+      return eD(n).startsWith(eD(t.value));
     case `is_empty`:
-      return eD(n);
+      return nD(n);
     case `not_empty`:
-      return !eD(n);
+      return !nD(n);
     case `is_true`:
-      return n === !0 || QE(n) === `true`;
+      return n === !0 || eD(n) === `true`;
     case `is_false`:
-      return n === !1 || QE(n) === `false` || eD(n);
+      return n === !1 || eD(n) === `false` || nD(n);
     case `any_of`:
-      return Array.isArray(t.value) ? t.value.some((e) => QE(e) === QE(n)) : !1;
+      return Array.isArray(t.value) ? t.value.some((e) => eD(e) === eD(n)) : !1;
     case `none_of`:
-      return !Array.isArray(t.value) || !t.value.some((e) => QE(e) === QE(n));
+      return !Array.isArray(t.value) || !t.value.some((e) => eD(e) === eD(n));
     case `gt`:
     case `gte`:
     case `lt`:
@@ -55910,31 +55938,31 @@ function nD(e, t) {
                 ? e <= r
                 : e >= r && e <= String(t.value2 ?? `9999`);
       }
-      let e = $E(n),
-        r = $E(t.value);
+      let e = tD(n),
+        r = tD(t.value);
       if (e === null || r === null) return !1;
       if (t.op === `gt`) return e > r;
       if (t.op === `gte`) return e >= r;
       if (t.op === `lt`) return e < r;
       if (t.op === `lte`) return e <= r;
-      let i = $E(t.value2);
+      let i = tD(t.value2);
       return i !== null && e >= r && e <= i;
     }
     default:
       return !0;
   }
 }
-function rD(e, t) {
+function aD(e, t) {
   if (!t.children.length) return !0;
-  let n = t.children.map((t) => (ZE(t) ? rD(e, t) : nD(e, t)));
+  let n = t.children.map((t) => ($E(t) ? aD(e, t) : iD(e, t)));
   return t.conj === `and` ? n.every(Boolean) : n.some(Boolean);
 }
-function iD(e) {
-  return e.children.reduce((e, t) => e + (ZE(t) ? iD(t) : 1), 0);
+function oD(e) {
+  return e.children.reduce((e, t) => e + ($E(t) ? oD(t) : 1), 0);
 }
-function aD(e, t) {
-  let n = $E(e),
-    r = $E(t);
+function sD(e, t) {
+  let n = tD(e),
+    r = tD(t);
   if (n !== null && r !== null && typeof e != `string`) return n - r;
   let i = e == null ? `` : String(e),
     a = t == null ? `` : String(t);
@@ -55942,24 +55970,24 @@ function aD(e, t) {
     ? n - r
     : i.localeCompare(a, void 0, { numeric: !0, sensitivity: `base` });
 }
-function oD(e, t, n) {
+function cD(e, t, n) {
   if (n === `none`) return null;
   let r = e.map((e) => e[t]);
   switch (n) {
     case `count`:
       return e.length;
     case `filled`:
-      return r.filter((e) => !eD(e)).length;
+      return r.filter((e) => !nD(e)).length;
     case `empty`:
-      return r.filter(eD).length;
+      return r.filter(nD).length;
     case `pct_filled`:
       return e.length
-        ? Math.round((r.filter((e) => !eD(e)).length / e.length) * 100)
+        ? Math.round((r.filter((e) => !nD(e)).length / e.length) * 100)
         : 0;
     case `unique`:
-      return new Set(r.map(QE).filter((e) => e !== ``)).size;
+      return new Set(r.map(eD).filter((e) => e !== ``)).size;
     default: {
-      let e = r.map($E).filter((e) => e !== null);
+      let e = r.map(tD).filter((e) => e !== null);
       return e.length
         ? n === `sum`
           ? Math.round(e.reduce((e, t) => e + t, 0) * 1e3) / 1e3
@@ -55974,39 +56002,39 @@ function oD(e, t, n) {
     }
   }
 }
-function sD(e, t, n) {
-  let r = e.map((e) => tD(e, n)),
-    i = r.filter((e) => rD(e, t.filters)),
+function lD(e, t, n) {
+  let r = e.map((e) => rD(e, n)),
+    i = r.filter((e) => aD(e, t.filters)),
     a = t.search?.trim().toLowerCase();
   if (a) {
     let e = n.fields.filter(
       (e) => e.type === `text` || e.type === `longtext` || e.type === `select`,
     );
-    i = i.filter((t) => e.some((e) => QE(t[e.key]).includes(a)));
+    i = i.filter((t) => e.some((e) => eD(t[e.key]).includes(a)));
   }
   if (t.sorts.length) {
     let e = t.sorts;
     i = [...i].sort((t, n) => {
       for (let r of e) {
-        let e = eD(t[r.field]),
-          i = eD(n[r.field]);
+        let e = nD(t[r.field]),
+          i = nD(n[r.field]);
         if (e !== i) return e ? 1 : -1;
         if (e && i) continue;
-        let a = aD(t[r.field], n[r.field]);
+        let a = sD(t[r.field], n[r.field]);
         if (a !== 0) return r.dir === `asc` ? a : -a;
       }
       return 0;
     });
   }
   let o = {};
-  for (let [e, n] of Object.entries(t.calcs ?? {})) o[e] = oD(i, e, n);
+  for (let [e, n] of Object.entries(t.calcs ?? {})) o[e] = cD(i, e, n);
   let s = null;
   if (t.groupBy) {
     let e = t.groupBy,
       n = new Map();
     for (let t of i) {
       let r = t[e],
-        i = eD(r) ? `` : String(r),
+        i = nD(r) ? `` : String(r),
         a = n.get(i);
       a ? a.push(t) : n.set(i, [t]);
     }
@@ -56016,7 +56044,7 @@ function sD(e, t, n) {
         label: e === `` ? `(empty)` : e,
         rows: n,
         calcs: Object.fromEntries(
-          Object.entries(t.calcs ?? {}).map(([e, t]) => [e, oD(n, e, t)]),
+          Object.entries(t.calcs ?? {}).map(([e, t]) => [e, cD(n, e, t)]),
         ),
       }))
       .sort(
@@ -56026,7 +56054,7 @@ function sD(e, t, n) {
   }
   return { rows: i, groups: s, calcs: o, total: r.length, filtered: i.length };
 }
-var cD = {
+var uD = {
     bar: `_bar_1cync_1`,
     views: `_views_1cync_9`,
     viewTab: `_viewTab_1cync_16`,
@@ -56056,28 +56084,28 @@ var cD = {
     chip: `_chip_1cync_214`,
     fnList: `_fnList_1cync_235`,
   },
-  lD = [
+  dD = [
     { key: `table`, label: `Table` },
     { key: `board`, label: `Board` },
     { key: `matrix`, label: `Matrix` },
   ];
-function uD({ api: e, onDone: t }) {
-  let n = Qg((e) => e.addColumn),
+function fD({ api: e, onDone: t }) {
+  let n = $g((e) => e.addColumn),
     [r, i] = (0, _.useState)(`manual`),
     [a, o] = (0, _.useState)(``),
     [s, c] = (0, _.useState)(`text`),
     [l, u] = (0, _.useState)(``),
     [d, f] = (0, _.useState)(``);
   return (0, X.jsxs)(`div`, {
-    className: cD.form,
+    className: uD.form,
     children: [
       (0, X.jsx)(`div`, {
-        className: cD.tabs,
+        className: uD.tabs,
         children: [`manual`, `formula`].map((e) =>
           (0, X.jsx)(
             `button`,
             {
-              className: r === e ? cD.tabActive : cD.tab,
+              className: r === e ? uD.tabActive : uD.tab,
               onClick: () => i(e),
               children: e === `manual` ? `Fill in by hand` : `Computed`,
             },
@@ -56086,7 +56114,7 @@ function uD({ api: e, onDone: t }) {
         ),
       }),
       (0, X.jsx)(`input`, {
-        className: RC.input,
+        className: zC.input,
         placeholder: `Column name`,
         value: a,
         onChange: (e) => o(e.target.value),
@@ -56096,7 +56124,7 @@ function uD({ api: e, onDone: t }) {
         ? (0, X.jsxs)(X.Fragment, {
             children: [
               (0, X.jsxs)(`select`, {
-                className: RC.select,
+                className: zC.select,
                 value: s,
                 onChange: (e) => c(e.target.value),
                 children: [
@@ -56116,7 +56144,7 @@ function uD({ api: e, onDone: t }) {
               }),
               s === `select` &&
                 (0, X.jsx)(`input`, {
-                  className: RC.input,
+                  className: zC.input,
                   placeholder: `Choices, comma separated — e.g. accept, reject, ask`,
                   value: d,
                   onChange: (e) => f(e.target.value),
@@ -56126,29 +56154,29 @@ function uD({ api: e, onDone: t }) {
         : (0, X.jsxs)(X.Fragment, {
             children: [
               (0, X.jsx)(`textarea`, {
-                className: `${RC.textarea} ${RC.mono}`,
+                className: `${zC.textarea} ${zC.mono}`,
                 rows: 3,
                 placeholder: `flag == "abnormal" and fate == "dropped" ? "SUSPECT" : ""`,
                 value: l,
                 onChange: (e) => u(e.target.value),
               }),
               (0, X.jsxs)(`details`, {
-                className: cD.help,
+                className: uD.help,
                 children: [
                   (0, X.jsx)(`summary`, { children: `Fields and functions` }),
                   (0, X.jsx)(`p`, {
-                    className: cD.helpNote,
+                    className: uD.helpNote,
                     children: `Use column keys as variables:`,
                   }),
                   (0, X.jsx)(`div`, {
-                    className: cD.chips,
+                    className: uD.chips,
                     children: e.fields
                       .slice(0, 26)
                       .map((e) =>
                         (0, X.jsx)(
                           `button`,
                           {
-                            className: cD.chip,
+                            className: uD.chip,
                             onClick: () => u((t) => `${t}${e.key}`),
                             children: e.key,
                           },
@@ -56157,8 +56185,8 @@ function uD({ api: e, onDone: t }) {
                       ),
                   }),
                   (0, X.jsx)(`ul`, {
-                    className: cD.fnList,
-                    children: XE.map((e) =>
+                    className: uD.fnList,
+                    children: QE.map((e) =>
                       (0, X.jsxs)(
                         `li`,
                         {
@@ -56176,12 +56204,12 @@ function uD({ api: e, onDone: t }) {
               }),
             ],
           }),
-      (0, X.jsx)(wC, {
+      (0, X.jsx)(TC, {
         variant: `solid`,
         onClick: () => {
           let i = a.trim();
           if (!i) return;
-          let o = `x_${i.toLowerCase().replace(/\W+/g, `_`)}_${kg().slice(0, 3)}`,
+          let o = `x_${i.toLowerCase().replace(/\W+/g, `_`)}_${Ag().slice(0, 3)}`,
             c = {
               key: o,
               label: i,
@@ -56207,7 +56235,7 @@ function uD({ api: e, onDone: t }) {
     ],
   });
 }
-function dD({
+function pD({
   api: e,
   savedViews: t,
   onPickView: n,
@@ -56215,10 +56243,10 @@ function dD({
   compact: i = !1,
 }) {
   let { view: a, setView: o, fields: s, visible: c, result: l } = e,
-    u = Qg((e) => e.saveView),
-    d = Qg((e) => e.deleteView),
-    f = Qg((e) => e.removeColumn),
-    p = iD(a.filters),
+    u = $g((e) => e.saveView),
+    d = $g((e) => e.deleteView),
+    f = $g((e) => e.removeColumn),
+    p = oD(a.filters),
     m = (e) =>
       o({
         ...a,
@@ -56234,15 +56262,15 @@ function dD({
       (([i[n], i[r]] = [i[r], i[n]]), o({ ...a, columns: i }));
     };
   return (0, X.jsxs)(`div`, {
-    className: cD.bar,
+    className: uD.bar,
     children: [
       (0, X.jsx)(`div`, {
-        className: cD.views,
+        className: uD.views,
         children: t.map((e) =>
           (0, X.jsx)(
             `button`,
             {
-              className: `${cD.viewTab} ${e.id === a.id ? cD.viewTabActive : ``}`,
+              className: `${uD.viewTab} ${e.id === a.id ? uD.viewTabActive : ``}`,
               onClick: () => n(e),
               onDoubleClick: () =>
                 !e.builtin &&
@@ -56258,17 +56286,17 @@ function dD({
         ),
       }),
       (0, X.jsxs)(`div`, {
-        className: cD.tools,
+        className: uD.tools,
         children: [
           (0, X.jsx)(`input`, {
-            className: `${RC.input} ${cD.search}`,
+            className: `${zC.input} ${uD.search}`,
             placeholder: `Search text…`,
             value: a.search ?? ``,
             onChange: (e) => o({ ...a, search: e.target.value }),
           }),
           i &&
             (0, X.jsxs)(`span`, {
-              className: cD.count,
+              className: uD.count,
               children: [
                 (0, X.jsx)(`b`, { className: `num`, children: l.filtered }),
                 l.filtered !== l.total &&
@@ -56281,18 +56309,18 @@ function dD({
           !i &&
             (0, X.jsxs)(X.Fragment, {
               children: [
-                (0, X.jsx)(Kw, {
+                (0, X.jsx)(Jw, {
                   label: `Filter${p ? ` · ${p}` : ``}`,
                   active: p > 0,
                   width: 460,
-                  children: (0, X.jsx)($w, {
+                  children: (0, X.jsx)(tT, {
                     view: a,
                     fields: s,
                     rows: l.rows,
                     onChange: o,
                   }),
                 }),
-                (0, X.jsx)(Kw, {
+                (0, X.jsx)(Jw, {
                   label: a.groupBy
                     ? `Group · ${e.fieldMap.get(a.groupBy)?.label}`
                     : `Group`,
@@ -56300,10 +56328,10 @@ function dD({
                   width: 240,
                   children: (e) =>
                     (0, X.jsxs)(`div`, {
-                      className: cD.list,
+                      className: uD.list,
                       children: [
                         (0, X.jsx)(`button`, {
-                          className: cD.listItem,
+                          className: uD.listItem,
                           onClick: () => {
                             (o({ ...a, groupBy: void 0 }), e());
                           },
@@ -56321,7 +56349,7 @@ function dD({
                             (0, X.jsx)(
                               `button`,
                               {
-                                className: `${cD.listItem} ${a.groupBy === t.key ? cD.listItemActive : ``}`,
+                                className: `${uD.listItem} ${a.groupBy === t.key ? uD.listItemActive : ``}`,
                                 onClick: () => {
                                   (o({ ...a, groupBy: t.key }), e());
                                 },
@@ -56333,39 +56361,39 @@ function dD({
                       ],
                     }),
                 }),
-                (0, X.jsx)(Kw, {
+                (0, X.jsx)(Jw, {
                   label: `Columns · ${c.length}`,
                   width: 300,
                   children: (e) =>
                     (0, X.jsxs)(`div`, {
-                      className: cD.list,
+                      className: uD.list,
                       children: [
                         s.map((e) => {
                           let t = a.columns.includes(e.key);
                           return (0, X.jsxs)(
                             `div`,
                             {
-                              className: cD.colRow,
+                              className: uD.colRow,
                               children: [
                                 (0, X.jsxs)(`button`, {
-                                  className: `${cD.listItem} ${t ? cD.listItemActive : ``}`,
+                                  className: `${uD.listItem} ${t ? uD.listItemActive : ``}`,
                                   onClick: () => m(e.key),
                                   children: [
                                     (0, X.jsx)(`span`, {
-                                      className: cD.colDot,
+                                      className: uD.colDot,
                                       "data-on": t,
                                     }),
                                     e.label,
                                     e.source !== `source` &&
                                       (0, X.jsx)(`span`, {
-                                        className: cD.colKind,
+                                        className: uD.colKind,
                                         children: e.source,
                                       }),
                                   ],
                                 }),
                                 t &&
                                   (0, X.jsxs)(`span`, {
-                                    className: cD.colMove,
+                                    className: uD.colMove,
                                     children: [
                                       (0, X.jsx)(`button`, {
                                         onClick: () => h(e.key, -1),
@@ -56382,7 +56410,7 @@ function dD({
                                 (e.source === `manual` ||
                                   e.source === `formula`) &&
                                   (0, X.jsx)(`button`, {
-                                    className: cD.colDelete,
+                                    className: uD.colDelete,
                                     title: `delete this column and its values`,
                                     onClick: () => {
                                       window.confirm(
@@ -56404,8 +56432,8 @@ function dD({
                           );
                         }),
                         (0, X.jsx)(`div`, {
-                          className: cD.listFoot,
-                          children: (0, X.jsx)(wC, {
+                          className: uD.listFoot,
+                          children: (0, X.jsx)(TC, {
                             size: `sm`,
                             variant: `quiet`,
                             onClick: e,
@@ -56415,19 +56443,19 @@ function dD({
                       ],
                     }),
                 }),
-                (0, X.jsx)(Kw, {
+                (0, X.jsx)(Jw, {
                   label: `+ Column`,
                   width: 360,
-                  children: (t) => (0, X.jsx)(uD, { api: e, onDone: t }),
+                  children: (t) => (0, X.jsx)(fD, { api: e, onDone: t }),
                 }),
                 (0, X.jsx)(`div`, {
-                  className: cD.layouts,
-                  children: lD.map((e) =>
+                  className: uD.layouts,
+                  children: dD.map((e) =>
                     (0, X.jsx)(
                       `button`,
                       {
                         className:
-                          a.layout === e.key ? cD.layoutActive : cD.layout,
+                          a.layout === e.key ? uD.layoutActive : uD.layout,
                         onClick: () => o({ ...a, layout: e.key }),
                         children: e.label,
                       },
@@ -56437,7 +56465,7 @@ function dD({
                 }),
                 r,
                 (0, X.jsxs)(`span`, {
-                  className: cD.count,
+                  className: uD.count,
                   children: [
                     (0, X.jsx)(`b`, { className: `num`, children: l.filtered }),
                     l.filtered !== l.total &&
@@ -56447,20 +56475,20 @@ function dD({
                       }),
                   ],
                 }),
-                (0, X.jsx)(wC, {
+                (0, X.jsx)(TC, {
                   size: `sm`,
                   onClick: () => {
                     let e = c.map((e) => ({ key: e.key, label: e.label }));
-                    PC(
+                    FC(
                       `${a.entity}-${a.name.toLowerCase().replace(/\W+/g, `-`)}.csv`,
-                      IC(l.rows, e),
+                      LC(l.rows, e),
                       `text/csv`,
                     );
                   },
                   title: `Export the rows and columns as shown`,
                   children: `CSV`,
                 }),
-                (0, X.jsx)(wC, {
+                (0, X.jsx)(TC, {
                   size: `sm`,
                   variant: `solid`,
                   onClick: () => {
@@ -56471,7 +56499,7 @@ function dD({
                     if (!e) return;
                     let t = {
                       ...a,
-                      id: a.builtin ? `v-${kg()}` : a.id,
+                      id: a.builtin ? `v-${Ag()}` : a.id,
                       name: e,
                       builtin: !1,
                     };
@@ -56486,7 +56514,7 @@ function dD({
     ],
   });
 }
-var fD = (e, t) => {
+var mD = (e, t) => {
   switch (t) {
     case `acdp`:
       return e.acdps;
@@ -56502,24 +56530,24 @@ var fD = (e, t) => {
       return e.l3;
   }
 };
-function pD(e, t) {
+function hD(e, t) {
   let [n, r] = (0, _.useState)(t),
-    i = Qg((e) => e.columns[t.entity]),
-    a = Qg((e) => e.cells),
-    o = Qg((e) => e.overrides),
-    s = Qg((e) => e.saveView),
-    c = Qg((e) => e.setCell),
-    l = Qg((e) => e.setOverride),
+    i = $g((e) => e.columns[t.entity]),
+    a = $g((e) => e.cells),
+    o = $g((e) => e.overrides),
+    s = $g((e) => e.saveView),
+    c = $g((e) => e.setCell),
+    l = $g((e) => e.setOverride),
     u = n.entity,
-    d = (0, _.useMemo)(() => [...Lg[u], ...(i ?? [])], [u, i]),
+    d = (0, _.useMemo)(() => [...Rg[u], ...(i ?? [])], [u, i]),
     f = (0, _.useMemo)(() => new Map(d.map((e) => [e.key, e])), [d]),
     p = (0, _.useMemo)(
       () => n.columns.map((e) => f.get(e)).filter((e) => !!e),
       [n.columns, f],
     ),
-    m = zg[u],
+    m = Bg[u],
     h = (0, _.useCallback)((e) => e[m], [m]),
-    g = (0, _.useMemo)(() => fD(e, u), [e, u]),
+    g = (0, _.useMemo)(() => mD(e, u), [e, u]),
     v = (0, _.useMemo)(
       () => ({ entity: u, fields: d, cells: a, overrides: o, idOf: h }),
       [u, d, a, o, h],
@@ -56528,7 +56556,7 @@ function pD(e, t) {
     fields: d,
     fieldMap: f,
     visible: p,
-    result: (0, _.useMemo)(() => sD(g, n, v), [g, n, v]),
+    result: (0, _.useMemo)(() => lD(g, n, v), [g, n, v]),
     view: n,
     setView: r,
     commitView: () => s(n),
@@ -56543,20 +56571,20 @@ function pD(e, t) {
     ),
   };
 }
-var mD = {
+var gD = {
   wrap: `_wrap_b1fhq_1`,
   main: `_main_b1fhq_7`,
   entities: `_entities_b1fhq_16`,
   entity: `_entity_b1fhq_22`,
   entityActive: `_entityActive_b1fhq_35`,
 };
-function hD({ dataset: e, initialView: t, entities: n, onEntityChange: r }) {
+function _D({ dataset: e, initialView: t, entities: n, onEntityChange: r }) {
   let [i, a] = (0, _.useState)(t),
     [o, s] = (0, _.useState)(null),
-    c = Qg((e) => e.views),
-    l = pC(),
-    u = (e) => (l ? qg(e) : e),
-    d = pD(e, u(i));
+    c = $g((e) => e.views),
+    l = mC(),
+    u = (e) => (l ? Jg(e) : e),
+    d = hD(e, u(i));
   (0, _.useEffect)(() => {
     (a(t), d.setView(u(t)));
   }, [t.id, t.entity, l]);
@@ -56570,46 +56598,46 @@ function hD({ dataset: e, initialView: t, entities: n, onEntityChange: r }) {
     m = (e) => {
       let t = c.find((t) => t.entity === e) ?? {
         ...d.view,
-        id: `v-${kg()}`,
+        id: `v-${Ag()}`,
         entity: e,
       };
       (p(t), r?.(e));
     },
     h = (e) => s({ entity: d.view.entity, id: e.__id });
   return (0, X.jsxs)(`div`, {
-    className: mD.wrap,
+    className: gD.wrap,
     children: [
       (0, X.jsxs)(`div`, {
-        className: mD.main,
+        className: gD.main,
         children: [
           n &&
             n.length > 1 &&
             !l &&
             (0, X.jsx)(`div`, {
-              className: mD.entities,
+              className: gD.entities,
               children: n.map((e) =>
                 (0, X.jsx)(
                   `button`,
                   {
-                    className: `${mD.entity} ${d.view.entity === e ? mD.entityActive : ``}`,
+                    className: `${gD.entity} ${d.view.entity === e ? gD.entityActive : ``}`,
                     onClick: () => m(e),
-                    children: Rg[e],
+                    children: zg[e],
                   },
                   e,
                 ),
               ),
             }),
-          (0, X.jsx)(dD, { api: d, savedViews: f, onPickView: p, compact: l }),
+          (0, X.jsx)(pD, { api: d, savedViews: f, onPickView: p, compact: l }),
           d.view.layout === `table` &&
-            (0, X.jsx)(Hw, {
+            (0, X.jsx)(Ww, {
               api: d,
               onOpenRow: h,
               activeRowId: o?.id ?? null,
               compact: l,
             }),
-          d.view.layout === `board` && (0, X.jsx)(mw, { api: d, onOpenRow: h }),
+          d.view.layout === `board` && (0, X.jsx)(gw, { api: d, onOpenRow: h }),
           d.view.layout === `matrix` &&
-            (0, X.jsx)(Ww, {
+            (0, X.jsx)(Kw, {
               api: d,
               onPick: (e, t) =>
                 d.setView({
@@ -56641,7 +56669,7 @@ function hD({ dataset: e, initialView: t, entities: n, onEntityChange: r }) {
         ],
       }),
       o &&
-        (0, X.jsx)($C, {
+        (0, X.jsx)(ew, {
           dataset: e,
           target: o,
           onOpen: s,
@@ -56650,11 +56678,11 @@ function hD({ dataset: e, initialView: t, entities: n, onEntityChange: r }) {
     ],
   });
 }
-var gD = [`acdp`, `biomarker`, `document`, `l3`, `medication`, `asserter`];
-function _D() {
-  let e = oC((e) => e.dataset),
-    t = Qg((e) => e.views),
-    n = lC(),
+var vD = [`acdp`, `biomarker`, `document`, `l3`, `medication`, `asserter`];
+function yD() {
+  let e = sC((e) => e.dataset),
+    t = $g((e) => e.views),
+    n = uC(),
     r = n.params.get(`view`),
     i = n.params.get(`entity`) ?? `acdp`,
     a = (0, _.useMemo)(() => {
@@ -56662,17 +56690,17 @@ function _D() {
         let e = t.find((e) => e.id === r);
         if (e) return e;
       }
-      return t.find((e) => e.entity === i) ?? Ug(i);
+      return t.find((e) => e.entity === i) ?? Wg(i);
     }, [r, i, t]);
   return e
-    ? (0, X.jsx)(jC, {
-        title: `Workbench`,
+    ? (0, X.jsx)(MC, {
+        title: `Atomic Clinical Data Points (L2)`,
         subtitle: `${e.stats.acdps} data points, ${e.stats.biomarkers} results, ${e.stats.documents} documents`,
-        children: (0, X.jsx)(hD, { dataset: e, initialView: a, entities: gD }),
+        children: (0, X.jsx)(_D, { dataset: e, initialView: a, entities: vD }),
       })
-    : (0, X.jsx)(NC, {});
+    : (0, X.jsx)(PC, {});
 }
-var vD = {
+var bD = {
     lede: `_lede_1x51k_1`,
     grid: `_grid_1x51k_11`,
     count: `_count_1x51k_21`,
@@ -56684,82 +56712,82 @@ var vD = {
     workDetail: `_workDetail_1x51k_78`,
     workGrid: `_workGrid_1x51k_85`,
   },
-  yD = { high: `bad`, medium: `warn`, low: `neutral`, info: `acc` };
-function bD() {
-  let e = oC((e) => e.dataset),
-    t = lC(),
+  xD = { high: `bad`, medium: `warn`, low: `neutral`, info: `acc` };
+function SD() {
+  let e = sC((e) => e.dataset),
+    t = uC(),
     [n, r] = (0, _.useState)(t.params.get(`insight`)),
     i = (0, _.useMemo)(
       () => e?.insights.find((e) => e.id === n) ?? null,
       [e, n],
     ),
-    a = (0, _.useMemo)(() => (i ? Gg(i.entity, i.title, i.rows) : null), [i]);
-  if (!e) return (0, X.jsx)(NC, {});
+    a = (0, _.useMemo)(() => (i ? Kg(i.entity, i.title, i.rows) : null), [i]);
+  if (!e) return (0, X.jsx)(PC, {});
   let o = e.insights.reduce((e, t) => e + t.count, 0);
-  return (0, X.jsx)(jC, {
-    title: `Review queue`,
+  return (0, X.jsx)(MC, {
+    title: `For Review`,
     subtitle: `${e.insights.length} checks · ${o} rows flagged`,
     actions:
       i &&
-      (0, X.jsx)(wC, { onClick: () => r(null), children: `Back to the queue` }),
+      (0, X.jsx)(TC, { onClick: () => r(null), children: `Back to the queue` }),
     children:
       i && a
         ? (0, X.jsxs)(`div`, {
-            className: vD.workArea,
+            className: bD.workArea,
             children: [
               (0, X.jsxs)(`div`, {
-                className: vD.workHead,
+                className: bD.workHead,
                 children: [
                   (0, X.jsxs)(`div`, {
                     children: [
                       (0, X.jsx)(`div`, {
                         className: `eyebrow`,
-                        children: Rg[i.entity],
+                        children: zg[i.entity],
                       }),
                       (0, X.jsx)(`h2`, {
-                        className: vD.workTitle,
+                        className: bD.workTitle,
                         children: i.title,
                       }),
                       (0, X.jsx)(`p`, {
-                        className: vD.workDetail,
+                        className: bD.workDetail,
                         children: i.detail,
                       }),
                     ],
                   }),
-                  (0, X.jsx)(xC, {
+                  (0, X.jsx)(SC, {
                     value: `${i.count} rows`,
-                    tone: yD[i.severity],
+                    tone: xD[i.severity],
                   }),
                 ],
               }),
               (0, X.jsx)(`div`, {
-                className: vD.workGrid,
-                children: (0, X.jsx)(hD, { dataset: e, initialView: a }),
+                className: bD.workGrid,
+                children: (0, X.jsx)(_D, { dataset: e, initialView: a }),
               }),
             ],
           })
-        : (0, X.jsxs)(MC, {
+        : (0, X.jsxs)(NC, {
             children: [
               (0, X.jsx)(`p`, {
-                className: vD.lede,
+                className: bD.lede,
                 children: `These are computed from the record itself — a value re-read against the range printed beside it, a result no data point cites, a document that yielded nothing. Nothing here is a model opinion; each one is a place the record contradicts itself or goes quiet.`,
               }),
               (0, X.jsx)(`div`, {
-                className: vD.grid,
+                className: bD.grid,
                 children: e.insights.map((e) =>
                   (0, X.jsxs)(
-                    vC,
+                    yC,
                     {
                       title: e.title,
-                      eyebrow: Rg[e.entity],
-                      action: (0, X.jsx)(xC, {
+                      eyebrow: zg[e.entity],
+                      action: (0, X.jsx)(SC, {
                         value: e.severity,
-                        tone: yD[e.severity],
+                        tone: xD[e.severity],
                         size: `sm`,
                       }),
                       children: [
                         (0, X.jsxs)(`div`, {
-                          className: vD.count,
+                          className: bD.count,
                           "data-sev": e.severity,
                           children: [
                             (0, X.jsx)(`span`, {
@@ -56767,17 +56795,17 @@ function bD() {
                               children: e.count,
                             }),
                             (0, X.jsx)(`span`, {
-                              className: vD.countLabel,
+                              className: bD.countLabel,
                               children: `rows`,
                             }),
                           ],
                         }),
                         (0, X.jsx)(`p`, {
-                          className: vD.detail,
+                          className: bD.detail,
                           children: e.detail,
                         }),
                         e.rows.length > 0 &&
-                          (0, X.jsx)(wC, {
+                          (0, X.jsx)(TC, {
                             variant: `solid`,
                             size: `sm`,
                             onClick: () => r(e.id),
@@ -56793,7 +56821,7 @@ function bD() {
           }),
   });
 }
-var xD = {
+var CD = {
   overlay: `_overlay_7w2wg_1`,
   palette: `_palette_7w2wg_11`,
   input: `_input_7w2wg_20`,
@@ -56805,11 +56833,11 @@ var xD = {
   hint: `_hint_7w2wg_74`,
   none: `_none_7w2wg_80`,
 };
-function SD() {
+function wD() {
   let [e, t] = (0, _.useState)(!1),
     [n, r] = (0, _.useState)(``),
     [i, a] = (0, _.useState)(0),
-    o = oC((e) => e.dataset);
+    o = sC((e) => e.dataset);
   (0, _.useEffect)(() => {
     let e = (e) => {
       ((e.metaKey || e.ctrlKey) &&
@@ -56824,12 +56852,12 @@ function SD() {
   }, []);
   let s = (0, _.useMemo)(() => {
     let e = n.trim().toLowerCase(),
-      t = hC.map((e) => ({
+      t = gC.map((e) => ({
         id: e.path,
         label: e.label,
         hint: e.hint,
         kind: `go`,
-        go: () => cC(e.path),
+        go: () => lC(e.path),
       }));
     if (
       (t.push({
@@ -56837,7 +56865,7 @@ function SD() {
         label: `Data`,
         hint: `Load a record, export the workspace`,
         kind: `go`,
-        go: () => cC(`/data`),
+        go: () => lC(`/data`),
       }),
       !o || !e)
     )
@@ -56853,7 +56881,7 @@ function SD() {
           hint: `data point ${n.acdp_id} · ${n.fate}`,
           kind: `point`,
           go: () =>
-            cC(`/pipeline/workbench`, {
+            lC(`/pipeline/workbench`, {
               entity: `acdp`,
               row: String(n.acdp_id),
             }),
@@ -56867,7 +56895,7 @@ function SD() {
         label: n.name,
         hint: `${n.points.length} readings · latest ${n.latest.raw}`,
         kind: `marker`,
-        go: () => cC(`/profile/labs`, { marker: n.key }),
+        go: () => lC(`/profile/labs`, { marker: n.key }),
       });
     for (let n of o.documents
       .filter((t) =>
@@ -56879,7 +56907,7 @@ function SD() {
         label: n.source_subcategory ?? n.source_category,
         hint: `${n.source_date} · ${n.acdp_count} points`,
         kind: `document`,
-        go: () => cC(`/profile/timeline`, { doc: String(n.source_id) }),
+        go: () => lC(`/profile/timeline`, { doc: String(n.source_id) }),
       });
     for (let n of o.l3
       .filter((t) => t.text.toLowerCase().includes(e))
@@ -56889,7 +56917,7 @@ function SD() {
         label: n.text,
         hint: `profile line · ${n.section.replace(/_/g, ` `)}`,
         kind: `line`,
-        go: () => cC(`/profile/lines`, { open: n.l3_id }),
+        go: () => lC(`/profile/lines`, { open: n.l3_id }),
       });
     return t
       .filter((t) => t.kind !== `go` || t.label.toLowerCase().includes(e))
@@ -56900,14 +56928,14 @@ function SD() {
     (e.go(), t(!1));
   };
   return (0, X.jsx)(`div`, {
-    className: xD.overlay,
+    className: CD.overlay,
     onClick: () => t(!1),
     children: (0, X.jsxs)(`div`, {
-      className: xD.palette,
+      className: CD.palette,
       onClick: (e) => e.stopPropagation(),
       children: [
         (0, X.jsx)(`input`, {
-          className: xD.input,
+          className: CD.input,
           autoFocus: !0,
           placeholder: `Jump to a screen, a marker, a document, or a data point id…`,
           value: n,
@@ -56921,26 +56949,26 @@ function SD() {
           },
         }),
         (0, X.jsxs)(`ul`, {
-          className: xD.list,
+          className: CD.list,
           children: [
             s.map((e, t) =>
               (0, X.jsx)(
                 `li`,
                 {
                   children: (0, X.jsxs)(`button`, {
-                    className: `${xD.item} ${t === i ? xD.itemActive : ``}`,
+                    className: `${CD.item} ${t === i ? CD.itemActive : ``}`,
                     onClick: () => c(e),
                     children: [
                       (0, X.jsx)(`span`, {
-                        className: xD.kind,
+                        className: CD.kind,
                         children: e.kind,
                       }),
                       (0, X.jsx)(`span`, {
-                        className: xD.label,
+                        className: CD.label,
                         children: e.label,
                       }),
                       (0, X.jsx)(`span`, {
-                        className: xD.hint,
+                        className: CD.hint,
                         children: e.hint,
                       }),
                     ],
@@ -56951,7 +56979,7 @@ function SD() {
             ),
             s.length === 0 &&
               (0, X.jsx)(`li`, {
-                className: xD.none,
+                className: CD.none,
                 children: `nothing matches`,
               }),
           ],
@@ -56960,31 +56988,31 @@ function SD() {
     }),
   });
 }
-var CD = {
-  "/data": zC,
-  "/profile/overview": qC,
-  "/profile/timeline": tw,
-  "/profile/labs": rw,
-  "/profile/lines": ow,
-  "/pipeline/reduction": cw,
-  "/pipeline/workbench": _D,
-  "/pipeline/review": bD,
+var TD = {
+  "/data": BC,
+  "/profile/overview": JC,
+  "/profile/timeline": nw,
+  "/profile/labs": aw,
+  "/profile/lines": cw,
+  "/pipeline/reduction": uw,
+  "/pipeline/workbench": yD,
+  "/pipeline/review": SD,
 };
-function wD() {
-  let e = lC(),
-    { dataset: t, status: n, tryDemo: r } = oC(),
+function ED() {
+  let e = uC(),
+    { dataset: t, status: n, tryDemo: r } = sC(),
     i = (0, _.useRef)(!1);
   (0, _.useEffect)(() => {
     !t && n === `empty` && !i.current && ((i.current = !0), r());
   }, [t, n, r]);
-  let a = CD[e.path] ?? qC;
+  let a = TD[e.path] ?? JC;
   return !t && e.path !== `/data`
-    ? (0, X.jsx)(zC, {})
+    ? (0, X.jsx)(BC, {})
     : (0, X.jsxs)(X.Fragment, {
-        children: [(0, X.jsx)(a, {}), (0, X.jsx)(SD, {})],
+        children: [(0, X.jsx)(a, {}), (0, X.jsx)(wD, {})],
       });
 }
 (0, v.createRoot)(document.getElementById(`root`)).render(
-  (0, X.jsx)(_.StrictMode, { children: (0, X.jsx)(wD, {}) }),
+  (0, X.jsx)(_.StrictMode, { children: (0, X.jsx)(ED, {}) }),
 );
-//# sourceMappingURL=index-C-qqaEV1.js.map
+//# sourceMappingURL=index-C5M1GYCE.js.map
