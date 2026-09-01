@@ -77650,38 +77650,41 @@ function l7() {
   });
 }
 var Q = {
-    drawer: `_drawer_nvyqk_1`,
-    head: `_head_nvyqk_11`,
-    id: `_id_nvyqk_19`,
-    body: `_body_nvyqk_25`,
-    statement: `_statement_nvyqk_31`,
-    detail: `_detail_nvyqk_37`,
-    tags: `_tags_nvyqk_46`,
-    h3: `_h3_nvyqk_54`,
-    count: `_count_nvyqk_65`,
-    line: `_line_nvyqk_70`,
-    lineLabel: `_lineLabel_nvyqk_79`,
-    lineValue: `_lineValue_nvyqk_86`,
-    quote: `_quote_nvyqk_94`,
-    link: `_link_nvyqk_103`,
-    disagree: `_disagree_nvyqk_114`,
-    card: `_card_nvyqk_119`,
-    cardHead: `_cardHead_nvyqk_134`,
-    cardTitle: `_cardTitle_nvyqk_142`,
-    cardMeta: `_cardMeta_nvyqk_147`,
-    cards: `_cards_nvyqk_153`,
-    list: `_list_nvyqk_154`,
-    acdpRow: `_acdpRow_nvyqk_160`,
-    acdpId: `_acdpId_nvyqk_177`,
-    acdpText: `_acdpText_nvyqk_182`,
-    acdpTail: `_acdpTail_nvyqk_189`,
-    range: `_range_nvyqk_195`,
-    rangeTrack: `_rangeTrack_nvyqk_199`,
-    rangeBand: `_rangeBand_nvyqk_206`,
-    rangeMark: `_rangeMark_nvyqk_215`,
-    rangeScale: `_rangeScale_nvyqk_234`,
-    readings: `_readings_nvyqk_242`,
-    reading: `_reading_nvyqk_242`,
+    backdrop: `_backdrop_1yw54_1`,
+    "fade-in": `_fade-in_1yw54_1`,
+    drawer: `_drawer_1yw54_9`,
+    "slide-in": `_slide-in_1yw54_1`,
+    head: `_head_1yw54_37`,
+    id: `_id_1yw54_45`,
+    body: `_body_1yw54_51`,
+    statement: `_statement_1yw54_57`,
+    detail: `_detail_1yw54_63`,
+    tags: `_tags_1yw54_72`,
+    h3: `_h3_1yw54_80`,
+    count: `_count_1yw54_91`,
+    line: `_line_1yw54_96`,
+    lineLabel: `_lineLabel_1yw54_105`,
+    lineValue: `_lineValue_1yw54_112`,
+    quote: `_quote_1yw54_120`,
+    link: `_link_1yw54_129`,
+    disagree: `_disagree_1yw54_140`,
+    card: `_card_1yw54_145`,
+    cardHead: `_cardHead_1yw54_160`,
+    cardTitle: `_cardTitle_1yw54_168`,
+    cardMeta: `_cardMeta_1yw54_173`,
+    cards: `_cards_1yw54_179`,
+    list: `_list_1yw54_180`,
+    acdpRow: `_acdpRow_1yw54_186`,
+    acdpId: `_acdpId_1yw54_203`,
+    acdpText: `_acdpText_1yw54_208`,
+    acdpTail: `_acdpTail_1yw54_215`,
+    range: `_range_1yw54_221`,
+    rangeTrack: `_rangeTrack_1yw54_225`,
+    rangeBand: `_rangeBand_1yw54_232`,
+    rangeMark: `_rangeMark_1yw54_241`,
+    rangeScale: `_rangeScale_1yw54_260`,
+    readings: `_readings_1yw54_268`,
+    reading: `_reading_1yw54_268`,
   },
   u7 = (e) => `${Math.round(e * 100)}%`;
 function d7({ label: e, children: t }) {
@@ -78243,26 +78246,31 @@ function h7({ dataset: e, target: t, onOpen: n, onClose: r }) {
         children: [`no detail view for `, i],
       });
     })();
-  return (0, q.jsxs)(`aside`, {
-    className: Q.drawer,
+  return (0, q.jsxs)(q.Fragment, {
     children: [
-      (0, q.jsxs)(`header`, {
-        className: Q.head,
+      (0, q.jsx)(`div`, { className: Q.backdrop, onClick: r }),
+      (0, q.jsxs)(`aside`, {
+        className: Q.drawer,
         children: [
-          (0, q.jsx)(`span`, {
-            className: `eyebrow`,
-            children: i === `l3` ? `profile line` : i,
+          (0, q.jsxs)(`header`, {
+            className: Q.head,
+            children: [
+              (0, q.jsx)(`span`, {
+                className: `eyebrow`,
+                children: i === `l3` ? `profile line` : i,
+              }),
+              (0, q.jsx)(`span`, { className: `${Q.id} num`, children: a }),
+              (0, q.jsx)(fM, {
+                size: `sm`,
+                variant: `quiet`,
+                onClick: r,
+                children: `Close`,
+              }),
+            ],
           }),
-          (0, q.jsx)(`span`, { className: `${Q.id} num`, children: a }),
-          (0, q.jsx)(fM, {
-            size: `sm`,
-            variant: `quiet`,
-            onClick: r,
-            children: `Close`,
-          }),
+          (0, q.jsx)(`div`, { className: Q.body, children: o }),
         ],
       }),
-      (0, q.jsx)(`div`, { className: Q.body, children: o }),
     ],
   });
 }
@@ -84400,4 +84408,4 @@ function Voe() {
 (0, y.createRoot)(document.getElementById(`root`)).render(
   (0, q.jsx)(v.StrictMode, { children: (0, q.jsx)(Voe, {}) }),
 );
-//# sourceMappingURL=index-CCpW4GN9.js.map
+//# sourceMappingURL=index-DrzO95dh.js.map
