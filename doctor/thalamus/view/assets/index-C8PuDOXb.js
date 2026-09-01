@@ -54605,7 +54605,7 @@ function Pj({ className: e, ...t }) {
   return (0, q.jsx)(`main`, {
     "data-slot": `sidebar-inset`,
     className: uj(
-      `relative flex w-full flex-1 flex-col bg-background md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2`,
+      `relative flex w-full min-w-0 flex-1 flex-col min-h-0 bg-background md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2`,
       e,
     ),
     ...t,
@@ -54903,15 +54903,15 @@ var Yj = [
   ],
   Xj = Yj,
   Zj = {
-    syncDot: `_syncDot_1if9o_1`,
-    topbar: `_topbar_1if9o_18`,
-    crumbs: `_crumbs_1if9o_30`,
-    title: `_title_1if9o_38`,
-    subtitle: `_subtitle_1if9o_45`,
-    topActions: `_topActions_1if9o_53`,
-    content: `_content_1if9o_60`,
-    pad: `_pad_1if9o_66`,
-    loader: `_loader_1if9o_71`,
+    syncDot: `_syncDot_s0zf8_1`,
+    topbar: `_topbar_s0zf8_18`,
+    crumbs: `_crumbs_s0zf8_30`,
+    title: `_title_s0zf8_38`,
+    subtitle: `_subtitle_s0zf8_45`,
+    topActions: `_topActions_s0zf8_53`,
+    content: `_content_s0zf8_60`,
+    pad: `_pad_s0zf8_68`,
+    loader: `_loader_s0zf8_73`,
   },
   Qj = {
     "/upload": (0, q.jsx)(XS, {}),
@@ -55030,6 +55030,7 @@ function tM({ title: e, subtitle: t, actions: n, children: r }) {
     o = Rg((e) => e.syncState),
     s = Rg((e) => e.syncError);
   return (0, q.jsxs)(jj, {
+    className: `h-svh overflow-hidden`,
     children: [
       (0, q.jsx)(eM, {
         activePath: i.path,
@@ -79542,33 +79543,33 @@ function b7(e) {
 }
 var aae = () => b7(rae),
   x7 = {
-    wrap: `_wrap_15bh4_1`,
-    scroll: `_scroll_15bh4_12`,
-    head: `_head_15bh4_18`,
-    headCell: `_headCell_15bh4_29`,
-    headLabel: `_headLabel_15bh4_54`,
-    headBadge: `_headBadge_15bh4_59`,
-    sortMark: `_sortMark_15bh4_69`,
-    body: `_body_15bh4_74`,
-    row: `_row_15bh4_80`,
-    rowActive: `_rowActive_15bh4_95`,
-    cell: `_cell_15bh4_99`,
-    cellInner: `_cellInner_15bh4_112`,
-    editable: `_editable_15bh4_126`,
-    overridden: `_overridden_15bh4_135`,
-    editor: `_editor_15bh4_151`,
-    blank: `_blank_15bh4_156`,
-    multi: `_multi_15bh4_160`,
-    groupRow: `_groupRow_15bh4_166`,
-    groupLabel: `_groupLabel_15bh4_184`,
-    groupCount: `_groupCount_15bh4_189`,
-    groupCalc: `_groupCalc_15bh4_199`,
-    foot: `_foot_15bh4_209`,
-    footCell: `_footCell_15bh4_218`,
-    calcSelect: `_calcSelect_15bh4_232`,
-    calcValue: `_calcValue_15bh4_246`,
-    serialHead: `_serialHead_15bh4_316`,
-    serialCell: `_serialCell_15bh4_323`,
+    wrap: `_wrap_1nz1v_1`,
+    scroll: `_scroll_1nz1v_13`,
+    head: `_head_1nz1v_19`,
+    headCell: `_headCell_1nz1v_30`,
+    headLabel: `_headLabel_1nz1v_55`,
+    headBadge: `_headBadge_1nz1v_60`,
+    sortMark: `_sortMark_1nz1v_70`,
+    body: `_body_1nz1v_75`,
+    row: `_row_1nz1v_81`,
+    rowActive: `_rowActive_1nz1v_96`,
+    cell: `_cell_1nz1v_100`,
+    cellInner: `_cellInner_1nz1v_113`,
+    editable: `_editable_1nz1v_127`,
+    overridden: `_overridden_1nz1v_136`,
+    editor: `_editor_1nz1v_152`,
+    blank: `_blank_1nz1v_157`,
+    multi: `_multi_1nz1v_161`,
+    groupRow: `_groupRow_1nz1v_167`,
+    groupLabel: `_groupLabel_1nz1v_185`,
+    groupCount: `_groupCount_1nz1v_190`,
+    groupCalc: `_groupCalc_1nz1v_200`,
+    foot: `_foot_1nz1v_210`,
+    footCell: `_footCell_1nz1v_219`,
+    calcSelect: `_calcSelect_1nz1v_233`,
+    calcValue: `_calcValue_1nz1v_247`,
+    serialHead: `_serialHead_1nz1v_317`,
+    serialCell: `_serialCell_1nz1v_324`,
   };
 function S7({ field: e, value: t }) {
   if (t == null || t === ``)
@@ -83963,11 +83964,11 @@ function Foe(e, t) {
   };
 }
 var Y9 = {
-  wrap: `_wrap_b1fhq_1`,
-  main: `_main_b1fhq_7`,
-  entities: `_entities_b1fhq_16`,
-  entity: `_entity_b1fhq_22`,
-  entityActive: `_entityActive_b1fhq_35`,
+  wrap: `_wrap_92kxy_1`,
+  main: `_main_92kxy_8`,
+  entities: `_entities_92kxy_17`,
+  entity: `_entity_92kxy_23`,
+  entityActive: `_entityActive_92kxy_36`,
 };
 function X9({ dataset: e, initialView: t, entities: n, onEntityChange: r }) {
   let [i, a] = (0, v.useState)(t),
@@ -84408,4 +84409,4 @@ function Voe() {
 (0, y.createRoot)(document.getElementById(`root`)).render(
   (0, q.jsx)(v.StrictMode, { children: (0, q.jsx)(Voe, {}) }),
 );
-//# sourceMappingURL=index-DrzO95dh.js.map
+//# sourceMappingURL=index-C8PuDOXb.js.map
