@@ -55939,11 +55939,12 @@ var QO = {
     detailMeta: `_detailMeta_51mwl_158`,
   },
   $O = `https://thalamus-intake-1078293053413.asia-south1.run.app`,
-  ek = [`download`, `l2`, `l3`, `l4a`, `l4b`],
+  ek = [`download`, `l2`, `l3`, `l3b`, `l4a`, `l4b`],
   tk = {
     download: `Downloading sources`,
     l2: `L2 — extracting data points`,
     l3: `L3 — building health profile`,
+    l3b: `L3b — reading layer`,
     l4a: `L4a — agent suggestions`,
     l4b: `L4b — preventive-care guidelines`,
   },
@@ -81218,7 +81219,22 @@ function ype(e, t) {
         frequency: e.medication_frequency,
         duration: e.medication_duration,
         route: e.medication_route,
-      }));
+      })),
+    o = new Map(t.acdps.map((e) => [e.acdp_id, e])),
+    s = e.source_acdp_ids.flatMap((e) => {
+      let t = o.get(e);
+      return t
+        ? [
+            {
+              acdp_id: t.acdp_id,
+              acdp: t.acdp,
+              category: t.category,
+              body_system: t.body_system,
+              date: t.date,
+            },
+          ]
+        : [];
+    });
   return {
     v_id: e.v_id,
     problem_text: e.problem_text,
@@ -81227,7 +81243,7 @@ function ype(e, t) {
     rcc: e.rcc,
     grounding_items: r,
     medications: a,
-    source_acdp_ids: e.source_acdp_ids,
+    source_acdps: s,
   };
 }
 function bpe(e, t) {
@@ -100540,7 +100556,7 @@ function Sge() {
           ? Promise.resolve(E8.html2canvas)
           : T8(
               () =>
-                import(`./html2canvas-D3n6iR1s.js`).then((e) => l(e.default)),
+                import(`./html2canvas-BIlJskgA.js`).then((e) => l(e.default)),
               [],
             )
       )
@@ -102563,7 +102579,7 @@ endobj\r
     return (
       E8.canvg
         ? Promise.resolve(E8.canvg)
-        : T8(() => import(`./index.es-BnH7yPkN.js`), [])
+        : T8(() => import(`./index.es-DSmA0TDt.js`), [])
     )
       .catch(function (e) {
         return Promise.reject(Error(`Could not load canvg: ` + e));
@@ -110520,4 +110536,4 @@ function jve() {
   (0, Z.jsx)(v.StrictMode, { children: (0, Z.jsx)(jve, {}) }),
 );
 export { o as n, l as r, h2 as t };
-//# sourceMappingURL=index-DOmrd6aP.js.map
+//# sourceMappingURL=index-BGZs9q0q.js.map
