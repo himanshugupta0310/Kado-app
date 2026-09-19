@@ -1,4 +1,4 @@
-import { n as e } from "./index-DPO26ZP-.js";
+import { n as e } from "./index-D6xw5P4N.js";
 var t = e((e, t) => {
   (function (n, r) {
     typeof e == `object` && t !== void 0
@@ -7594,4 +7594,4 @@ var t = e((e, t) => {
   });
 });
 export default t();
-//# sourceMappingURL=html2canvas-9Hnm0IjO.js.map
+//# sourceMappingURL=html2canvas-BrQhKwxy.js.map

@@ -100690,7 +100690,7 @@ function Fge() {
           ? Promise.resolve(b8.html2canvas)
           : y8(
               () =>
-                import(`./html2canvas-9Hnm0IjO.js`).then((e) => l(e.default)),
+                import(`./html2canvas-BrQhKwxy.js`).then((e) => l(e.default)),
               [],
             )
       )
@@ -102713,7 +102713,7 @@ endobj\r
     return (
       b8.canvg
         ? Promise.resolve(b8.canvg)
-        : y8(() => import(`./index.es-CWBAN86-.js`), [])
+        : y8(() => import(`./index.es-D8Xr7kUb.js`), [])
     )
       .catch(function (e) {
         return Promise.reject(Error(`Could not load canvg: ` + e));
@@ -111346,16 +111346,16 @@ function Wve() {
   });
 }
 var Z9 = {
-    wrap: `_wrap_y8hfr_1`,
-    note: `_note_y8hfr_8`,
-    frameBox: `_frameBox_y8hfr_22`,
-    frame: `_frame_y8hfr_22`,
+    wrap: `_wrap_1dou0_1`,
+    note: `_note_1dou0_8`,
+    frameBox: `_frameBox_1dou0_22`,
+    frame: `_frame_1dou0_22`,
   },
   Q9 = `http://localhost:8000`;
 function Gve() {
   return (0, Z.jsx)(AO, {
     title: `Example Agent`,
-    subtitle: `Maya -- post-op follow-up call, grounded on John's L4A record`,
+    subtitle: `Maya -- ask anything about this patient's record; answers are looked up in the chart, with dates`,
     children: (0, Z.jsx)(jO, {
       children: (0, Z.jsxs)(`div`, {
         className: Z9.wrap,
@@ -111594,4 +111594,4 @@ function Jve() {
   (0, Z.jsx)(v.StrictMode, { children: (0, Z.jsx)(Jve, {}) }),
 );
 export { o as n, l as r, l2 as t };
-//# sourceMappingURL=index-DPO26ZP-.js.map
+//# sourceMappingURL=index-D6xw5P4N.js.map
